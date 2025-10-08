@@ -11,7 +11,7 @@ import {
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import { brandService } from '../services/brandService';
-import { Product, Category, Brand, ProductFilters } from '../types';
+import { Product, Category, Brand, ProductFilters as ProductFiltersType } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import ProductForm from '../components/products/ProductForm';
@@ -32,7 +32,7 @@ const Products: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<ProductFilters>({
+  const [filters, setFilters] = useState<ProductFiltersType>({
     search: '',
     page: 1,
     limit: 10,
@@ -141,7 +141,7 @@ const Products: React.FC = () => {
     setFilters(prev => ({ ...prev, category: value || undefined }));
   };
 
-  const handleFiltersChange = (newFilters: ProductFilters) => {
+  const handleFiltersChange = (newFilters: ProductFiltersType) => {
     setFilters(newFilters);
     setCurrentPage(1); // Reset to first page when filters change
   };
