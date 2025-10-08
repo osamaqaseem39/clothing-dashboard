@@ -201,9 +201,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
       occasion: formData.occasion || undefined,
       season: formData.season || undefined,
       careInstructions: formData.careInstructions || undefined,
-      modelMeasurements: formData.modelMeasurements.height || formData.modelMeasurements.bust || formData.modelMeasurements.waist || formData.modelMeasurements.hips ? formData.modelMeasurements : undefined,
+      modelMeasurements: formData.modelMeasurements && (formData.modelMeasurements.height || formData.modelMeasurements.bust || formData.modelMeasurements.waist || formData.modelMeasurements.hips) ? formData.modelMeasurements : undefined,
       designer: formData.designer || undefined,
-      handwork: formData.handwork.length > 0 ? formData.handwork : undefined,
+      handwork: formData.handwork && formData.handwork.length > 0 ? formData.handwork : undefined,
       colorFamily: formData.colorFamily || undefined,
       pattern: formData.pattern || undefined,
       sleeveLength: formData.sleeveLength || undefined,
@@ -211,12 +211,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
       length: formData.length || undefined,
       fit: formData.fit || undefined,
       ageGroup: formData.ageGroup || undefined,
-      bodyType: formData.bodyType.length > 0 ? formData.bodyType : undefined,
+      bodyType: formData.bodyType && formData.bodyType.length > 0 ? formData.bodyType : undefined,
       isLimitedEdition: formData.isLimitedEdition || undefined,
       isCustomMade: formData.isCustomMade || undefined,
-      customDeliveryDays: formData.customDeliveryDays > 0 ? formData.customDeliveryDays : undefined,
+      customDeliveryDays: formData.customDeliveryDays && formData.customDeliveryDays > 0 ? formData.customDeliveryDays : undefined,
       sizeChart: formData.sizeChart || undefined,
-      availableSizes: formData.availableSizes.length > 0 ? formData.availableSizes : undefined,
+      availableSizes: formData.availableSizes && formData.availableSizes.length > 0 ? formData.availableSizes : undefined,
     };
 
     // Add category and brand if selected
@@ -341,10 +341,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const addHandwork = () => {
-    if (newHandwork.trim() && !formData.handwork.includes(newHandwork.trim())) {
+    if (newHandwork.trim() && formData.handwork && !formData.handwork.includes(newHandwork.trim())) {
       setFormData(prev => ({
         ...prev,
-        handwork: [...prev.handwork, newHandwork.trim()],
+        handwork: [...(prev.handwork || []), newHandwork.trim()],
       }));
       setNewHandwork('');
     }
@@ -353,15 +353,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const removeHandwork = (handworkToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      handwork: prev.handwork.filter(h => h !== handworkToRemove),
+      handwork: (prev.handwork || []).filter(h => h !== handworkToRemove),
     }));
   };
 
   const addBodyType = () => {
-    if (newBodyType.trim() && !formData.bodyType.includes(newBodyType.trim())) {
+    if (newBodyType.trim() && formData.bodyType && !formData.bodyType.includes(newBodyType.trim())) {
       setFormData(prev => ({
         ...prev,
-        bodyType: [...prev.bodyType, newBodyType.trim()],
+        bodyType: [...(prev.bodyType || []), newBodyType.trim()],
       }));
       setNewBodyType('');
     }
@@ -370,15 +370,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const removeBodyType = (bodyTypeToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      bodyType: prev.bodyType.filter(bt => bt !== bodyTypeToRemove),
+      bodyType: (prev.bodyType || []).filter(bt => bt !== bodyTypeToRemove),
     }));
   };
 
   const addSize = () => {
-    if (newSize.trim() && !formData.availableSizes.includes(newSize.trim())) {
+    if (newSize.trim() && formData.availableSizes && !formData.availableSizes.includes(newSize.trim())) {
       setFormData(prev => ({
         ...prev,
-        availableSizes: [...prev.availableSizes, newSize.trim()],
+        availableSizes: [...(prev.availableSizes || []), newSize.trim()],
       }));
       setNewSize('');
     }
@@ -387,7 +387,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const removeSize = (sizeToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      availableSizes: prev.availableSizes.filter(s => s !== sizeToRemove),
+      availableSizes: (prev.availableSizes || []).filter(s => s !== sizeToRemove),
     }));
   };
 
@@ -1110,7 +1110,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {formData.handwork.map((handwork, index) => (
+                {formData.handwork?.map((handwork, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
@@ -1151,7 +1151,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {formData.bodyType.map((bodyType, index) => (
+                {formData.bodyType?.map((bodyType, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
@@ -1192,7 +1192,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {formData.availableSizes.map((size, index) => (
+                {formData.availableSizes?.map((size, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -1220,7 +1220,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <label className="block text-xs text-gray-600 mb-1">Height</label>
                   <input
                     type="text"
-                    value={formData.modelMeasurements.height}
+                    value={formData.modelMeasurements?.height || ''}
                     onChange={(e) => handleChange('modelMeasurements', {
                       ...formData.modelMeasurements,
                       height: e.target.value,
@@ -1233,7 +1233,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <label className="block text-xs text-gray-600 mb-1">Bust</label>
                   <input
                     type="text"
-                    value={formData.modelMeasurements.bust}
+                    value={formData.modelMeasurements?.bust || ''}
                     onChange={(e) => handleChange('modelMeasurements', {
                       ...formData.modelMeasurements,
                       bust: e.target.value,
@@ -1246,7 +1246,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <label className="block text-xs text-gray-600 mb-1">Waist</label>
                   <input
                     type="text"
-                    value={formData.modelMeasurements.waist}
+                    value={formData.modelMeasurements?.waist || ''}
                     onChange={(e) => handleChange('modelMeasurements', {
                       ...formData.modelMeasurements,
                       waist: e.target.value,
@@ -1259,7 +1259,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <label className="block text-xs text-gray-600 mb-1">Hips</label>
                   <input
                     type="text"
-                    value={formData.modelMeasurements.hips}
+                    value={formData.modelMeasurements?.hips || ''}
                     onChange={(e) => handleChange('modelMeasurements', {
                       ...formData.modelMeasurements,
                       hips: e.target.value,
