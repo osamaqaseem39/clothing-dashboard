@@ -63,9 +63,9 @@ const Sidebar: React.FC = () => {
             <div className="flex h-16 items-center justify-between px-4">
               <div className="flex items-center">
                 <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">E</span>
+                  <span className="text-white font-bold text-sm">S</span>
                 </div>
-                <span className="ml-2 text-lg font-semibold text-gray-900">Élégance Couture</span>
+                <span className="ml-2 text-lg font-semibold text-gray-900">She's Trends</span>
               </div>
               <button
                 type="button"
@@ -101,9 +101,9 @@ const Sidebar: React.FC = () => {
       <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 lg:bg-white lg:pt-5 lg:pb-4">
         <div className="flex items-center flex-shrink-0 px-4">
           <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">E</span>
+            <span className="text-white font-bold text-sm">S</span>
           </div>
-          <span className="ml-2 text-lg font-semibold text-gray-900">Élégance Couture</span>
+          <span className="ml-2 text-lg font-semibold text-gray-900">She's Trends</span>
         </div>
         
         {/* User info */}
@@ -145,7 +145,7 @@ const Sidebar: React.FC = () => {
         {/* Footer */}
         <div className="flex-shrink-0 border-t border-gray-200 p-4">
           <div className="text-xs text-gray-500 text-center">
-            © 2024 Élégance Couture
+            © 2024 She's Trends
           </div>
         </div>
       </div>

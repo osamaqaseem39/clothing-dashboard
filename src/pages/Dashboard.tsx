@@ -152,9 +152,9 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Élégance Couture Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">She's Trends Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Welcome back! Here's what's happening with your luxury women's couture boutique today.
+          Welcome back! Here's what's happening with your boutique today.
         </p>
       </div>
 
