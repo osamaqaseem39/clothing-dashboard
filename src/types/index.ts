@@ -108,8 +108,17 @@ export interface Category {
   description?: string;
   parentId?: string;
   image?: string;
+  icon?: string;
+  color?: string;
   isActive: boolean;
+  sortOrder: number;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string[];
+  productCount?: number;
   children?: Category[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Brand {
@@ -118,10 +127,12 @@ export interface Brand {
   slug: string;
   description?: string;
   logoUrl?: string;
+  logo?: string; // Alias for logoUrl
   website?: string;
   mainCompany?: string;
   level: 'main' | 'sub';
   industry?: string;
+  country?: string;
   colors?: {
     primary: string;
     secondary: string;
@@ -242,25 +253,44 @@ export interface Coupon {
 // Inventory Types
 export interface Inventory {
   _id: string;
-  productId: Product;
-  variantId: ProductVariant;
+  productId: string;
+  variantId?: string;
+  productName?: string;
+  sku?: string;
+  productImage?: string;
   currentStock: number;
+  reservedStock: number;
+  availableStock: number;
   reorderPoint: number;
   reorderQuantity: number;
+  maxStock?: number;
   costPrice: number;
-  lastUpdated: string;
-  movements: InventoryMovement[];
+  sellingPrice: number;
+  warehouse: string;
+  status: 'in_stock' | 'low_stock' | 'out_of_stock' | 'discontinued';
+  lastRestocked?: string;
+  lastSold?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface InventoryMovement {
   _id: string;
-  type: 'purchase' | 'sale' | 'return' | 'adjustment' | 'transfer';
+  inventoryId: string;
+  type: 'purchase' | 'sale' | 'return' | 'adjustment' | 'transfer' | 'damage' | 'expired';
   quantity: number;
   previousStock: number;
   newStock: number;
-  reference: string;
+  referenceId?: string;
+  referenceType?: string;
   notes?: string;
+  userId?: string;
+  unitCost?: number;
+  totalCost?: number;
+  fromWarehouse?: string;
+  toWarehouse?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 // Shipping Types

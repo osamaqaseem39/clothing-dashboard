@@ -10,7 +10,7 @@ import {
   XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { customerService } from '../services/customerService';
-import { Customer } from '../types';
+import type { Customer } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 

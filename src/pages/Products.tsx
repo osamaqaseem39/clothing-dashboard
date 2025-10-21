@@ -11,7 +11,7 @@ import {
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import { brandService } from '../services/brandService';
-import { Product, Category, Brand, ProductFilters as ProductFiltersType } from '../types';
+import type { Product, Category, Brand, ProductFilters as ProductFiltersType } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import ProductForm from '../components/products/ProductForm';
@@ -107,17 +107,24 @@ const Products: React.FC = () => {
   const handleProductSubmit = async (productData: Partial<Product>) => {
     try {
       if (editingProduct) {
-        // TODO: Update product
-        console.log('Updating product:', productData);
+        const response = await productService.updateProduct(editingProduct._id, productData);
+        if (response.success) {
+          setProducts(products.map(p => 
+            p._id === editingProduct._id ? { ...p, ...productData } : p
+          ));
+        }
       } else {
-        // TODO: Create product
-        console.log('Creating product:', productData);
+        const response = await productService.createProduct(productData);
+        if (response.success && response.data) {
+          setProducts([response.data.product, ...products]);
+        }
       }
       setShowProductForm(false);
       setEditingProduct(null);
       await fetchProducts();
     } catch (error) {
       console.error('Error saving product:', error);
+      setError('Failed to save product');
     }
   };
 

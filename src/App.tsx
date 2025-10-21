@@ -1,14 +1,18 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SidebarProvider } from './contexts/SidebarContext';
 import LoginForm from './components/auth/LoginForm';
 import Register from './pages/Register';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
+import Categories from './pages/Categories';
+import Inventory from './pages/Inventory';
 import ProductSetup from './pages/ProductSetup';
 import Orders from './pages/Orders';
 import Customers from './pages/Customers';
+import Brands from './pages/Brands';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 
@@ -63,9 +67,12 @@ const AppContent: React.FC = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="products" element={<Products />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="inventory" element={<Inventory />} />
           <Route path="product-setup" element={<ProductSetup />} />
           <Route path="orders" element={<Orders />} />
           <Route path="customers" element={<Customers />} />
+          <Route path="brands" element={<Brands />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
         </Route>
@@ -84,7 +91,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <SidebarProvider>
+        <AppContent />
+      </SidebarProvider>
     </AuthProvider>
   );
 };

@@ -6,7 +6,7 @@ import {
   CogIcon,
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
-import { Category, Brand } from '../types';
+import type { Category, Brand } from '../types';
 import CategoryForm from '../components/products/CategoryForm';
 import BrandForm from '../components/products/BrandForm';
 import LoadingSpinner from '../components/ui/LoadingSpinner';

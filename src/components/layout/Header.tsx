@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
-import { BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { BellIcon, MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSidebar } from '../../contexts/SidebarContext';
 
 const Header: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { toggleSidebar } = useSidebar();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        {/* Search */}
-        <div className="flex-1 max-w-lg lg:max-w-xs">
+        {/* Left side - Toggle button and Search */}
+        <div className="flex items-center space-x-4">
+          {/* Sidebar toggle button */}
+          <button
+            type="button"
+            className="p-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group relative"
+            onClick={toggleSidebar}
+            title="Toggle Sidebar (Ctrl+B)"
+          >
+            <Bars3Icon className="h-6 w-6" />
+            <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+              Ctrl+B
+            </span>
+          </button>
+          
+          {/* Search */}
+          <div className="flex-1 max-w-lg lg:max-w-xs">
           <label htmlFor="search" className="sr-only">
             Search
           </label>
@@ -26,6 +43,7 @@ const Header: React.FC = () => {
               placeholder="Search..."
               type="search"
             />
+          </div>
           </div>
         </div>
 
