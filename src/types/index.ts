@@ -359,6 +359,9 @@ export interface ProductForm {
 // Filter Types - Extends shared base
 export interface ProductFilters extends BaseProductFilters {
   // Dashboard-specific filters can be added here if needed
+  search?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface OrderFilters {

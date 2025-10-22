@@ -37,8 +37,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   const clearFilters = () => {
     const clearedFilters: ProductFiltersType = {
       search: localFilters.search,
-      page: localFilters.page,
-      limit: localFilters.limit,
+      page: localFilters.page || 1,
+      limit: localFilters.limit || 10,
     };
     setLocalFilters(clearedFilters);
     onFiltersChange(clearedFilters);
