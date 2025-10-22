@@ -21,7 +21,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   };
 
   const handleArrayFilterChange = (key: keyof ProductFiltersType, value: string, checked: boolean) => {
-    const currentArray = (localFilters[key] as string[]) || [];
+    const currentValue = localFilters[key];
+    const currentArray = Array.isArray(currentValue) ? currentValue as string[] : [];
     const newArray = checked 
       ? [...currentArray, value]
       : currentArray.filter(item => item !== value);
