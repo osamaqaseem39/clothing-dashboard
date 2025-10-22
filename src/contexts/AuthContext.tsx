@@ -149,8 +149,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (userData: any) => {
     try {
+      console.log('AuthContext.register called with:', userData);
       dispatch({ type: 'AUTH_START' });
       const response = await authService.register(userData);
+      console.log('AuthContext received response:', response);
       if (response.success && response.data) {
         const { user, token } = response.data;
         localStorage.setItem('token', token);
@@ -160,6 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'AUTH_FAILURE', payload: response.message || 'Registration failed' });
       }
     } catch (error: any) {
+      console.error('AuthContext.register error:', error);
       dispatch({
         type: 'AUTH_FAILURE',
         payload: error.response?.data?.message || 'Registration failed',

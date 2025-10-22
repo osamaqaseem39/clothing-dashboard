@@ -10,7 +10,10 @@ export const authService = {
 
   // Register user
   async register(userData: RegisterForm): Promise<ApiResponse<{ user: User; token: string }>> {
+    console.log('authService.register called with:', userData);
+    console.log('Making API call to:', '/auth/register');
     const response = await api.post('/auth/register', userData);
+    console.log('API response:', response.data);
     return response.data;
   },
 

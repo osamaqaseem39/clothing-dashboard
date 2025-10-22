@@ -69,8 +69,10 @@ const RegisterForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('RegisterForm.handleSubmit called');
     
     if (!validateForm()) {
+      console.log('Form validation failed');
       return;
     }
 
@@ -81,6 +83,7 @@ const RegisterForm: React.FC = () => {
       password: formData.password,
     };
 
+    console.log('RegisterForm calling register with:', userData);
     await register(userData);
   };
 
