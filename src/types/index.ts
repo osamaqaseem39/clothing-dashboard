@@ -123,6 +123,8 @@ export interface ProductVariant {
   sku: string;
   price: number;
   salePrice?: number;
+  comparePrice?: number;
+  costPrice?: number;
   stockQuantity: number;
   stockStatus: 'instock' | 'outofstock' | 'onbackorder';
   attributes: Record<string, string>;
@@ -133,6 +135,7 @@ export interface ProductVariant {
     width: number;
     height: number;
   };
+  isActive: boolean;
 }
 
 export interface ProductSEO {
