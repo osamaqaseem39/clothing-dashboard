@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ApiResponse } from '../types';
 
 // Create axios instance
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const baseURL = process.env.REACT_APP_API_URL || 'https://clothing-server-cyan.vercel.app/api';
 console.log('API Base URL:', baseURL); // Debug log
 
 const api: AxiosInstance = axios.create({

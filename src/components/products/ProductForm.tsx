@@ -32,6 +32,8 @@ interface ProductFormData {
     description: string;
     keywords: string[];
     slug: string;
+    canonicalUrl: string;
+    ogImage: string;
     noIndex: boolean;
     noFollow: boolean;
   };
@@ -92,6 +94,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: product?.seo?.description || '',
       keywords: product?.seo?.keywords || [],
       slug: product?.seo?.slug || '',
+      canonicalUrl: product?.seo?.canonicalUrl || '',
+      ogImage: product?.seo?.ogImage || '',
       noIndex: product?.seo?.noIndex ?? false,
       noFollow: product?.seo?.noFollow ?? false,
     },
@@ -104,9 +108,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
         comparePrice: 0,
         costPrice: 0,
         stockQuantity: 0,
+        stockStatus: 'instock' as const,
         weight: 0,
         dimensions: { length: 0, width: 0, height: 0 },
         attributes: {},
+        images: [],
         isActive: true,
       },
     ],
@@ -307,9 +313,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
           comparePrice: 0,
           costPrice: 0,
           stockQuantity: 0,
+          stockStatus: 'instock' as const,
           weight: 0,
           dimensions: { length: 0, width: 0, height: 0 },
           attributes: {},
+          images: [],
           isActive: true,
         },
       ],
