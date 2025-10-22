@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { ProductFilters as ProductFiltersType } from '../../types';
+import { ProductFilters as SharedProductFilters } from '../../../../shared-types/product';
 
 interface ProductFiltersProps {
   filters: ProductFiltersType;
@@ -85,7 +86,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={fabric} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.fabrics || []).includes(fabric)}
+                      checked={((localFilters as any).fabrics || []).includes(fabric)}
                       onChange={(e) => handleArrayFilterChange('fabrics', fabric, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -103,7 +104,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={occasion} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.occasions || []).includes(occasion)}
+                      checked={((localFilters as any).occasions || []).includes(occasion)}
                       onChange={(e) => handleArrayFilterChange('occasions', occasion, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -121,7 +122,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={season} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.seasons || []).includes(season)}
+                      checked={((localFilters as any).seasons || []).includes(season)}
                       onChange={(e) => handleArrayFilterChange('seasons', season, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -139,7 +140,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={color} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.colorFamilies || []).includes(color)}
+                      checked={((localFilters as any).colorFamilies || []).includes(color)}
                       onChange={(e) => handleArrayFilterChange('colorFamilies', color, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -157,7 +158,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={pattern} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.patterns || []).includes(pattern)}
+                      checked={((localFilters as any).patterns || []).includes(pattern)}
                       onChange={(e) => handleArrayFilterChange('patterns', pattern, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -178,7 +179,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={length} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.sleeveLengths || []).includes(length)}
+                      checked={((localFilters as any).sleeveLengths || []).includes(length)}
                       onChange={(e) => handleArrayFilterChange('sleeveLengths', length, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -196,7 +197,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={neckline} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.necklines || []).includes(neckline)}
+                      checked={((localFilters as any).necklines || []).includes(neckline)}
                       onChange={(e) => handleArrayFilterChange('necklines', neckline, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -214,7 +215,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={length} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.lengths || []).includes(length)}
+                      checked={((localFilters as any).lengths || []).includes(length)}
                       onChange={(e) => handleArrayFilterChange('lengths', length, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -232,7 +233,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={fit} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.fits || []).includes(fit)}
+                      checked={((localFilters as any).fits || []).includes(fit)}
                       onChange={(e) => handleArrayFilterChange('fits', fit, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -250,7 +251,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={age} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.ageGroups || []).includes(age)}
+                      checked={((localFilters as any).ageGroups || []).includes(age)}
                       onChange={(e) => handleArrayFilterChange('ageGroups', age, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -268,7 +269,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={bodyType} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.bodyTypes || []).includes(bodyType)}
+                      checked={((localFilters as any).bodyTypes || []).includes(bodyType)}
                       onChange={(e) => handleArrayFilterChange('bodyTypes', bodyType, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -286,7 +287,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={work} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.handwork || []).includes(work)}
+                      checked={((localFilters as any).handwork || []).includes(work)}
                       onChange={(e) => handleArrayFilterChange('handwork', work, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
@@ -304,7 +305,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <label key={size} className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={(localFilters.sizes || []).includes(size)}
+                      checked={((localFilters as any).sizes || []).includes(size)}
                       onChange={(e) => handleArrayFilterChange('sizes', size, e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
