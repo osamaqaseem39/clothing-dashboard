@@ -32,7 +32,7 @@ export interface Address {
 }
 
 // Import shared product types
-import { Product as BaseProduct, ProductVariant as BaseProductVariant, ProductFilters as BaseProductFilters } from '../../../shared-types/product';
+import { Product as BaseProduct, ProductVariant as BaseProductVariant, ProductFilters as BaseProductFilters } from '../../shared-types/product';
 
 // Product Types - Extends shared base with dashboard-specific fields
 export interface Product extends BaseProduct {

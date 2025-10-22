@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { XMarkIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { ProductFilters as ProductFiltersType } from '../../types';
-import { ProductFilters as SharedProductFilters } from '../../../../shared-types/product';
 
 interface ProductFiltersProps {
   filters: ProductFiltersType;
