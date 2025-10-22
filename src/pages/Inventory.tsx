@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, ExclamationTriangleIcon, XCircleIcon, CheckCircleIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { inventoryService } from '../services/inventoryService';
-import type { Inventory } from '../types';
+import type { Inventory as InventoryType } from '../types';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -11,18 +11,18 @@ import SearchInput from '../components/ui/SearchInput';
 import Modal from '../components/ui/Modal';
 
 const Inventory: React.FC = () => {
-  const [inventory, setInventory] = useState<Inventory[]>([]);
-  const [filteredInventory, setFilteredInventory] = useState<Inventory[]>([]);
+  const [inventory, setInventory] = useState<InventoryType[]>([]);
+  const [filteredInventory, setFilteredInventory] = useState<InventoryType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showForm, setShowForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<Inventory | null>(null);
-  const [selectedItem, setSelectedItem] = useState<Inventory | null>(null);
+  const [editingItem, setEditingItem] = useState<InventoryType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<InventoryType | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<Inventory | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<InventoryType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
@@ -102,7 +102,7 @@ const Inventory: React.FC = () => {
     }
   };
 
-  const handleDeleteItem = async (item: Inventory) => {
+  const handleDeleteItem = async (item: InventoryType) => {
     setItemToDelete(item);
     setShowDeleteModal(true);
   };
@@ -123,7 +123,7 @@ const Inventory: React.FC = () => {
     }
   };
 
-  const handleEditItem = (item: Inventory) => {
+  const handleEditItem = (item: InventoryType) => {
     setEditingItem(item);
     setFormData({
       productName: item.productName || '',
@@ -140,7 +140,7 @@ const Inventory: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleViewItem = (item: Inventory) => {
+  const handleViewItem = (item: InventoryType) => {
     setSelectedItem(item);
     setShowDetails(true);
   };
@@ -215,7 +215,7 @@ const Inventory: React.FC = () => {
     {
       key: 'product',
       header: 'Product',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <div className="flex items-center space-x-3">
           {item.productImage && (
             <img
@@ -234,7 +234,7 @@ const Inventory: React.FC = () => {
     {
       key: 'stock',
       header: 'Stock',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <div className="text-center">
           <div className="font-medium text-gray-900">{item.currentStock}</div>
           <div className="text-sm text-gray-500">Available: {item.availableStock}</div>
@@ -244,7 +244,7 @@ const Inventory: React.FC = () => {
     {
       key: 'status',
       header: 'Status',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <div className="flex items-center space-x-2">
           {getStatusIcon(item.status)}
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
@@ -256,7 +256,7 @@ const Inventory: React.FC = () => {
     {
       key: 'pricing',
       header: 'Pricing',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <div className="text-sm">
           <div className="font-medium text-gray-900">${item.sellingPrice}</div>
           <div className="text-gray-500">Cost: ${item.costPrice}</div>
@@ -266,7 +266,7 @@ const Inventory: React.FC = () => {
     {
       key: 'reorder',
       header: 'Reorder',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <div className="text-sm">
           <div className="text-gray-900">Point: {item.reorderPoint}</div>
           <div className="text-gray-500">Qty: {item.reorderQuantity}</div>
@@ -276,14 +276,14 @@ const Inventory: React.FC = () => {
     {
       key: 'warehouse',
       header: 'Warehouse',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <span className="text-sm text-gray-600 capitalize">{item.warehouse}</span>
       ),
     },
     {
       key: 'actions',
       header: 'Actions',
-      render: (item: Inventory) => (
+      render: (item: InventoryType) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleViewItem(item)}

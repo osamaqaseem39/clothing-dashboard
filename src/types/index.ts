@@ -31,74 +31,20 @@ export interface Address {
   isDefault: boolean;
 }
 
-// Product Types
-export interface Product {
-  _id: string;
-  name: string;
-  slug: string;
-  description: string;
-  categoryId: Category;
+// Import shared product types
+import { Product as BaseProduct, ProductVariant as BaseProductVariant, ProductFilters as BaseProductFilters } from '../../../shared-types/product';
+
+// Product Types - Extends shared base with dashboard-specific fields
+export interface Product extends BaseProduct {
+  // Dashboard-specific relationship fields
+  categoryId?: Category;
   brandId?: Brand;
-  variants: ProductVariant[];
-  images: string[];
-  tags: string[];
-  rating: number;
-  seo: SEOData;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  // Additional properties used in the UI
-  sku?: string;
-  price?: number;
-  stockQuantity?: number;
-  status?: string;
+  variants?: ProductVariant[];
   category?: Category; // Alias for categoryId
-  
-  // Pakistani Clothing Specific Fields
-  fabric?: string;
-  collection?: string;
-  occasion?: string;
-  season?: string;
-  careInstructions?: string;
-  modelMeasurements?: {
-    height: string;
-    bust: string;
-    waist: string;
-    hips: string;
-  };
-  designer?: string;
-  handwork?: string[];
-  colorFamily?: string;
-  pattern?: string;
-  sleeveLength?: string;
-  neckline?: string;
-  length?: string;
-  fit?: string;
-  ageGroup?: string;
-  bodyType?: string[];
-  isLimitedEdition?: boolean;
-  isCustomMade?: boolean;
-  customDeliveryDays?: number;
-  sizeChart?: string;
-  availableSizes?: string[];
 }
 
-export interface ProductVariant {
-  _id: string;
-  sku: string;
-  name: string;
-  price: number;
-  comparePrice?: number;
-  costPrice: number;
-  stockQuantity: number;
-  weight: number;
-  dimensions: {
-    length: number;
-    width: number;
-    height: number;
-  };
-  attributes: Record<string, string>;
-  isActive: boolean;
+export interface ProductVariant extends BaseProductVariant {
+  // Dashboard-specific fields can be added here if needed
 }
 
 export interface Category {
@@ -126,19 +72,24 @@ export interface Brand {
   name: string;
   slug: string;
   description?: string;
-  logoUrl?: string;
-  logo?: string; // Alias for logoUrl
+  logo?: string;
+  logoUrl?: string; // Alias for logo
   website?: string;
+  country?: string;
+  foundedYear?: number;
   mainCompany?: string;
   level: 'main' | 'sub';
   industry?: string;
-  country?: string;
   colors?: {
     primary: string;
     secondary: string;
   };
   isFeatured: boolean;
   isActive: boolean;
+  sortOrder: number;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SEOData {
@@ -405,37 +356,9 @@ export interface ProductForm {
   images: string[];
 }
 
-// Filter Types
-export interface ProductFilters {
-  search?: string;
-  category?: string;
-  brand?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  inStock?: boolean;
-  rating?: number;
-  sortBy?: 'name' | 'price' | 'rating' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-  // Pakistani Clothing Specific Filters
-  fabrics?: string[];
-  collections?: string[];
-  occasions?: string[];
-  seasons?: string[];
-  designers?: string[];
-  handwork?: string[];
-  colorFamilies?: string[];
-  patterns?: string[];
-  sleeveLengths?: string[];
-  necklines?: string[];
-  lengths?: string[];
-  fits?: string[];
-  ageGroups?: string[];
-  bodyTypes?: string[];
-  sizes?: string[];
-  isLimitedEdition?: boolean;
-  isCustomMade?: boolean;
+// Filter Types - Extends shared base
+export interface ProductFilters extends BaseProductFilters {
+  // Dashboard-specific filters can be added here if needed
 }
 
 export interface OrderFilters {

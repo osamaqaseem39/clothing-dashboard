@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Product, Category, Brand, ProductVariant } from '../../types';
+import TagsModal from './modals/TagsModal';
+import KeywordsModal from './modals/KeywordsModal';
+import HandworkModal from './modals/HandworkModal';
+import BodyTypeModal from './modals/BodyTypeModal';
+import SizesModal from './modals/SizesModal';
+import FeaturesModal from './modals/FeaturesModal';
+import ColorsModal from './modals/ColorsModal';
+import AttributesModal from './modals/AttributesModal';
 
 interface ProductFormProps {
   product?: Product;
@@ -29,6 +37,10 @@ interface ProductFormData {
   };
   variants: Omit<ProductVariant, '_id'>[];
   images: string[];
+  // UI-specific fields
+  features?: string[];
+  colors?: string[];
+  attributes: string[];
   // Pakistani Clothing Specific Fields
   fabric?: string;
   collection?: string;
@@ -100,6 +112,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
     ],
     // Images
     images: product?.images || [],
+    // UI-specific fields
+    features: product?.features || [],
+    colors: product?.colors || [],
+    attributes: product?.attributes || [],
     // Pakistani Clothing Specific Fields
     fabric: product?.fabric || '',
     collection: product?.collection || '',
@@ -129,12 +145,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
     availableSizes: product?.availableSizes || [],
   });
 
-  const [newTag, setNewTag] = useState('');
-  const [newKeyword, setNewKeyword] = useState('');
-  const [newHandwork, setNewHandwork] = useState('');
-  const [newBodyType, setNewBodyType] = useState('');
-  const [newSize, setNewSize] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Modal states
+  const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
+  const [isKeywordsModalOpen, setIsKeywordsModalOpen] = useState(false);
+  const [isHandworkModalOpen, setIsHandworkModalOpen] = useState(false);
+  const [isBodyTypeModalOpen, setIsBodyTypeModalOpen] = useState(false);
+  const [isSizesModalOpen, setIsSizesModalOpen] = useState(false);
+  const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
+  const [isColorsModalOpen, setIsColorsModalOpen] = useState(false);
+  const [isAttributesModalOpen, setIsAttributesModalOpen] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -195,6 +216,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
         _id: '', // Add empty _id for new variants
       })),
       images: formData.images,
+      // UI-specific fields
+      features: formData.features && formData.features.length > 0 ? formData.features : undefined,
+      colors: formData.colors && formData.colors.length > 0 ? formData.colors : undefined,
+      attributes: formData.attributes && formData.attributes.length > 0 ? formData.attributes : undefined,
       // Pakistani Clothing Specific Fields
       fabric: formData.fabric || undefined,
       collection: formData.collection || undefined,
@@ -300,96 +325,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()],
-      }));
-      setNewTag('');
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove),
-    }));
-  };
-
-  const addKeyword = () => {
-    if (newKeyword.trim() && !formData.seo.keywords.includes(newKeyword.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        seo: {
-          ...prev.seo,
-          keywords: [...prev.seo.keywords, newKeyword.trim()],
-        },
-      }));
-      setNewKeyword('');
-    }
-  };
-
-  const removeKeyword = (keywordToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      seo: {
-        ...prev.seo,
-        keywords: prev.seo.keywords.filter(keyword => keyword !== keywordToRemove),
-      },
-    }));
-  };
-
-  const addHandwork = () => {
-    if (newHandwork.trim() && formData.handwork && !formData.handwork.includes(newHandwork.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        handwork: [...(prev.handwork || []), newHandwork.trim()],
-      }));
-      setNewHandwork('');
-    }
-  };
-
-  const removeHandwork = (handworkToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      handwork: (prev.handwork || []).filter(h => h !== handworkToRemove),
-    }));
-  };
-
-  const addBodyType = () => {
-    if (newBodyType.trim() && formData.bodyType && !formData.bodyType.includes(newBodyType.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        bodyType: [...(prev.bodyType || []), newBodyType.trim()],
-      }));
-      setNewBodyType('');
-    }
-  };
-
-  const removeBodyType = (bodyTypeToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      bodyType: (prev.bodyType || []).filter(bt => bt !== bodyTypeToRemove),
-    }));
-  };
-
-  const addSize = () => {
-    if (newSize.trim() && formData.availableSizes && !formData.availableSizes.includes(newSize.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        availableSizes: [...(prev.availableSizes || []), newSize.trim()],
-      }));
-      setNewSize('');
-    }
-  };
-
-  const removeSize = (sizeToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      availableSizes: (prev.availableSizes || []).filter(s => s !== sizeToRemove),
-    }));
-  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
@@ -499,42 +434,31 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tags
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                className="input-field flex-1"
-                placeholder="Add a tag"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-              />
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tags
+              </label>
               <button
                 type="button"
-                onClick={addTag}
-                className="btn btn-secondary"
+                onClick={() => setIsTagsModalOpen(true)}
+                className="btn btn-secondary text-sm"
               >
-                Add
+                <PlusIcon className="h-4 w-4 mr-1" />
+                Manage Tags
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 min-h-[2rem]">
               {formData.tags.map((tag, index) => (
                 <span
                   key={index}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
                 >
                   {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-1 text-primary-600 hover:text-primary-800"
-                  >
-                    <XMarkIcon className="h-3 w-3" />
-                  </button>
                 </span>
               ))}
+              {formData.tags.length === 0 && (
+                <span className="text-gray-500 text-sm">No tags added</span>
+              )}
             </div>
           </div>
 
@@ -794,42 +718,31 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Keywords
-                </label>
-                <div className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={newKeyword}
-                    onChange={(e) => setNewKeyword(e.target.value)}
-                    className="input-field flex-1"
-                    placeholder="Add a keyword"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKeyword())}
-                  />
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Keywords
+                  </label>
                   <button
                     type="button"
-                    onClick={addKeyword}
-                    className="btn btn-secondary"
+                    onClick={() => setIsKeywordsModalOpen(true)}
+                    className="btn btn-secondary text-sm"
                   >
-                    Add
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    Manage Keywords
                   </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 min-h-[2rem]">
                   {formData.seo.keywords.map((keyword, index) => (
                     <span
                       key={index}
                       className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                     >
                       {keyword}
-                      <button
-                        type="button"
-                        onClick={() => removeKeyword(keyword)}
-                        className="ml-1 text-gray-600 hover:text-gray-800"
-                      >
-                        <XMarkIcon className="h-3 w-3" />
-                      </button>
                     </span>
                   ))}
+                  {formData.seo.keywords.length === 0 && (
+                    <span className="text-gray-500 text-sm">No keywords added</span>
+                  )}
                 </div>
               </div>
 
@@ -854,6 +767,101 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     <span className="ml-2 text-sm text-gray-700">No Follow</span>
                   </label>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* UI-Specific Fields */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Product Details</h3>
+            
+            {/* Features */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Features
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsFeaturesModalOpen(true)}
+                  className="btn btn-secondary text-sm"
+                >
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Manage Features
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                {formData.features?.map((feature, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                  >
+                    {feature}
+                  </span>
+                ))}
+                {(!formData.features || formData.features.length === 0) && (
+                  <span className="text-gray-500 text-sm">No features added</span>
+                )}
+              </div>
+            </div>
+
+            {/* Colors */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Available Colors
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsColorsModalOpen(true)}
+                  className="btn btn-secondary text-sm"
+                >
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Manage Colors
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                {formData.colors?.map((color, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                  >
+                    {color}
+                  </span>
+                ))}
+                {(!formData.colors || formData.colors.length === 0) && (
+                  <span className="text-gray-500 text-sm">No colors added</span>
+                )}
+              </div>
+            </div>
+
+            {/* Attributes */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Attributes
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsAttributesModalOpen(true)}
+                  className="btn btn-secondary text-sm"
+                >
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Manage Attributes
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                {formData.attributes?.map((attribute, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    {attribute}
+                  </span>
+                ))}
+                {(!formData.attributes || formData.attributes.length === 0) && (
+                  <span className="text-gray-500 text-sm">No attributes added</span>
+                )}
               </div>
             </div>
           </div>
@@ -1089,124 +1097,91 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
             {/* Handwork Details */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Handwork Details
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newHandwork}
-                  onChange={(e) => setNewHandwork(e.target.value)}
-                  className="input-field flex-1"
-                  placeholder="Add handwork type (e.g., Embroidery, Zari, Sequins)"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHandwork())}
-                />
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Handwork Details
+                </label>
                 <button
                   type="button"
-                  onClick={addHandwork}
-                  className="btn btn-secondary"
+                  onClick={() => setIsHandworkModalOpen(true)}
+                  className="btn btn-secondary text-sm"
                 >
-                  Add
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Manage Handwork
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 min-h-[2rem]">
                 {formData.handwork?.map((handwork, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
                   >
                     {handwork}
-                    <button
-                      type="button"
-                      onClick={() => removeHandwork(handwork)}
-                      className="ml-1 text-purple-600 hover:text-purple-800"
-                    >
-                      <XMarkIcon className="h-3 w-3" />
-                    </button>
                   </span>
                 ))}
+                {(!formData.handwork || formData.handwork.length === 0) && (
+                  <span className="text-gray-500 text-sm">No handwork details added</span>
+                )}
               </div>
             </div>
 
             {/* Body Type Suitability */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Body Type Suitability
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newBodyType}
-                  onChange={(e) => setNewBodyType(e.target.value)}
-                  className="input-field flex-1"
-                  placeholder="Add body type (e.g., Apple, Pear, Hourglass)"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBodyType())}
-                />
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Body Type Suitability
+                </label>
                 <button
                   type="button"
-                  onClick={addBodyType}
-                  className="btn btn-secondary"
+                  onClick={() => setIsBodyTypeModalOpen(true)}
+                  className="btn btn-secondary text-sm"
                 >
-                  Add
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Manage Body Types
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 min-h-[2rem]">
                 {formData.bodyType?.map((bodyType, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                   >
                     {bodyType}
-                    <button
-                      type="button"
-                      onClick={() => removeBodyType(bodyType)}
-                      className="ml-1 text-green-600 hover:text-green-800"
-                    >
-                      <XMarkIcon className="h-3 w-3" />
-                    </button>
                   </span>
                 ))}
+                {(!formData.bodyType || formData.bodyType.length === 0) && (
+                  <span className="text-gray-500 text-sm">No body types added</span>
+                )}
               </div>
             </div>
 
             {/* Available Sizes */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Available Sizes
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newSize}
-                  onChange={(e) => setNewSize(e.target.value)}
-                  className="input-field flex-1"
-                  placeholder="Add size (e.g., S, M, L, XL, 6, 8, 10)"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSize())}
-                />
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Available Sizes
+                </label>
                 <button
                   type="button"
-                  onClick={addSize}
-                  className="btn btn-secondary"
+                  onClick={() => setIsSizesModalOpen(true)}
+                  className="btn btn-secondary text-sm"
                 >
-                  Add
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Manage Sizes
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 min-h-[2rem]">
                 {formData.availableSizes?.map((size, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                   >
                     {size}
-                    <button
-                      type="button"
-                      onClick={() => removeSize(size)}
-                      className="ml-1 text-blue-600 hover:text-blue-800"
-                    >
-                      <XMarkIcon className="h-3 w-3" />
-                    </button>
                   </span>
                 ))}
+                {(!formData.availableSizes || formData.availableSizes.length === 0) && (
+                  <span className="text-gray-500 text-sm">No sizes added</span>
+                )}
               </div>
             </div>
 
@@ -1377,6 +1352,63 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </button>
           </div>
         </form>
+
+        {/* Modals */}
+        <TagsModal
+          isOpen={isTagsModalOpen}
+          onClose={() => setIsTagsModalOpen(false)}
+          tags={formData.tags}
+          onTagsChange={(tags) => handleChange('tags', tags)}
+        />
+
+        <KeywordsModal
+          isOpen={isKeywordsModalOpen}
+          onClose={() => setIsKeywordsModalOpen(false)}
+          keywords={formData.seo.keywords}
+          onKeywordsChange={(keywords) => handleChange('seo', { ...formData.seo, keywords })}
+        />
+
+        <FeaturesModal
+          isOpen={isFeaturesModalOpen}
+          onClose={() => setIsFeaturesModalOpen(false)}
+          features={formData.features || []}
+          onFeaturesChange={(features) => handleChange('features', features)}
+        />
+
+        <ColorsModal
+          isOpen={isColorsModalOpen}
+          onClose={() => setIsColorsModalOpen(false)}
+          colors={formData.colors || []}
+          onColorsChange={(colors) => handleChange('colors', colors)}
+        />
+
+        <AttributesModal
+          isOpen={isAttributesModalOpen}
+          onClose={() => setIsAttributesModalOpen(false)}
+          attributes={formData.attributes || []}
+          onAttributesChange={(attributes) => handleChange('attributes', attributes)}
+        />
+
+        <HandworkModal
+          isOpen={isHandworkModalOpen}
+          onClose={() => setIsHandworkModalOpen(false)}
+          handwork={formData.handwork || []}
+          onHandworkChange={(handwork) => handleChange('handwork', handwork)}
+        />
+
+        <BodyTypeModal
+          isOpen={isBodyTypeModalOpen}
+          onClose={() => setIsBodyTypeModalOpen(false)}
+          bodyTypes={formData.bodyType || []}
+          onBodyTypesChange={(bodyTypes) => handleChange('bodyType', bodyTypes)}
+        />
+
+        <SizesModal
+          isOpen={isSizesModalOpen}
+          onClose={() => setIsSizesModalOpen(false)}
+          sizes={formData.availableSizes || []}
+          onSizesChange={(sizes) => handleChange('availableSizes', sizes)}
+        />
       </div>
     </div>
   );
