@@ -31,11 +31,85 @@ export interface Address {
   isDefault: boolean;
 }
 
-// Import shared product types
-import { Product as BaseProduct, ProductVariant as BaseProductVariant, ProductFilters as BaseProductFilters } from '../../shared-types/product';
-
-// Product Types - Extends shared base with dashboard-specific fields
-export interface Product extends BaseProduct {
+// Product Types for Dashboard
+export interface Product {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  shortDescription: string;
+  sku: string;
+  price: number;
+  salePrice?: number;
+  originalPrice?: number;
+  currency: string;
+  stockQuantity: number;
+  stockStatus: 'instock' | 'outofstock' | 'onbackorder';
+  weight: number;
+  dimensions: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  manageStock: boolean;
+  allowBackorders: boolean;
+  status: 'published' | 'draft' | 'archived';
+  categories: string[];
+  tags: string[];
+  brand: string;
+  attributes: string[];
+  variations: ProductVariant[];
+  images: string[];
+  
+  // UI-specific fields
+  rating: number;
+  reviews: number;
+  isNew: boolean;
+  isSale: boolean;
+  features: string[];
+  colors: string[];
+  inStock: boolean;
+  stockCount: number;
+  shippingWeight: number;
+  shippingDimensions: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  isActive: boolean;
+  seo: ProductSEO;
+  
+  // Pakistani Clothing Specific Fields
+  fabric: string;
+  collection: string;
+  collectionName: string;
+  occasion: string;
+  season: string;
+  careInstructions: string;
+  modelMeasurements: {
+    height: string;
+    bust: string;
+    waist: string;
+    hips: string;
+  };
+  designer: string;
+  handwork: string[];
+  colorFamily: string;
+  pattern: string;
+  sleeveLength: string;
+  neckline: string;
+  length: string;
+  fit: string;
+  ageGroup: string;
+  bodyType: string[];
+  isLimitedEdition: boolean;
+  isCustomMade: boolean;
+  customDeliveryDays?: number;
+  sizeChart: string;
+  availableSizes: string[];
+  createdAt: string;
+  updatedAt: string;
+  
   // Dashboard-specific relationship fields
   categoryId?: Category;
   brandId?: Brand;
@@ -43,8 +117,33 @@ export interface Product extends BaseProduct {
   category?: Category; // Alias for categoryId
 }
 
-export interface ProductVariant extends BaseProductVariant {
-  // Dashboard-specific fields can be added here if needed
+export interface ProductVariant {
+  _id: string;
+  name: string;
+  sku: string;
+  price: number;
+  salePrice?: number;
+  stockQuantity: number;
+  stockStatus: 'instock' | 'outofstock' | 'onbackorder';
+  attributes: Record<string, string>;
+  images: string[];
+  weight: number;
+  dimensions: {
+    length: number;
+    width: number;
+    height: number;
+  };
+}
+
+export interface ProductSEO {
+  title: string;
+  description: string;
+  keywords: string[];
+  slug: string;
+  canonicalUrl: string;
+  ogImage: string;
+  noIndex: boolean;
+  noFollow: boolean;
 }
 
 export interface Category {
@@ -356,12 +455,48 @@ export interface ProductForm {
   images: string[];
 }
 
-// Filter Types - Extends shared base
-export interface ProductFilters extends BaseProductFilters {
-  // Dashboard-specific filters can be added here if needed
-  search?: string;
+// Filter Types for Dashboard
+export interface ProductFilters {
   page?: number;
   limit?: number;
+  search?: string;
+  category?: string;
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  status?: 'published' | 'draft' | 'archived';
+  sortBy?: 'name' | 'price' | 'createdAt' | 'updatedAt' | 'rating';
+  sortOrder?: 'asc' | 'desc';
+  sizes?: string[];
+  fabrics?: string[];
+  occasions?: string[];
+  colorFamilies?: string[];
+  tags?: string[];
+  attributes?: string[];
+  collections?: string[];
+  designers?: string[];
+  seasons?: string[];
+  ageGroups?: string[];
+  bodyTypes?: string[];
+  isNew?: boolean;
+  isSale?: boolean;
+  isLimitedEdition?: boolean;
+  isCustomMade?: boolean;
+  handwork?: string[];
+  patterns?: string[];
+  sleeveLengths?: string[];
+  necklines?: string[];
+  lengths?: string[];
+  fits?: string[];
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  rating?: {
+    min: number;
+    max: number;
+  };
 }
 
 export interface OrderFilters {
