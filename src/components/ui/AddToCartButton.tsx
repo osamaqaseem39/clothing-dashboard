@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ShoppingBagIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../contexts/CartContext';
-import { Product } from '../types';
+import { ShoppingBagIcon } from '@heroicons/react/outline';
+import { useCart } from '../../contexts/CartContext';
+import { Product } from '../../types';
 import LoadingSpinner from './LoadingSpinner';
 
 interface AddToCartButtonProps {

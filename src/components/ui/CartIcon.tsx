@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBagIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../contexts/CartContext';
+import { ShoppingBagIcon } from '@heroicons/react/outline';
+import { useCart } from '../../contexts/CartContext';
 
 interface CartIconProps {
   className?: string;

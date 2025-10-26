@@ -6,7 +6,7 @@ import {
   TruckIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/outline';
 import { useCart } from '../contexts/CartContext';
 import { orderService } from '../services/orderService';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
