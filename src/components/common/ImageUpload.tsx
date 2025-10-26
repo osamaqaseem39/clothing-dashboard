@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { CloudArrowUpIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import { CloudArrowUpIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/outline';
 import { productService } from '../../services/productService';
 
 interface ImageUploadProps {

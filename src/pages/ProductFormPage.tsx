@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, SaveIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, SaveIcon, EyeIcon, TrashIcon } from '@heroicons/react/outline';
 import { Product, Category, Brand } from '../../types';
 import ProductFormTabs from './ProductFormTabs';
 import ProductFormBasic from './ProductFormBasic';

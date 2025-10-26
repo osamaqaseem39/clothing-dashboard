@@ -7,7 +7,7 @@ import {
   UsersIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/outline';
 import {
   LineChart,
   Line,

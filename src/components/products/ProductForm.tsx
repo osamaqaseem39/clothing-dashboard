@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/outline';
 import { Product, Category, Brand, ProductVariant } from '../../types';
 import TagsModal from './modals/TagsModal';
 import KeywordsModal from './modals/KeywordsModal';

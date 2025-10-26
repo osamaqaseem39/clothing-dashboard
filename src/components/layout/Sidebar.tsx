@@ -20,7 +20,7 @@ import {
   PresentationChartLineIcon,
   WrenchScrewdriverIcon,
   BuildingOfficeIcon,
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import Tooltip from '../ui/Tooltip';

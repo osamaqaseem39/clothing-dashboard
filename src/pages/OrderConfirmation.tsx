@@ -6,7 +6,7 @@ import {
   HomeIcon,
   ShoppingBagIcon,
   PrinterIcon
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/outline';
 import { orderService } from '../services/orderService';
 import { Order } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';

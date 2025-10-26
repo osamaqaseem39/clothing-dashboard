@@ -6,7 +6,7 @@ import {
   TruckIcon,
   CheckCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/outline';
 import { orderService } from '../services/orderService';
 import type { Order } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';

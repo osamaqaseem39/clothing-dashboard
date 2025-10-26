@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlassIcon, FunnelIcon, StarIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, FunnelIcon, StarIcon } from '@heroicons/react/outline';
 import { productService } from '../services/productService';
 import { Product } from '../types';
 import AddToCartButton from '../components/ui/AddToCartButton';

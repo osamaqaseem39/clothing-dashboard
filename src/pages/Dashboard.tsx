@@ -6,7 +6,7 @@ import {
   UsersIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/outline';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { dashboardService } from '../services/dashboardService';
 import type { DashboardStats } from '../types';

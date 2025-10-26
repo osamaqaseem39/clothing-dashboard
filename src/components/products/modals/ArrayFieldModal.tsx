@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon } from '@heroicons/react/outline';
 
 interface ArrayFieldModalProps {
   isOpen: boolean;
