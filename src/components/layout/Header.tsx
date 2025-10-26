@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BellIcon, MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
+import CartIcon from '../ui/CartIcon';
 
 const Header: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -49,6 +50,9 @@ const Header: React.FC = () => {
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
+          {/* Cart Icon */}
+          <CartIcon />
+
           {/* Notifications */}
           <div className="relative">
             <button
@@ -70,35 +74,8 @@ const Header: React.FC = () => {
                     <h3 className="text-sm font-medium text-gray-900">Notifications</h3>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
-                    {/* Sample notifications */}
-                    <div className="px-4 py-3 hover:bg-gray-50">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                            <span className="text-green-600 text-sm">✓</span>
-                          </div>
-                        </div>
-                        <div className="ml-3 flex-1">
-                          <p className="text-sm font-medium text-gray-900">New order received</p>
-                          <p className="text-sm text-gray-500">Order #12345 has been placed</p>
-                          <p className="text-xs text-gray-400 mt-1">2 minutes ago</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="px-4 py-3 hover:bg-gray-50">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                            <span className="text-yellow-600 text-sm">!</span>
-                          </div>
-                        </div>
-                        <div className="ml-3 flex-1">
-                          <p className="text-sm font-medium text-gray-900">Low stock alert</p>
-                          <p className="text-sm text-gray-500">Product "Nike Shoes" is running low</p>
-                          <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
-                        </div>
-                      </div>
+                    <div className="px-4 py-8 text-center text-gray-500">
+                      <p className="text-sm">No notifications</p>
                     </div>
                   </div>
                   <div className="px-4 py-2 border-t border-gray-200">

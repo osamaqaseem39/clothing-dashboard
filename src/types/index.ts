@@ -106,6 +106,7 @@ export interface Product {
   isCustomMade: boolean;
   customDeliveryDays?: number;
   sizeChart: string;
+  sizeChartImageUrl?: string;
   availableSizes: string[];
   createdAt: string;
   updatedAt: string;
@@ -115,6 +116,30 @@ export interface Product {
   brandId?: Brand;
   variants?: ProductVariant[];
   category?: Category; // Alias for categoryId
+}
+
+export interface SizeChart {
+  _id: string;
+  name: string;
+  description?: string;
+  sizeType: 'numeric' | 'alphabetic' | 'custom';
+  sizes: Array<{
+    size: string;
+    measurements: {
+      bust?: string;
+      waist?: string;
+      hips?: string;
+      shoulder?: string;
+      sleeveLength?: string;
+      length?: string;
+      custom?: Record<string, string>;
+    };
+  }>;
+  imageUrl?: string;
+  imageAltText?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProductVariant {

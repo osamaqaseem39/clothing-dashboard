@@ -40,6 +40,7 @@ const Sidebar: React.FC = () => {
 
   const navigation: SidebarItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
+    { name: 'Shop', href: '/shop', icon: ShoppingBagIcon },
     { name: 'Products', href: '/dashboard/products', icon: CubeIcon },
     { name: 'Categories', href: '/dashboard/categories', icon: TagIcon },
     { name: 'Inventory', href: '/dashboard/inventory', icon: CubeIcon },

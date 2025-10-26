@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SidebarProvider } from './contexts/SidebarContext';
+import { CartProvider } from './contexts/CartContext';
 import LoginForm from './components/auth/LoginForm';
 import Register from './pages/Register';
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -15,6 +16,10 @@ import Customers from './pages/Customers';
 import Brands from './pages/Brands';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
+import Shop from './pages/Shop';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -77,6 +82,42 @@ const AppContent: React.FC = () => {
           <Route path="settings" element={<Settings />} />
         </Route>
 
+        {/* Shop route */}
+        <Route
+          path="/shop"
+          element={
+            <ProtectedRoute>
+              <Shop />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Cart and Checkout routes */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={
+            <ProtectedRoute>
+              <OrderConfirmation />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Redirect root to dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
@@ -92,7 +133,9 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <SidebarProvider>
-        <AppContent />
+        <CartProvider customerId="current-user-id" sessionId="session-id">
+          <AppContent />
+        </CartProvider>
       </SidebarProvider>
     </AuthProvider>
   );

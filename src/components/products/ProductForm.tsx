@@ -69,6 +69,7 @@ interface ProductFormData {
   isCustomMade?: boolean;
   customDeliveryDays?: number;
   sizeChart?: string;
+  sizeChartImageUrl?: string;
   availableSizes?: string[];
 }
 
@@ -148,6 +149,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     isCustomMade: product?.isCustomMade || false,
     customDeliveryDays: product?.customDeliveryDays || 0,
     sizeChart: product?.sizeChart || '',
+    sizeChartImageUrl: product?.sizeChartImageUrl || '',
     availableSizes: product?.availableSizes || [],
   });
 
@@ -247,6 +249,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       isCustomMade: formData.isCustomMade || undefined,
       customDeliveryDays: formData.customDeliveryDays && formData.customDeliveryDays > 0 ? formData.customDeliveryDays : undefined,
       sizeChart: formData.sizeChart || undefined,
+      sizeChartImageUrl: formData.sizeChartImageUrl || undefined,
       availableSizes: formData.availableSizes && formData.availableSizes.length > 0 ? formData.availableSizes : undefined,
     };
 
@@ -1191,6 +1194,61 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <span className="text-gray-500 text-sm">No sizes added</span>
                 )}
               </div>
+            </div>
+
+            {/* Size Chart */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Size Chart ID
+              </label>
+              <input
+                type="text"
+                value={formData.sizeChart}
+                onChange={(e) => handleChange('sizeChart', e.target.value)}
+                placeholder="Enter size chart ID"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Size Chart Image */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Size Chart Image URL
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={formData.sizeChartImageUrl}
+                  onChange={(e) => handleChange('sizeChartImageUrl', e.target.value)}
+                  placeholder="https://example.com/size-chart.jpg"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Open image upload modal or external upload service
+                    const url = prompt('Enter image URL:');
+                    if (url) {
+                      handleChange('sizeChartImageUrl', url);
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Upload
+                </button>
+              </div>
+              {formData.sizeChartImageUrl && (
+                <div className="mt-2">
+                  <img
+                    src={formData.sizeChartImageUrl}
+                    alt="Size chart preview"
+                    className="max-w-xs max-h-32 object-contain border border-gray-200 rounded"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Model Measurements */}

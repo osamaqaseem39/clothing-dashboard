@@ -1,7 +1,70 @@
 import api from './api';
-import { ApiResponse, Order, OrderFilters } from '../types';
+import { ApiResponse, Order } from '../types';
+
+export interface CreateOrderRequest {
+  customerId: string;
+  paymentMethod: string;
+  paymentStatus?: string;
+  total: number;
+  subtotal: number;
+  discountTotal?: number;
+  shippingTotal?: number;
+  taxTotal?: number;
+  currency?: string;
+  billingAddress: {
+    firstName: string;
+    lastName: string;
+    company?: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    phone?: string;
+    email?: string;
+  };
+  shippingAddress: {
+    firstName: string;
+    lastName: string;
+    company?: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    phone?: string;
+    email?: string;
+  };
+  items: Array<{
+    productId: string;
+    variationId?: string;
+    name: string;
+    sku?: string;
+    quantity: number;
+    price: number;
+    subtotal: number;
+    total: number;
+  }>;
+}
+
+export interface OrderFilters {
+  status?: string;
+  paymentStatus?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  minAmount?: number;
+  maxAmount?: number;
+}
 
 export const orderService = {
+  // Create a new order
+  async createOrder(orderData: CreateOrderRequest): Promise<ApiResponse<Order>> {
+    const response = await api.post('/orders', orderData);
+    return response.data;
+  },
+
   // Get all orders with filters
   async getOrders(filters?: OrderFilters, page: number = 1, limit: number = 20): Promise<ApiResponse<any>> {
     const params = new URLSearchParams();
@@ -26,6 +89,12 @@ export const orderService = {
     return response.data;
   },
 
+  // Get orders by customer ID
+  async getCustomerOrders(customerId: string): Promise<ApiResponse<Order[]>> {
+    const response = await api.get(`/orders/customer/${customerId}`);
+    return response.data;
+  },
+
   // Update order status
   async updateOrderStatus(id: string, status: string): Promise<ApiResponse<{ order: Order }>> {
     const response = await api.put(`/orders/${id}/status`, { status });
@@ -43,4 +112,4 @@ export const orderService = {
     const response = await api.get('/orders/stats');
     return response.data;
   },
-}; 
+};
