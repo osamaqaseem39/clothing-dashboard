@@ -7,7 +7,7 @@ import {
   TrashIcon,
   EyeIcon,
   BuildingOfficeIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { brandService } from '../services/brandService';
 import type { Brand } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';

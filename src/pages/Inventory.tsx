@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon, ExclamationTriangleIcon, XCircleIcon, CheckCircleIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/outline';
+import { PlusIcon, ExclamationTriangleIcon, XCircleIcon, CheckCircleIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { inventoryService } from '../services/inventoryService';
 import type { Inventory as InventoryType } from '../types';
 import Button from '../components/ui/Button';

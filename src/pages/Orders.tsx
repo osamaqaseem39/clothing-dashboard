@@ -6,7 +6,7 @@ import {
   TruckIcon,
   CheckCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { orderService } from '../services/orderService';
 import type { Order } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -32,12 +32,13 @@ const Orders: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      const response = await orderService.getOrders({
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-        status: selectedStatus,
-      });
+      const response = await orderService.getOrders(
+        {
+          status: selectedStatus,
+        },
+        currentPage,
+        10
+      );
 
       if (response.success && response.data) {
         setOrders(response.data.orders || []);

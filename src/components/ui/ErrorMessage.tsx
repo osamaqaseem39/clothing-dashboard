@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface ErrorMessageProps {
   message: string;

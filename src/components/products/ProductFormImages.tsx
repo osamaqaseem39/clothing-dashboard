@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlusIcon, XMarkIcon } from '@heroicons/react/outline';
+import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
 import ImageUpload from '../common/ImageUpload';
 

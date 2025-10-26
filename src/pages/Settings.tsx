@@ -9,7 +9,7 @@ import {
   GlobeAltIcon,
   CheckCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 

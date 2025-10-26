@@ -5,7 +5,7 @@ import {
   BuildingStorefrontIcon,
   CogIcon,
   ArrowRightIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import type { Category, Brand } from '../types';
 import CategoryForm from '../components/products/CategoryForm';
 import BrandForm from '../components/products/BrandForm';

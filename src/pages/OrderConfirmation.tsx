@@ -6,7 +6,7 @@ import {
   HomeIcon,
   ShoppingBagIcon,
   PrinterIcon
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { orderService } from '../services/orderService';
 import { Order } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -252,9 +252,9 @@ const OrderConfirmationPage: React.FC = () => {
               {order.shippingAddress.company && (
                 <p>{order.shippingAddress.company}</p>
               )}
-              <p>{order.shippingAddress.address1}</p>
-              {order.shippingAddress.address2 && (
-                <p>{order.shippingAddress.address2}</p>
+              <p>{order.shippingAddress.addressLine1}</p>
+              {order.shippingAddress.addressLine2 && (
+                <p>{order.shippingAddress.addressLine2}</p>
               )}
               <p>
                 {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}

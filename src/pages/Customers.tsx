@@ -8,7 +8,7 @@ import {
   PhoneIcon,
   MapPinIcon,
   XCircleIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { customerService } from '../services/customerService';
 import type { Customer } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';

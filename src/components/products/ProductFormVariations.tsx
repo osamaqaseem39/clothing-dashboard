@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlusIcon, TrashIcon } from '@heroicons/react/outline';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Product, ProductVariant } from '../../types';
 
 interface ProductFormVariationsProps {

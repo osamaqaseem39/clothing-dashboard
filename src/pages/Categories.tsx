@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, Squares2X2Icon, ListBulletIcon } from '@heroicons/react/outline';
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, Squares2X2Icon, ListBulletIcon } from '@heroicons/react/24/outline';
 import { categoryService } from '../services/categoryService';
 import type { Category } from '../types';
 import CategoryForm from '../components/products/CategoryForm';

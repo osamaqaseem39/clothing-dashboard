@@ -6,7 +6,7 @@ import {
   TruckIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { useCart } from '../contexts/CartContext';
 import { orderService } from '../services/orderService';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -170,7 +170,7 @@ const CheckoutPage: React.FC = () => {
 
       const response = await orderService.createOrder(orderData);
       
-      if (response.success) {
+      if (response.success && response.data) {
         // Redirect to order confirmation
         navigate(`/order-confirmation/${response.data._id}`);
       } else {

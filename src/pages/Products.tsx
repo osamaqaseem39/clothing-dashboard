@@ -7,7 +7,7 @@ import {
   TrashIcon,
   EyeIcon,
   ShoppingBagIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import { brandService } from '../services/brandService';

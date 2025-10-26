@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/outline';
-import { SizeChart } from '../../types';
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { SizeChart } from '../types';
 
 interface SizeChartsPageProps {}
 
@@ -275,7 +275,7 @@ const SizeChartModal: React.FC<SizeChartModalProps> = ({
     if (field === 'size') {
       newSizes[index].size = value;
     } else {
-      newSizes[index].measurements[field as keyof typeof newSizes[0]['measurements']] = value;
+      (newSizes[index].measurements as any)[field] = value;
     }
     setSizes(newSizes);
   };

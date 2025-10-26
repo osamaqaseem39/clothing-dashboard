@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, SaveIcon, EyeIcon, TrashIcon } from '@heroicons/react/outline';
-import { Product, Category, Brand } from '../../types';
-import ProductFormTabs from './ProductFormTabs';
-import ProductFormBasic from './ProductFormBasic';
-import ProductFormInventory from './ProductFormInventory';
-import ProductFormShipping from './ProductFormShipping';
-import ProductFormAttributes from './ProductFormAttributes';
-import ProductFormVariations from './ProductFormVariations';
-import ProductFormImages from './ProductFormImages';
-import ProductFormSEO from './ProductFormSEO';
+import { ArrowLeftIcon, CheckIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { Product, Category, Brand } from '../types';
+import ProductFormTabs from '../components/products/ProductFormTabs';
+import ProductFormBasic from '../components/products/ProductFormBasic';
+import ProductFormInventory from '../components/products/ProductFormInventory';
+import ProductFormShipping from '../components/products/ProductFormShipping';
+import ProductFormAttributes from '../components/products/ProductFormAttributes';
+import ProductFormVariations from '../components/products/ProductFormVariations';
+import ProductFormImages from '../components/products/ProductFormImages';
+import ProductFormSEO from '../components/products/ProductFormSEO';
 
 interface ProductFormPageProps {
   product?: Product;
@@ -140,7 +140,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     setFormData(prev => ({
       ...prev,
       [parentField]: {
-        ...(prev[parentField] as any),
+        ...(prev[parentField as keyof Product] as any),
         [field]: value,
       },
     }));
@@ -258,7 +258,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                 disabled={isLoading}
                 className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                <SaveIcon className="h-4 w-4 mr-2" />
+                <CheckIcon className="h-4 w-4 mr-2" />
                 {isLoading ? 'Saving...' : 'Save Draft'}
               </button>
               
@@ -267,7 +267,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                 disabled={isLoading}
                 className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                <SaveIcon className="h-4 w-4 mr-2" />
+                <CheckIcon className="h-4 w-4 mr-2" />
                 {isLoading ? 'Publishing...' : 'Publish'}
               </button>
             </div>

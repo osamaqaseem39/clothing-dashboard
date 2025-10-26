@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlassIcon, FunnelIcon, StarIcon } from '@heroicons/react/outline';
+import { MagnifyingGlassIcon, FunnelIcon, StarIcon } from '@heroicons/react/24/outline';
 import { productService } from '../services/productService';
 import { Product } from '../types';
 import AddToCartButton from '../components/ui/AddToCartButton';
@@ -13,7 +13,7 @@ const ShopPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'createdAt' | 'updatedAt' | 'rating'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
@@ -118,7 +118,7 @@ const ShopPage: React.FC = () => {
                 value={`${sortBy}-${sortOrder}`}
                 onChange={(e) => {
                   const [field, order] = e.target.value.split('-');
-                  setSortBy(field);
+                  setSortBy(field as 'name' | 'price' | 'createdAt' | 'updatedAt' | 'rating');
                   setSortOrder(order as 'asc' | 'desc');
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"

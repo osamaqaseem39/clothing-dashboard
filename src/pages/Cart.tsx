@@ -7,7 +7,7 @@ import {
   MinusIcon,
   ArrowLeftIcon,
   CreditCardIcon
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { useCart } from '../contexts/CartContext';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
