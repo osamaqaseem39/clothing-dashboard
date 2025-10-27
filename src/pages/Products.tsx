@@ -300,7 +300,11 @@ const Products: React.FC = () => {
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
                             className="h-12 w-12 rounded-md object-cover"
-                            src={product.images?.[0] || '/placeholder-product.png'}
+                            src={
+                              typeof product.images?.[0] === 'string' 
+                                ? product.images[0] 
+                                : product.images?.[0]?.url || '/placeholder-product.png'
+                            }
                             alt={product.name}
                           />
                         </div>

@@ -154,7 +154,11 @@ const ShopPage: React.FC = () => {
               <div className="aspect-w-1 aspect-h-1">
                 <Link to={`/products/${product.slug}`}>
                   <img
-                    src={product.images?.[0] || '/placeholder-product.png'}
+                    src={
+                      typeof product.images?.[0] === 'string' 
+                        ? product.images[0] 
+                        : product.images?.[0]?.url || '/placeholder-product.png'
+                    }
                     alt={product.name}
                     className="w-full h-64 object-cover hover:scale-105 transition-transform duration-200"
                   />

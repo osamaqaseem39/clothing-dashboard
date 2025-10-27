@@ -132,7 +132,11 @@ const CartPage: React.FC = () => {
                     {/* Product Image */}
                     <div className="flex-shrink-0">
                       <img
-                        src={item.productId.images?.[0] || '/placeholder-product.png'}
+                        src={
+                          typeof item.productId.images?.[0] === 'string' 
+                            ? item.productId.images[0] 
+                            : item.productId.images?.[0]?.url || '/placeholder-product.png'
+                        }
                         alt={item.productId.name}
                         className="h-20 w-20 rounded-lg object-cover"
                       />

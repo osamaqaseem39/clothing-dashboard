@@ -584,7 +584,11 @@ const CheckoutPage: React.FC = () => {
                 {state.items.map((item) => (
                   <div key={item.productId._id} className="flex items-center space-x-3">
                     <img
-                      src={item.productId.images?.[0] || '/placeholder-product.png'}
+                      src={
+                        typeof item.productId.images?.[0] === 'string' 
+                          ? item.productId.images[0] 
+                          : item.productId.images?.[0]?.url || '/placeholder-product.png'
+                      }
                       alt={item.productId.name}
                       className="h-12 w-12 rounded-lg object-cover"
                     />

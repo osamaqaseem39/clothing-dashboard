@@ -215,7 +215,11 @@ const OrderConfirmationPage: React.FC = () => {
             <div key={index} className="p-6">
               <div className="flex items-center space-x-4">
                 <img
-                  src={item.product?.images?.[0] || '/placeholder-product.png'}
+                  src={
+                    typeof item.product?.images?.[0] === 'string' 
+                      ? item.product.images[0] 
+                      : item.product?.images?.[0]?.url || '/placeholder-product.png'
+                  }
                   alt={item.product?.name}
                   className="h-16 w-16 rounded-lg object-cover"
                 />
