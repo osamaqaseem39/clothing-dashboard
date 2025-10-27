@@ -9,6 +9,7 @@ import SizesModal from './modals/SizesModal';
 import FeaturesModal from './modals/FeaturesModal';
 import ColorsModal from './modals/ColorsModal';
 import AttributesModal from './modals/AttributesModal';
+import ImageUpload from '../common/ImageUpload';
 
 interface ProductFormProps {
   product?: Product;
@@ -22,6 +23,7 @@ interface ProductFormProps {
 interface ProductFormData {
   name: string;
   description: string;
+  type: string;
   categoryId: string;
   brandId: string;
   tags: string[];
@@ -45,7 +47,7 @@ interface ProductFormData {
   attributes: string[];
   // Pakistani Clothing Specific Fields
   fabric?: string;
-  collection?: string;
+  collectionName?: string;
   occasion?: string;
   season?: string;
   careInstructions?: string;
@@ -84,6 +86,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || '',
     description: product?.description || '',
+    type: product?.type || 'simple',
     categoryId: typeof product?.categoryId === 'object' ? product.categoryId._id : product?.categoryId || '',
     brandId: typeof product?.brandId === 'object' ? product.brandId._id : product?.brandId || '',
     tags: product?.tags || [],
@@ -117,15 +120,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
         isActive: true,
       },
     ],
-    // Images
-    images: product?.images || [],
+    // Images - extract URLs if objects, otherwise use as strings
+    images: (product?.images || []).map((img: any) => typeof img === 'string' ? img : img.url),
     // UI-specific fields
     features: product?.features || [],
     colors: product?.colors || [],
     attributes: product?.attributes || [],
     // Pakistani Clothing Specific Fields
     fabric: product?.fabric || '',
-    collection: product?.collection || '',
+    collectionName: product?.collectionName || '',
     occasion: product?.occasion || '',
     season: product?.season || '',
     careInstructions: product?.careInstructions || '',
@@ -211,10 +214,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
+    // Convert images from URLs to objects with position
+    const imageObjects = formData.images.map((url, index) => ({
+      url: url,
+      altText: formData.name, // Use product name as alt text
+      position: index,
+    }));
+
     // Convert form data to Product format
+    // Note: We cast images as any[] to satisfy the union type
     const productData: Partial<Product> = {
       name: formData.name,
       description: formData.description,
+      type: formData.type as any,
       tags: formData.tags,
       isActive: formData.isActive,
       status: formData.status as any,
@@ -223,14 +235,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
         ...variant,
         _id: '', // Add empty _id for new variants
       })),
-      images: formData.images,
+      images: imageObjects as any,
       // UI-specific fields
       features: formData.features && formData.features.length > 0 ? formData.features : undefined,
       colors: formData.colors && formData.colors.length > 0 ? formData.colors : undefined,
       attributes: formData.attributes && formData.attributes.length > 0 ? formData.attributes : undefined,
       // Pakistani Clothing Specific Fields
       fabric: formData.fabric || undefined,
-      collection: formData.collection || undefined,
+      collectionName: formData.collectionName || undefined,
       occasion: formData.occasion || undefined,
       season: formData.season || undefined,
       careInstructions: formData.careInstructions || undefined,
@@ -373,6 +385,25 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Type *
+              </label>
+              <select
+                value={formData.type}
+                onChange={(e) => handleChange('type', e.target.value)}
+                className={`input-field ${errors.type ? 'border-red-300' : ''}`}
+              >
+                <option value="simple">Simple Product</option>
+                <option value="variable">Variable Product</option>
+                <option value="grouped">Grouped Product</option>
+                <option value="external">External Product</option>
+              </select>
+              {errors.type && (
+                <p className="mt-1 text-sm text-red-600">{errors.type}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
               <select
@@ -420,27 +451,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 className="input-field"
               >
                 <option value="draft">Draft</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="published">Published</option>
+                <option value="archived">Archived</option>
               </select>
             </div>
-          </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange('description', e.target.value)}
-              rows={4}
-              className={`input-field ${errors.description ? 'border-red-300' : ''}`}
-              placeholder="Enter product description"
-            />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-            )}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleChange('description', e.target.value)}
+                className={`input-field ${errors.description ? 'border-red-300' : ''}`}
+                rows={4}
+                placeholder="Enter product description"
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+              )}
+            </div>
           </div>
 
           {/* Tags */}
@@ -911,8 +941,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={formData.collection}
-                  onChange={(e) => handleChange('collection', e.target.value)}
+                  value={formData.collectionName}
+                  onChange={(e) => handleChange('collectionName', e.target.value)}
                   className="input-field"
                   placeholder="e.g., Summer 2024, Eid Collection"
                 />
@@ -1213,42 +1243,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
             {/* Size Chart Image */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Size Chart Image URL
+                Size Chart Image
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  value={formData.sizeChartImageUrl}
-                  onChange={(e) => handleChange('sizeChartImageUrl', e.target.value)}
-                  placeholder="https://example.com/size-chart.jpg"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    // Open image upload modal or external upload service
-                    const url = prompt('Enter image URL:');
-                    if (url) {
-                      handleChange('sizeChartImageUrl', url);
-                    }
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Upload
-                </button>
-              </div>
-              {formData.sizeChartImageUrl && (
-                <div className="mt-2">
-                  <img
-                    src={formData.sizeChartImageUrl}
-                    alt="Size chart preview"
-                    className="max-w-xs max-h-32 object-contain border border-gray-200 rounded"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
+              <ImageUpload
+                onImageUpload={(url) => handleChange('sizeChartImageUrl', url)}
+                onImageRemove={() => handleChange('sizeChartImageUrl', '')}
+                existingImages={formData.sizeChartImageUrl ? [formData.sizeChartImageUrl] : []}
+                maxImages={1}
+              />
             </div>
 
             {/* Model Measurements */}

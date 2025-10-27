@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { productService } from '../../services/productService';
+import { uploadConfig } from '../../config/upload';
 
 interface ImageUploadProps {
   onImageUpload: (url: string) => void;
@@ -44,9 +45,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           continue;
         }
 
-        // Validate file size (5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
-          alert(`${file.name} is too large. Maximum size is 5MB`);
+        // Validate file size
+        if (file.size > uploadConfig.maxFileSize) {
+          alert(`${file.name} is too large. Maximum size is ${Math.round(uploadConfig.maxFileSize / (1024 * 1024))}MB`);
           continue;
         }
 
@@ -65,15 +66,33 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             continue;
           }
         } else {
-          // For new products or standalone uploads, create a temporary URL
-          // In a real implementation, you might upload to a temporary storage
-          // and then move the files when the product is saved
-          const imageUrl = URL.createObjectURL(file);
-          
-          // Simulate upload delay for better UX
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          onImageUpload(imageUrl);
+          // Upload to your PHP upload endpoint
+          try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Upload to your PHP upload endpoint
+            const response = await fetch(uploadConfig.uploadUrl, {
+              method: 'POST',
+              body: formData,
+            });
+            
+            if (!response.ok) {
+              throw new Error('Upload failed');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.data?.url) {
+              onImageUpload(data.data.url);
+            } else {
+              throw new Error('Upload failed');
+            }
+          } catch (error) {
+            console.error('Error uploading to PHP endpoint:', error);
+            alert(`Failed to upload ${file.name}. Please try again.`);
+            continue;
+          }
         }
       }
     } catch (error) {

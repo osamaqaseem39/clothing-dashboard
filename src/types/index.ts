@@ -32,6 +32,10 @@ export interface Address {
 }
 
 // Product Types for Dashboard
+export type ProductType = 'simple' | 'variable' | 'grouped' | 'external';
+export type ProductStatus = 'draft' | 'published' | 'archived';
+export type StockStatus = 'instock' | 'outofstock' | 'onbackorder';
+
 export interface Product {
   _id: string;
   name: string;
@@ -39,12 +43,13 @@ export interface Product {
   description: string;
   shortDescription: string;
   sku: string;
+  type: ProductType;
   price: number;
   salePrice?: number;
   originalPrice?: number;
   currency: string;
   stockQuantity: number;
-  stockStatus: 'instock' | 'outofstock' | 'onbackorder';
+  stockStatus: StockStatus;
   weight: number;
   dimensions: {
     length: number;
@@ -53,13 +58,17 @@ export interface Product {
   };
   manageStock: boolean;
   allowBackorders: boolean;
-  status: 'published' | 'draft' | 'archived';
+  status: ProductStatus;
   categories: string[];
   tags: string[];
   brand: string;
   attributes: string[];
   variations: ProductVariant[];
-  images: string[];
+  images: (string | {
+    url: string;
+    altText?: string;
+    position: number;
+  })[];
   
   // UI-specific fields
   rating: number;
@@ -81,7 +90,6 @@ export interface Product {
   
   // Pakistani Clothing Specific Fields
   fabric: string;
-  collection: string;
   collectionName: string;
   occasion: string;
   season: string;

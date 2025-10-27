@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Brand } from '../../types';
+import ImageUpload from '../common/ImageUpload';
 
 interface BrandFormProps {
   brand?: Brand;
@@ -294,27 +295,15 @@ const BrandForm: React.FC<BrandFormProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Brand Logo
             </label>
-            <div className="flex items-center space-x-4">
-              {formData.logoUrl && (
-                <img
-                  src={formData.logoUrl}
-                  alt="Brand logo"
-                  className="w-20 h-20 object-contain border border-gray-200 rounded-lg"
-                />
-              )}
-              <div className="flex-1">
-                <input
-                  type="url"
-                  value={formData.logoUrl || ''}
-                  onChange={(e) => handleChange('logoUrl', e.target.value)}
-                  className="input-field"
-                  placeholder="https://example.com/logo.png"
-                />
-                <p className="mt-1 text-sm text-gray-500">
-                  Enter the URL of your brand logo image
-                </p>
-              </div>
-            </div>
+            <ImageUpload
+              onImageUpload={(url) => handleChange('logoUrl', url)}
+              onImageRemove={() => handleChange('logoUrl', '')}
+              existingImages={formData.logoUrl ? [formData.logoUrl] : []}
+              maxImages={1}
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              Upload your brand logo image (JPG, PNG, GIF, WebP)
+            </p>
           </div>
 
           {/* Status Options */}
