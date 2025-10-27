@@ -197,8 +197,8 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
             </label>
             <input
               type="text"
-              value={formData.collection || ''}
-              onChange={(e) => onFieldChange('collection', e.target.value)}
+              value={formData.collectionName || ''}
+              onChange={(e) => onFieldChange('collectionName', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="e.g., Summer 2024"
             />

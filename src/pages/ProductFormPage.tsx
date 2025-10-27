@@ -56,7 +56,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     features: product?.features || [],
     colors: product?.colors || [],
     fabric: product?.fabric || '',
-    collection: product?.collection || '',
+    collectionName: product?.collectionName || '',
     occasion: product?.occasion || '',
     season: product?.season || '',
     careInstructions: product?.careInstructions || '',
