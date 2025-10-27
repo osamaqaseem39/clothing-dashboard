@@ -19,10 +19,20 @@ type AuthAction =
   | { type: 'UPDATE_USER'; payload: User };
 
 const initialState: AuthState = {
-  user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: false,
-  isLoading: true,
+  user: {
+    _id: '1',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    role: 'admin',
+    isActive: true,
+    addresses: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  token: 'mock-token',
+  isAuthenticated: true,
+  isLoading: false,
   error: null,
 };
 

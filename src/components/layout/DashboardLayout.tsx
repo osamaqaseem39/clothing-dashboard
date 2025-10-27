@@ -3,12 +3,14 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { useSidebar } from '../../contexts/SidebarContext';
+import DebugInfo from '../DebugInfo';
 
 const DashboardLayout: React.FC = () => {
   const { isCollapsed } = useSidebar();
   
   return (
     <div className="min-h-screen bg-gray-50">
+      <DebugInfo />
       <Sidebar />
       
       {/* Main content */}
