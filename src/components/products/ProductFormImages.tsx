@@ -25,6 +25,11 @@ const ProductFormImages: React.FC<ProductFormImagesProps> = ({
     onFieldChange('images', images);
   };
 
+  // Convert images array to string array (extract URLs if objects)
+  const imageUrls = (formData.images || []).map(img => 
+    typeof img === 'string' ? img : img.url
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -34,7 +39,7 @@ const ProductFormImages: React.FC<ProductFormImagesProps> = ({
         <ImageUpload
           onImageUpload={handleImageUpload}
           onImageRemove={handleImageRemove}
-          existingImages={formData.images || []}
+          existingImages={imageUrls}
           maxImages={10}
         />
 
