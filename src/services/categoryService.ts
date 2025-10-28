@@ -31,4 +31,10 @@ export const categoryService = {
     const response = await api.delete(`/categories/${id}`);
     return response.data;
   },
+  
+  // Get category statistics
+  async getCategoryStats(): Promise<ApiResponse<{ totalCategories: number; activeCategories: number }>> {
+    const response = await api.get('/categories/stats');
+    return response.data;
+  },
 }; 

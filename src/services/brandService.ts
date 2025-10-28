@@ -31,4 +31,10 @@ export const brandService = {
     const response = await api.delete(`/brands/${id}`);
     return response.data;
   },
+
+  // Get brand statistics
+  async getBrandStats(): Promise<ApiResponse<{ totalBrands: number; activeBrands: number; countries: string[] }>> {
+    const response = await api.get('/brands/stats');
+    return response.data;
+  },
 }; 

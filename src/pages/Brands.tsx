@@ -13,6 +13,7 @@ import type { Brand } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import Modal from '../components/ui/Modal';
+import BrandForm from '../components/products/BrandForm';
 
 const Brands: React.FC = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -84,15 +85,28 @@ const Brands: React.FC = () => {
   const handleBrandSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Build payload to match backend DTO and omit empty strings
+      const payload: any = {
+        name: formData.name.trim(),
+        slug: formData.slug.trim(),
+        description: formData.description.trim() || undefined,
+        website: formData.website.trim() || undefined,
+        country: formData.country.trim() || undefined,
+        isActive: formData.isActive,
+      };
+      if (formData.logo && formData.logo.trim() !== '') {
+        payload.logo = formData.logo.trim();
+      }
+
       if (editingBrand) {
-        const response = await brandService.updateBrand(editingBrand._id, formData);
+        const response = await brandService.updateBrand(editingBrand._id, payload);
         if (response.success) {
           setBrands(brands.map(b => 
-            b._id === editingBrand._id ? { ...b, ...formData } : b
+            b._id === editingBrand._id ? { ...b, ...payload } : b
           ));
         }
       } else {
-        const response = await brandService.createBrand(formData);
+        const response = await brandService.createBrand(payload);
         if (response.success && response.data) {
           setBrands([response.data, ...brands]);
         }
@@ -108,22 +122,32 @@ const Brands: React.FC = () => {
 
   const handleEditBrand = (brand: Brand) => {
     setEditingBrand(brand);
-    setFormData({
-      name: brand.name,
-      slug: brand.slug,
-      description: brand.description || '',
-      website: brand.website || '',
-      logo: brand.logo || '',
-      country: brand.country || '',
-      isActive: brand.isActive,
-    });
     setShowBrandForm(true);
   };
 
   const handleAddBrand = () => {
     setEditingBrand(null);
-    resetForm();
     setShowBrandForm(true);
+  };
+
+  // Unified BrandForm submit handler (reuses shared component)
+  const handleBrandFormSubmit = async (brandData: Partial<Brand>) => {
+    try {
+      if (editingBrand) {
+        const response = await brandService.updateBrand(editingBrand._id, brandData);
+        if (response.success && response.data) {
+          setBrands(brands.map(b => b._id === editingBrand._id ? response.data as Brand : b));
+        }
+      } else {
+        const response = await brandService.createBrand(brandData);
+        if (response.success && response.data) {
+          setBrands([response.data as Brand, ...brands]);
+        }
+      }
+    } finally {
+      setShowBrandForm(false);
+      setEditingBrand(null);
+    }
   };
 
   const handleViewBrand = (brand: Brand) => {
@@ -322,129 +346,16 @@ const Brands: React.FC = () => {
         )}
       </div>
 
-      {/* Brand Form Modal */}
+      {/* Brand Form Modal - unified with shared BrandForm */}
       {showBrandForm && (
-        <Modal
-          isOpen={true}
-          onClose={() => {
+        <BrandForm
+          brand={editingBrand || undefined}
+          onSubmit={handleBrandFormSubmit}
+          onCancel={() => {
             setShowBrandForm(false);
             setEditingBrand(null);
-            resetForm();
           }}
-          title={editingBrand ? 'Edit Brand' : 'Add Brand'}
-        >
-          <form onSubmit={handleBrandSubmit} className="p-6">
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Brand Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Slug *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.slug}
-                  onChange={(e) => setFormData({...formData, slug: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Website
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => setFormData({...formData, website: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Country
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.country}
-                    onChange={(e) => setFormData({...formData, country: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Logo URL
-                </label>
-                <input
-                  type="url"
-                  value={formData.logo}
-                  onChange={(e) => setFormData({...formData, logo: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 text-sm text-gray-700">
-                  Active
-                </label>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBrandForm(false);
-                  setEditingBrand(null);
-                  resetForm();
-                }}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-              >
-                {editingBrand ? 'Update Brand' : 'Create Brand'}
-              </button>
-            </div>
-          </form>
-        </Modal>
+        />
       )}
 
       {/* Brand Details Modal */}

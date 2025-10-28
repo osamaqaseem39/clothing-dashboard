@@ -7,8 +7,7 @@ import {
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 import type { Category, Brand } from '../types';
-import CategoryForm from '../components/products/CategoryForm';
-import BrandForm from '../components/products/BrandForm';
+import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { categoryService } from '../services/categoryService';
 import { brandService } from '../services/brandService';
@@ -16,11 +15,10 @@ import { brandService } from '../services/brandService';
 const ProductSetup: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [categoryCount, setCategoryCount] = useState<number>(0);
+  const [brandCount, setBrandCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [showCategoryForm, setShowCategoryForm] = useState(false);
-  const [showBrandForm, setShowBrandForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSetupData();
@@ -29,8 +27,12 @@ const ProductSetup: React.FC = () => {
   const fetchSetupData = async () => {
     try {
       setIsLoading(true);
-      const categoriesResponse = await categoryService.getCategories();
-      const brandsResponse = await brandService.getBrands();
+      const [categoriesResponse, brandsResponse, categoryStatsRes, brandStatsRes] = await Promise.all([
+        categoryService.getCategories(),
+        brandService.getBrands(),
+        categoryService.getCategoryStats().catch(() => ({ success: false } as any)),
+        brandService.getBrandStats().catch(() => ({ success: false } as any)),
+      ]);
       
       if (categoriesResponse.success && categoriesResponse.data) {
         setCategories(categoriesResponse.data);
@@ -39,6 +41,18 @@ const ProductSetup: React.FC = () => {
       if (brandsResponse.success && brandsResponse.data) {
         setBrands(brandsResponse.data);
       }
+
+      if (categoryStatsRes.success && categoryStatsRes.data) {
+        setCategoryCount(categoryStatsRes.data.totalCategories);
+      } else {
+        setCategoryCount(categoriesResponse.data?.length || 0);
+      }
+
+      if (brandStatsRes.success && brandStatsRes.data) {
+        setBrandCount(brandStatsRes.data.totalBrands);
+      } else {
+        setBrandCount(brandsResponse.data?.length || 0);
+      }
     } catch (error) {
       console.error('Error fetching setup data:', error);
     } finally {
@@ -46,44 +60,12 @@ const ProductSetup: React.FC = () => {
     }
   };
 
-  const handleCategorySubmit = async (categoryData: Partial<Category>) => {
-    try {
-      if (editingCategory) {
-        await categoryService.updateCategory(editingCategory._id, categoryData);
-      } else {
-        await categoryService.createCategory(categoryData);
-      }
-      setShowCategoryForm(false);
-      setEditingCategory(null);
-      await fetchSetupData();
-    } catch (error) {
-      console.error('Error saving category:', error);
-    }
-  };
-
-  const handleBrandSubmit = async (brandData: Partial<Brand>) => {
-    try {
-      if (editingBrand) {
-        await brandService.updateBrand(editingBrand._id, brandData);
-      } else {
-        await brandService.createBrand(brandData);
-      }
-      setShowBrandForm(false);
-      setEditingBrand(null);
-      await fetchSetupData();
-    } catch (error) {
-      console.error('Error saving brand:', error);
-    }
-  };
-
   const handleEditCategory = (category: Category) => {
-    setEditingCategory(category);
-    setShowCategoryForm(true);
+    navigate(`/dashboard/categories/${category._id}/edit`);
   };
 
   const handleEditBrand = (brand: Brand) => {
-    setEditingBrand(brand);
-    setShowBrandForm(true);
+    navigate(`/dashboard/brands/${brand._id}/edit`);
   };
 
   if (isLoading) {
@@ -113,12 +95,12 @@ const ProductSetup: React.FC = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-lg font-medium text-gray-900">Categories</h3>
-              <p className="text-sm text-gray-500">{categories.length} categories</p>
+              <p className="text-sm text-gray-500">{categoryCount} categories</p>
             </div>
           </div>
           <div className="mt-4">
             <button
-              onClick={() => setShowCategoryForm(true)}
+              onClick={() => navigate('/dashboard/categories/new')}
               className="btn btn-primary w-full"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
@@ -134,12 +116,12 @@ const ProductSetup: React.FC = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-lg font-medium text-gray-900">Brands</h3>
-              <p className="text-sm text-gray-500">{brands.length} brands</p>
+              <p className="text-sm text-gray-500">{brandCount} brands</p>
             </div>
           </div>
           <div className="mt-4">
             <button
-              onClick={() => setShowBrandForm(true)}
+              onClick={() => navigate('/dashboard/brands/new')}
               className="btn btn-primary w-full"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
@@ -171,7 +153,7 @@ const ProductSetup: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-900">Product Categories</h2>
           <button
-            onClick={() => setShowCategoryForm(true)}
+            onClick={() => navigate('/dashboard/categories/new')}
             className="btn btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
@@ -186,7 +168,7 @@ const ProductSetup: React.FC = () => {
             <p className="mt-1 text-sm text-gray-500">Get started by creating your first product category.</p>
             <div className="mt-6">
               <button
-                onClick={() => setShowCategoryForm(true)}
+                onClick={() => navigate('/dashboard/categories/new')}
                 className="btn btn-primary"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
@@ -260,7 +242,7 @@ const ProductSetup: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-900">Product Brands</h2>
           <button
-            onClick={() => setShowBrandForm(true)}
+            onClick={() => navigate('/dashboard/brands/new')}
             className="btn btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
@@ -275,7 +257,7 @@ const ProductSetup: React.FC = () => {
             <p className="mt-1 text-sm text-gray-500">Get started by creating your first product brand.</p>
             <div className="mt-6">
               <button
-                onClick={() => setShowBrandForm(true)}
+                onClick={() => navigate('/dashboard/brands/new')}
                 className="btn btn-primary"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
@@ -396,30 +378,7 @@ const ProductSetup: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Form Modal */}
-      {showCategoryForm && (
-        <CategoryForm
-          category={editingCategory || undefined}
-          parentCategories={categories}
-          onSubmit={handleCategorySubmit}
-          onCancel={() => {
-            setShowCategoryForm(false);
-            setEditingCategory(null);
-          }}
-        />
-      )}
-
-      {/* Brand Form Modal */}
-      {showBrandForm && (
-        <BrandForm
-          brand={editingBrand || undefined}
-          onSubmit={handleBrandSubmit}
-          onCancel={() => {
-            setShowBrandForm(false);
-            setEditingBrand(null);
-          }}
-        />
-      )}
+      {/* Forms moved to dedicated routes */}
     </div>
   );
 };
