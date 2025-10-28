@@ -51,12 +51,17 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       return;
     }
 
-    const categoryData = {
-      ...formData,
+    const categoryData: any = {
       name: formData.name.trim(),
       slug: formData.slug.trim(),
       description: formData.description.trim(),
+      isActive: formData.isActive,
     };
+
+    // Only include parentId if it's not empty
+    if (formData.parentId && formData.parentId.trim() !== '') {
+      categoryData.parentId = formData.parentId;
+    }
 
     await onSubmit(categoryData);
   };
