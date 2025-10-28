@@ -5,7 +5,26 @@ export const brandService = {
   // Get all brands
   async getBrands(): Promise<ApiResponse<Brand[]>> {
     const response = await api.get('/brands');
-    return response.data;
+    const payload = response.data;
+    // Normalize both paginated and plain-array responses
+    if (Array.isArray(payload)) {
+      return { success: true, data: payload };
+    }
+    if (payload?.data && Array.isArray(payload.data)) {
+      return { success: true, data: payload.data, pagination: {
+        currentPage: payload.page,
+        totalPages: payload.totalPages,
+        total: payload.total,
+        limit: payload.limit,
+        hasNextPage: payload.page < payload.totalPages,
+        hasPrevPage: payload.page > 1,
+      } } as any;
+    }
+    // If backend wraps as { success, data }
+    if (payload?.success && Array.isArray(payload.data)) {
+      return payload;
+    }
+    return { success: false, data: [] } as ApiResponse<Brand[]>;
   },
 
   // Get brand by ID

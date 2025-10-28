@@ -5,7 +5,24 @@ export const categoryService = {
   // Get all categories
   async getCategories(): Promise<ApiResponse<Category[]>> {
     const response = await api.get('/categories');
-    return response.data;
+    const payload = response.data;
+    if (Array.isArray(payload)) {
+      return { success: true, data: payload };
+    }
+    if (payload?.data && Array.isArray(payload.data)) {
+      return { success: true, data: payload.data, pagination: {
+        currentPage: payload.page,
+        totalPages: payload.totalPages,
+        total: payload.total,
+        limit: payload.limit,
+        hasNextPage: payload.page < payload.totalPages,
+        hasPrevPage: payload.page > 1,
+      } } as any;
+    }
+    if (payload?.success && Array.isArray(payload.data)) {
+      return payload;
+    }
+    return { success: false, data: [] } as ApiResponse<Category[]>;
   },
 
   // Get category by ID
