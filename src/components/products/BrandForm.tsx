@@ -63,17 +63,30 @@ const BrandForm: React.FC<BrandFormProps> = ({
       return;
     }
 
-    const brandData = {
-      ...formData,
+    // Backend whitelist only allows specific fields; map and omit others
+    const payload: any = {
       name: formData.name.trim(),
       slug: formData.slug.trim(),
-      description: formData.description.trim(),
+      description: formData.description.trim() || undefined,
       website: formData.website.trim() || undefined,
-      mainCompany: formData.mainCompany.trim() || undefined,
-      industry: formData.industry.trim() || undefined,
+      isActive: formData.isActive,
     };
 
-    await onSubmit(brandData);
+    // Map logoUrl -> logo only if provided
+    if (formData.logoUrl && formData.logoUrl.trim() !== '') {
+      payload.logo = formData.logoUrl.trim();
+    }
+
+    // Preserve optional UI-only fields inside metadata (accepted by backend DTO)
+    const metadata: Record<string, any> = {};
+    if (formData.mainCompany && formData.mainCompany.trim() !== '') metadata.mainCompany = formData.mainCompany.trim();
+    if (formData.industry && formData.industry.trim() !== '') metadata.industry = formData.industry.trim();
+    if (formData.level) metadata.level = formData.level;
+    if (typeof formData.isFeatured === 'boolean') metadata.isFeatured = formData.isFeatured;
+    if (formData.colors && (formData.colors.primary || formData.colors.secondary)) metadata.colors = formData.colors;
+    if (Object.keys(metadata).length > 0) payload.metadata = metadata;
+
+    await onSubmit(payload);
   };
 
   const handleChange = (field: string, value: any) => {
