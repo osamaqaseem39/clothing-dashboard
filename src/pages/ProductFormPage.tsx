@@ -197,7 +197,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
       try {
         await onDelete(product._id);
-        navigate('/products');
+        navigate('/dashboard/products');
       } catch (error) {
         console.error('Error deleting product:', error);
       }
@@ -220,7 +220,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             {/* Left side */}
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => navigate('/products')}
+                onClick={() => navigate('/dashboard/products')}
                 className="flex items-center text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeftIcon className="h-5 w-5 mr-2" />
@@ -362,7 +362,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                   </div>
                   <div className="flex items-center space-x-3">
                     <button
-                      onClick={() => navigate('/products')}
+                      onClick={() => navigate('/dashboard/products')}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                     >
                       Cancel

@@ -69,7 +69,7 @@ const ProductFormPageWrapper: React.FC = () => {
       }
 
       if (response.success) {
-        navigate('/products');
+        navigate('/dashboard/products');
       } else {
         throw new Error(response.message || 'Failed to save product');
       }
@@ -83,7 +83,7 @@ const ProductFormPageWrapper: React.FC = () => {
     try {
       const response = await productService.deleteProduct(productId);
       if (response.success) {
-        navigate('/products');
+        navigate('/dashboard/products');
       } else {
         throw new Error(response.message || 'Failed to delete product');
       }

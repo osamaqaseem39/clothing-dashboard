@@ -104,11 +104,11 @@ const Products: React.FC = () => {
   };
 
   const handleEditProduct = (product: Product) => {
-    navigate(`/products/${product._id}/edit`);
+    navigate(`/dashboard/products/${product._id}/edit`);
   };
 
   const handleAddProduct = () => {
-    navigate('/products/new');
+    navigate('/dashboard/products/new');
   };
 
   const handleSearchChange = (value: string) => {
