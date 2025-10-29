@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftIcon, CheckIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Product, Category, Brand } from '../types';
+import { categoryService } from '../services/categoryService';
+import { brandService } from '../services/brandService';
+import { materialService, occasionService, seasonService } from '../services/masterDataService';
+import CreateItemModal from '../components/products/modals/CreateItemModal';
 import ProductFormTabs from '../components/products/ProductFormTabs';
 import ProductFormBasic from '../components/products/ProductFormBasic';
 import ProductFormInventory from '../components/products/ProductFormInventory';
@@ -15,6 +19,9 @@ interface ProductFormPageProps {
   product?: Product;
   categories: Category[];
   brands: Brand[];
+  materials?: any[];
+  occasions?: any[];
+  seasons?: any[];
   onSubmit: (productData: Partial<Product>) => Promise<void>;
   onDelete?: (productId: string) => Promise<void>;
   isLoading?: boolean;
@@ -24,6 +31,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   product,
   categories,
   brands,
+  materials = [],
+  occasions = [],
+  seasons = [],
   onSubmit,
   onDelete,
   isLoading = false,
@@ -33,6 +43,17 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   const isEditing = !!id && !!product;
 
   const [activeTab, setActiveTab] = useState('general');
+  const [categoriesState, setCategoriesState] = useState<Category[]>(categories);
+  const [brandsState, setBrandsState] = useState<Brand[]>(brands);
+  const [materialsState, setMaterialsState] = useState<any[]>(materials);
+  const [occasionsState, setOccasionsState] = useState<any[]>(occasions);
+  const [seasonsState, setSeasonsState] = useState<any[]>(seasons);
+
+  const [showCreateCategory, setShowCreateCategory] = useState(false);
+  const [showCreateBrand, setShowCreateBrand] = useState(false);
+  const [showCreateMaterial, setShowCreateMaterial] = useState(false);
+  const [showCreateOccasion, setShowCreateOccasion] = useState(false);
+  const [showCreateSeason, setShowCreateSeason] = useState(false);
   const [formData, setFormData] = useState<Partial<Product>>({
     name: product?.name || '',
     description: product?.description || '',
@@ -295,8 +316,16 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                   <ProductFormBasic
                     formData={formData}
                     errors={errors}
-                    categories={categories}
-                    brands={brands}
+                    categories={categoriesState}
+                    brands={brandsState}
+                    materials={materialsState}
+                    occasions={occasionsState}
+                    seasons={seasonsState}
+                    onAddCategory={() => setShowCreateCategory(true)}
+                    onAddBrand={() => setShowCreateBrand(true)}
+                    onAddMaterial={() => setShowCreateMaterial(true)}
+                    onAddOccasion={() => setShowCreateOccasion(true)}
+                    onAddSeason={() => setShowCreateSeason(true)}
                     onFieldChange={handleFieldChange}
                     onNestedFieldChange={handleNestedFieldChange}
                   />
@@ -388,6 +417,86 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Create Category */}
+      <CreateItemModal
+        isOpen={showCreateCategory}
+        title="Add New Category"
+        onClose={() => setShowCreateCategory(false)}
+        onSubmit={async (values) => {
+          const res = await categoryService.createCategory({ name: values.name, description: values.description });
+          if (res.success && res.data) {
+            setCategoriesState(prev => [res.data, ...prev]);
+            handleFieldChange('categories', [res.data._id]);
+          } else {
+            throw new Error(res.message || 'Failed to create category');
+          }
+        }}
+      />
+
+      {/* Create Brand */}
+      <CreateItemModal
+        isOpen={showCreateBrand}
+        title="Add New Brand"
+        onClose={() => setShowCreateBrand(false)}
+        onSubmit={async (values) => {
+          const res = await brandService.createBrand({ name: values.name, description: values.description });
+          if (res.success && res.data) {
+            setBrandsState(prev => [res.data, ...prev]);
+            handleFieldChange('brand', res.data._id);
+          } else {
+            throw new Error(res.message || 'Failed to create brand');
+          }
+        }}
+      />
+
+      {/* Create Material (Fabric) */}
+      <CreateItemModal
+        isOpen={showCreateMaterial}
+        title="Add New Fabric Type"
+        onClose={() => setShowCreateMaterial(false)}
+        onSubmit={async (values) => {
+          const res = await materialService.create({ name: values.name, description: values.description });
+          if (res.success && res.data) {
+            setMaterialsState(prev => [res.data, ...prev]);
+            handleFieldChange('fabric', res.data.name);
+          } else {
+            throw new Error(res.message || 'Failed to create fabric type');
+          }
+        }}
+      />
+
+      {/* Create Occasion */}
+      <CreateItemModal
+        isOpen={showCreateOccasion}
+        title="Add New Occasion"
+        onClose={() => setShowCreateOccasion(false)}
+        onSubmit={async (values) => {
+          const res = await occasionService.create({ name: values.name, description: values.description });
+          if (res.success && res.data) {
+            setOccasionsState(prev => [res.data, ...prev]);
+            handleFieldChange('occasion', res.data.name);
+          } else {
+            throw new Error(res.message || 'Failed to create occasion');
+          }
+        }}
+      />
+
+      {/* Create Season */}
+      <CreateItemModal
+        isOpen={showCreateSeason}
+        title="Add New Season"
+        onClose={() => setShowCreateSeason(false)}
+        onSubmit={async (values) => {
+          const res = await seasonService.create({ name: values.name, description: values.description });
+          if (res.success && res.data) {
+            setSeasonsState(prev => [res.data, ...prev]);
+            handleFieldChange('season', res.data.name);
+          } else {
+            throw new Error(res.message || 'Failed to create season');
+          }
+        }}
+      />
     </div>
   );
 };

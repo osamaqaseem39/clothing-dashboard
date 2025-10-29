@@ -6,8 +6,16 @@ interface ProductFormBasicProps {
   errors: Record<string, string>;
   categories: Category[];
   brands: Brand[];
+  materials?: Array<{ _id: string; name: string }>;
+  occasions?: Array<{ _id: string; name: string }>;
+  seasons?: Array<{ _id: string; name: string }>;
   onFieldChange: (field: string, value: any) => void;
   onNestedFieldChange: (parentField: string, field: string, value: any) => void;
+  onAddCategory?: () => void;
+  onAddBrand?: () => void;
+  onAddMaterial?: () => void;
+  onAddOccasion?: () => void;
+  onAddSeason?: () => void;
 }
 
 const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
@@ -15,8 +23,16 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
   errors,
   categories,
   brands,
+  materials = [],
+  occasions = [],
+  seasons = [],
   onFieldChange,
   onNestedFieldChange,
+  onAddCategory,
+  onAddBrand,
+  onAddMaterial,
+  onAddOccasion,
+  onAddSeason,
 }) => {
   return (
     <div className="space-y-6">
@@ -112,6 +128,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
                 </option>
               ))}
             </select>
+            <button type="button" onClick={onAddCategory} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new category
+            </button>
           </div>
 
           <div>
@@ -130,6 +149,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
                 </option>
               ))}
             </select>
+            <button type="button" onClick={onAddBrand} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new brand
+            </button>
           </div>
         </div>
 
@@ -179,16 +201,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Fabric</option>
-              <option value="Cotton">Cotton</option>
-              <option value="Silk">Silk</option>
-              <option value="Lawn">Lawn</option>
-              <option value="Chiffon">Chiffon</option>
-              <option value="Linen">Linen</option>
-              <option value="Georgette">Georgette</option>
-              <option value="Organza">Organza</option>
-              <option value="Velvet">Velvet</option>
-              <option value="Other">Other</option>
+              {materials.map((m) => (
+                <option key={m._id} value={m.name}>{m.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddMaterial} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new fabric type
+            </button>
           </div>
 
           <div>
@@ -214,14 +233,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Occasion</option>
-              <option value="Formal">Formal</option>
-              <option value="Casual">Casual</option>
-              <option value="Wedding">Wedding</option>
-              <option value="Party">Party</option>
-              <option value="Office">Office</option>
-              <option value="Traditional">Traditional</option>
-              <option value="Festive">Festive</option>
+              {occasions.map(o => (
+                <option key={o._id} value={o.name}>{o.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddOccasion} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new occasion
+            </button>
           </div>
 
           <div>
@@ -234,12 +252,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Season</option>
-              <option value="Summer">Summer</option>
-              <option value="Winter">Winter</option>
-              <option value="Spring">Spring</option>
-              <option value="Fall">Fall</option>
-              <option value="All Season">All Season</option>
+              {seasons.map(s => (
+                <option key={s._id} value={s.name}>{s.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddSeason} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new season
+            </button>
           </div>
         </div>
 

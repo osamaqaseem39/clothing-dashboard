@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import { brandService } from '../services/brandService';
+import { materialService, occasionService, seasonService } from '../services/masterDataService';
 import { Product, Category, Brand } from '../types';
 import ProductFormPage from './ProductFormPage';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -18,6 +19,9 @@ const ProductFormPageWrapper: React.FC = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [materials, setMaterials] = useState<any[]>([]);
+  const [occasions, setOccasions] = useState<any[]>([]);
+  const [seasons, setSeasons] = useState<any[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -28,10 +32,13 @@ const ProductFormPageWrapper: React.FC = () => {
       setIsLoading(true);
       setError(null);
 
-      // Fetch categories and brands
-      const [categoriesResponse, brandsResponse] = await Promise.all([
+      // Fetch categories, brands and master data
+      const [categoriesResponse, brandsResponse, materialsRes, occasionsRes, seasonsRes] = await Promise.all([
         categoryService.getCategories(),
         brandService.getBrands(),
+        materialService.getAll(),
+        occasionService.getAll(),
+        seasonService.getAll(),
       ]);
 
       if (categoriesResponse.success && categoriesResponse.data) {
@@ -41,6 +48,10 @@ const ProductFormPageWrapper: React.FC = () => {
       if (brandsResponse.success && brandsResponse.data) {
         setBrands(brandsResponse.data);
       }
+
+      if (materialsRes.success && materialsRes.data) setMaterials(materialsRes.data);
+      if (occasionsRes.success && occasionsRes.data) setOccasions(occasionsRes.data);
+      if (seasonsRes.success && seasonsRes.data) setSeasons(seasonsRes.data);
 
       // Fetch product if editing
       if (isEditing && id) {
@@ -114,6 +125,9 @@ const ProductFormPageWrapper: React.FC = () => {
       product={product || undefined}
       categories={categories}
       brands={brands}
+      materials={materials}
+      occasions={occasions}
+      seasons={seasons}
       onSubmit={handleSubmit}
       onDelete={isEditing ? handleDelete : undefined}
       isLoading={false}
