@@ -35,11 +35,13 @@ const CreateItemModal: React.FC<CreateItemModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      // Reset only when modal opens to avoid wiping user input on re-renders
       setFormValues(initialValues);
       setError(null);
       setIsSaving(false);
     }
-  }, [isOpen, initialValues]);
+    // Intentionally exclude initialValues to avoid reset on identity changes
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

@@ -85,7 +85,9 @@ const ProductFormPageWrapper: React.FC = () => {
         throw new Error(response.message || 'Failed to save product');
       }
     } catch (err: any) {
-      console.error('Error saving product:', err);
+      // Log richer error info to help diagnose 500s
+      const serverData = err?.response?.data;
+      console.error('Error saving product:', err, serverData);
       throw err;
     }
   };

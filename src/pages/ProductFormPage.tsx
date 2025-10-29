@@ -230,7 +230,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
       });
       setHasUnsavedChanges(false);
     } catch (error) {
-      console.error('Error saving product:', error);
+      // Surface server response if available
+      const serverData = (error as any)?.response?.data;
+      console.error('Error saving product:', error, serverData);
     }
   };
 

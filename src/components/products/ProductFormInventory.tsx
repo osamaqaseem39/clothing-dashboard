@@ -1,6 +1,5 @@
 import React from 'react';
 import { Product } from '../../types';
-import ImageUpload from '../common/ImageUpload';
 
 interface ProductFormInventoryProps {
   formData: Partial<Product>;
@@ -169,19 +168,6 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
             onChange={(e) => onFieldChange('sizeChart', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter size chart ID"
-          />
-        </div>
-
-        {/* Size Chart Image */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Size Chart Image
-          </label>
-          <ImageUpload
-            onImageUpload={(url) => onFieldChange('sizeChartImageUrl', url)}
-            onImageRemove={() => onFieldChange('sizeChartImageUrl', '')}
-            existingImages={formData.sizeChartImageUrl ? [formData.sizeChartImageUrl] : []}
-            maxImages={1}
           />
         </div>
 

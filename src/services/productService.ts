@@ -43,13 +43,56 @@ export const productService = {
       ...rest
     } = productData || {};
 
-    return {
-      ...rest,
-      slug,
-      type,
-      ...(categories ? { categories } : {}),
-      ...(images ? { images } : {}),
+    // Whitelist fields commonly accepted by backend to avoid 500s from unknown props
+    const whitelisted: Record<string, any> = {};
+
+    const copyIfDefined = (key: string, srcKey?: string) => {
+      const fromKey = srcKey || key;
+      if (rest[fromKey] !== undefined && rest[fromKey] !== null) {
+        whitelisted[key] = rest[fromKey];
+      }
     };
+
+    // Basic identity and merchandising fields
+    copyIfDefined('name');
+    whitelisted.slug = slug;
+    copyIfDefined('description');
+    copyIfDefined('shortDescription');
+    copyIfDefined('sku');
+    whitelisted.type = type;
+    copyIfDefined('status');
+
+    // Pricing
+    copyIfDefined('price');
+    copyIfDefined('salePrice');
+    copyIfDefined('originalPrice');
+    copyIfDefined('currency');
+
+    // Inventory
+    copyIfDefined('stockQuantity');
+    copyIfDefined('stockStatus');
+    copyIfDefined('manageStock');
+    copyIfDefined('allowBackorders');
+
+    // Shipping/physical
+    copyIfDefined('weight');
+    if (rest.dimensions && typeof rest.dimensions === 'object') {
+      whitelisted.dimensions = {
+        length: Number(rest.dimensions.length) || 0,
+        width: Number(rest.dimensions.width) || 0,
+        height: Number(rest.dimensions.height) || 0,
+      };
+    }
+
+    // Relationships and taxonomy
+    if (categories) whitelisted.categories = categories;
+    copyIfDefined('tags');
+    copyIfDefined('brand'); // should be brand id string
+
+    // Media
+    if (images) whitelisted.images = images;
+
+    return whitelisted;
   },
   // Get all products with filters
   async getProducts(filters?: ProductFilters, page: number = 1, limit: number = 20): Promise<ApiResponse<any>> {
@@ -92,6 +135,9 @@ export const productService = {
   // Create new product
   async createProduct(productData: any): Promise<ApiResponse<{ product: Product }>> {
     const payload = productService.buildProductPayload(productData);
+    // Debug payload to help diagnose backend 500s
+    // eslint-disable-next-line no-console
+    console.log('createProduct payload', payload);
     const response = await api.post('/products', payload);
     return response.data;
   },
@@ -99,6 +145,8 @@ export const productService = {
   // Update product
   async updateProduct(id: string, productData: any): Promise<ApiResponse<{ product: Product }>> {
     const payload = productService.buildProductPayload(productData);
+    // eslint-disable-next-line no-console
+    console.log('updateProduct payload', id, payload);
     const response = await api.put(`/products/${id}`, payload);
     return response.data;
   },

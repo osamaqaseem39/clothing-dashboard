@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
 import FeaturesModal from './modals/FeaturesModal';
 import ColorsModal from './modals/ColorsModal';
 import AttributesModal from './modals/AttributesModal';
 import HandworkModal from './modals/HandworkModal';
 import BodyTypeModal from './modals/BodyTypeModal';
-import SizesModal from './modals/SizesModal';
 
 interface ProductFormAttributesProps {
   formData: Partial<Product>;
@@ -21,7 +20,6 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
 }) => {
   const [isHandworkModalOpen, setIsHandworkModalOpen] = useState(false);
   const [isBodyTypeModalOpen, setIsBodyTypeModalOpen] = useState(false);
-  const [isSizesModalOpen, setIsSizesModalOpen] = useState(false);
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
   const [isColorsModalOpen, setIsColorsModalOpen] = useState(false);
   const [isAttributesModalOpen, setIsAttributesModalOpen] = useState(false);
@@ -181,35 +179,6 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
           </div>
         </div>
 
-        {/* Available Sizes */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Available Sizes
-            </label>
-            <button
-              type="button"
-              onClick={() => setIsSizesModalOpen(true)}
-              className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50"
-            >
-              <PlusIcon className="h-4 w-4 mr-1" />
-              Manage Sizes
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2 min-h-[2rem] p-3 border border-gray-200 rounded-md">
-            {formData.availableSizes?.map((size, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-              >
-                {size}
-              </span>
-            ))}
-            {(!formData.availableSizes || formData.availableSizes.length === 0) && (
-              <span className="text-gray-500 text-sm">No sizes added</span>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Tags */}
@@ -273,13 +242,6 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
         onClose={() => setIsBodyTypeModalOpen(false)}
         bodyTypes={formData.bodyType || []}
         onBodyTypesChange={(bodyTypes) => onFieldChange('bodyType', bodyTypes)}
-      />
-      
-      <SizesModal
-        isOpen={isSizesModalOpen}
-        onClose={() => setIsSizesModalOpen(false)}
-        sizes={formData.availableSizes || []}
-        onSizesChange={(sizes) => onFieldChange('availableSizes', sizes)}
       />
     </div>
   );
