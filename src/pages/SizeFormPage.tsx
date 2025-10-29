@@ -79,12 +79,20 @@ const SizeFormPage: React.FC = () => {
       setIsSaving(true);
       setError(null);
 
-      const sizeData = {
+      const sizeData: any = {
         name: formData.name.trim(),
-        description: formData.description.trim(),
-        sizeType: formData.sizeType,
         isActive: formData.isActive,
       };
+      
+      // Only include description if it's provided
+      if (formData.description && formData.description.trim()) {
+        sizeData.description = formData.description.trim();
+      }
+      
+      // Only include sizeType if it's provided
+      if (formData.sizeType) {
+        sizeData.sizeType = formData.sizeType;
+      }
 
       let response;
       if (isEditing && id) {
@@ -96,11 +104,17 @@ const SizeFormPage: React.FC = () => {
       if (response.success) {
         navigate('/master-data');
       } else {
-        throw new Error(response.message || 'Failed to save size');
+        const errorMessage = response.message || 'Failed to save size';
+        setError(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (err: any) {
       console.error('Error saving size:', err);
-      setError(err.response?.data?.message || 'Failed to save size');
+      const errorMessage = err.response?.data?.message 
+        || err.response?.data?.error 
+        || err.message 
+        || 'Failed to save size. Please check the console for more details.';
+      setError(errorMessage);
     } finally {
       setIsSaving(false);
     }

@@ -4,6 +4,7 @@ import { ArrowLeftIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { colorService, Color } from '../services/masterDataService';
+import ImageUpload from '../components/common/ImageUpload';
 
 const ColorFormPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const ColorFormPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    hexCode: '#000000',
+    imageUrl: '',
     isActive: true,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -36,7 +37,7 @@ const ColorFormPage: React.FC = () => {
           setColor(response.data);
           setFormData({
             name: response.data.name,
-            hexCode: response.data.hexCode || '#000000',
+            imageUrl: response.data.imageUrl || '',
             isActive: response.data.isActive ?? true,
           });
         } else {
@@ -58,8 +59,8 @@ const ColorFormPage: React.FC = () => {
       newErrors.name = 'Color name is required';
     }
 
-    if (!formData.hexCode || !/^#[0-9A-F]{6}$/i.test(formData.hexCode)) {
-      newErrors.hexCode = 'Valid hex color code is required';
+    if (!formData.imageUrl) {
+      newErrors.imageUrl = 'Color image is required';
     }
 
     setErrors(newErrors);
@@ -77,9 +78,9 @@ const ColorFormPage: React.FC = () => {
       setIsSaving(true);
       setError(null);
 
-      const colorData = {
+      const colorData: any = {
         name: formData.name.trim(),
-        hexCode: formData.hexCode,
+        imageUrl: formData.imageUrl.trim(), // Required - validation ensures it exists
         isActive: formData.isActive,
       };
 
@@ -93,11 +94,17 @@ const ColorFormPage: React.FC = () => {
       if (response.success) {
         navigate('/master-data');
       } else {
-        throw new Error(response.message || 'Failed to save color');
+        const errorMessage = response.message || 'Failed to save color';
+        setError(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (err: any) {
       console.error('Error saving color:', err);
-      setError(err.response?.data?.message || 'Failed to save color');
+      const errorMessage = err.response?.data?.message 
+        || err.response?.data?.error 
+        || err.message 
+        || 'Failed to save color. Please check the console for more details.';
+      setError(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -231,34 +238,26 @@ const ColorFormPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Hex Code */}
+              {/* Color Image */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hex Color Code *
+                  Color Image *
                 </label>
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="color"
-                    value={formData.hexCode}
-                    onChange={(e) => handleFieldChange('hexCode', e.target.value)}
-                    className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={formData.hexCode}
-                    onChange={(e) => handleFieldChange('hexCode', e.target.value)}
-                    className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.hexCode ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    placeholder="#000000"
-                    maxLength={7}
-                  />
-                </div>
-                {errors.hexCode && (
-                  <p className="mt-1 text-sm text-red-600">{errors.hexCode}</p>
+                <ImageUpload
+                  onImageUpload={(url) => handleFieldChange('imageUrl', url)}
+                  onImageRemove={(index) => {
+                    if (index === 0) {
+                      handleFieldChange('imageUrl', '');
+                    }
+                  }}
+                  existingImages={formData.imageUrl ? [formData.imageUrl] : []}
+                  maxImages={1}
+                />
+                {errors.imageUrl && (
+                  <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>
                 )}
                 <p className="mt-1 text-sm text-gray-500">
-                  Choose a color using the color picker or enter a hex code
+                  Upload an image that represents this color (e.g., a color swatch)
                 </p>
               </div>
 
@@ -278,21 +277,26 @@ const ColorFormPage: React.FC = () => {
               </div>
 
               {/* Color Preview */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preview
-                </label>
-                <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-md bg-gray-50">
-                  <div
-                    className="w-12 h-12 rounded border border-gray-300"
-                    style={{ backgroundColor: formData.hexCode }}
-                  />
-                  <div>
-                    <p className="font-medium text-gray-900">{formData.name || 'Color Name'}</p>
-                    <p className="text-sm text-gray-500">{formData.hexCode}</p>
+              {formData.imageUrl && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preview
+                  </label>
+                  <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-md bg-gray-50">
+                    <div className="w-16 h-16 rounded border border-gray-300 overflow-hidden">
+                      <img
+                        src={formData.imageUrl}
+                        alt={formData.name || 'Color preview'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{formData.name || 'Color Name'}</p>
+                      <p className="text-sm text-gray-500">Image uploaded</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </form>
           </div>
 

@@ -123,18 +123,31 @@ class MasterDataService<T extends MasterDataItem> {
       ) {
         // Already in ApiResponse format
         return payload as ApiResponse<T>;
-      } else {
+      } else if (payload && typeof payload === 'object' && !Array.isArray(payload) && payload._id) {
         // Backend returned the item directly, wrap it
         return {
           success: true,
           data: payload as T,
         };
+      } else {
+        // Unexpected response format
+        console.error(`Unexpected response format from /master-data/${this.endpoint}:`, payload);
+        return {
+          success: false,
+          data: {} as T,
+          message: 'Unexpected response format from server',
+        };
       }
     } catch (error: any) {
+      console.error(`Error creating ${this.endpoint}:`, error);
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error
+        || error.message 
+        || 'Failed to create item';
       return {
         success: false,
         data: {} as T,
-        message: error.response?.data?.message || error.message || 'Failed to create item',
+        message: errorMessage,
       };
     }
   }
