@@ -40,12 +40,50 @@ class MasterDataService<T extends MasterDataItem> {
 
   async create(data: Partial<T>): Promise<ApiResponse<T>> {
     const response = await api.post(`/master-data/${this.endpoint}`, data);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<T>;
+    } else {
+      // Backend returned the item directly, wrap it
+      return {
+        success: true,
+        data: payload as T,
+      };
+    }
   }
 
   async update(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
     const response = await api.put(`/master-data/${this.endpoint}/${id}`, data);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<T>;
+    } else {
+      // Backend returned the item directly, wrap it
+      return {
+        success: true,
+        data: payload as T,
+      };
+    }
   }
 
   async delete(id: string): Promise<ApiResponse<void>> {
