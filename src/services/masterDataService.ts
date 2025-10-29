@@ -32,12 +32,46 @@ class MasterDataService<T extends MasterDataItem> {
 
   async getAll(): Promise<ApiResponse<T[]>> {
     const response = await api.get(`/master-data/${this.endpoint}`);
-    return response.data;
+    const payload = response.data;
+
+    // Normalize response: backend may return array directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof (payload as any).success === 'boolean'
+    ) {
+      return payload as ApiResponse<T[]>;
+    }
+
+    return {
+      success: true,
+      data: (Array.isArray(payload) ? payload : []) as T[],
+    };
   }
 
   async getById(id: string): Promise<ApiResponse<T>> {
     const response = await api.get(`/master-data/${this.endpoint}/${id}`);
-    return response.data;
+    const payload = response.data;
+
+    // Normalize response: backend may return object directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof (payload as any).success === 'boolean'
+    ) {
+      return payload as ApiResponse<T>;
+    }
+
+    return {
+      success: true,
+      data: payload as T,
+    };
   }
 
   async create(data: Partial<T>): Promise<ApiResponse<T>> {
