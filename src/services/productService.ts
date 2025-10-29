@@ -23,6 +23,7 @@ export const productService = {
     if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
     if (filters?.inStock !== undefined) params.append('inStock', filters.inStock.toString());
     if (filters?.rating) params.append('rating', filters.rating.toString());
+    if (filters?.status) params.append('status', filters.status);
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
     

@@ -6,6 +6,8 @@ import { categoryService } from '../services/categoryService';
 import { brandService } from '../services/brandService';
 import { materialService, occasionService, seasonService } from '../services/masterDataService';
 import CreateItemModal from '../components/products/modals/CreateItemModal';
+import CategoryForm from '../components/products/CategoryForm';
+import BrandForm from '../components/products/BrandForm';
 import ProductFormTabs from '../components/products/ProductFormTabs';
 import ProductFormBasic from '../components/products/ProductFormBasic';
 import ProductFormInventory from '../components/products/ProductFormInventory';
@@ -438,39 +440,42 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         </div>
       </div>
 
-      {/* Create Category */}
-      <CreateItemModal
-        isOpen={showCreateCategory}
-        title="Add New Category"
-        onClose={() => setShowCreateCategory(false)}
-        onSubmit={async (values) => {
-          const res = await categoryService.createCategory({ name: values.name, description: values.description });
-          if (res.success && res.data) {
-            const newCategory = res.data;
-            setCategoriesState(prev => [newCategory, ...prev]);
-            handleFieldChange('categories', [newCategory._id]);
-          } else {
-            throw new Error(res.message || 'Failed to create category');
-          }
-        }}
-      />
+      {/* Create Category - full form modal */}
+      {showCreateCategory && (
+        <CategoryForm
+          parentCategories={categoriesState}
+          onCancel={() => setShowCreateCategory(false)}
+          onSubmit={async (categoryData) => {
+            const res = await categoryService.createCategory(categoryData);
+            if (res.success && res.data) {
+              const newCategory = res.data;
+              setCategoriesState(prev => [newCategory, ...prev]);
+              handleFieldChange('categories', [newCategory._id]);
+              setShowCreateCategory(false);
+            } else {
+              throw new Error(res.message || 'Failed to create category');
+            }
+          }}
+        />
+      )}
 
-      {/* Create Brand */}
-      <CreateItemModal
-        isOpen={showCreateBrand}
-        title="Add New Brand"
-        onClose={() => setShowCreateBrand(false)}
-        onSubmit={async (values) => {
-          const res = await brandService.createBrand({ name: values.name, description: values.description });
-          if (res.success && res.data) {
-            const newBrand = res.data;
-            setBrandsState(prev => [newBrand, ...prev]);
-            handleFieldChange('brand', newBrand._id);
-          } else {
-            throw new Error(res.message || 'Failed to create brand');
-          }
-        }}
-      />
+      {/* Create Brand - full form modal */}
+      {showCreateBrand && (
+        <BrandForm
+          onCancel={() => setShowCreateBrand(false)}
+          onSubmit={async (brandData) => {
+            const res = await brandService.createBrand(brandData);
+            if (res.success && res.data) {
+              const newBrand = res.data;
+              setBrandsState(prev => [newBrand, ...prev]);
+              handleFieldChange('brand', newBrand._id);
+              setShowCreateBrand(false);
+            } else {
+              throw new Error(res.message || 'Failed to create brand');
+            }
+          }}
+        />
+      )}
 
       {/* Create Material (Fabric) */}
       <CreateItemModal
