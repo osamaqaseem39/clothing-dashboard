@@ -7,8 +7,18 @@ export const productService = {
     const params = new URLSearchParams();
     
     if (filters?.search) params.append('search', filters.search);
-    if (filters?.category) params.append('category', filters.category);
+    if (filters?.category) {
+      // Backend expects categories as array, so we wrap single category in array
+      const categoryArray = Array.isArray(filters.category) ? filters.category : [filters.category];
+      categoryArray.forEach(cat => params.append('categories', cat));
+    }
+    if (filters?.categories) {
+      filters.categories.forEach(cat => params.append('categories', cat));
+    }
     if (filters?.brand) params.append('brand', filters.brand);
+    if (filters?.brands) {
+      filters.brands.forEach(brand => params.append('brands', brand));
+    }
     if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
     if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
     if (filters?.inStock !== undefined) params.append('inStock', filters.inStock.toString());
