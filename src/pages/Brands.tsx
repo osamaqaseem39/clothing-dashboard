@@ -264,18 +264,6 @@ const Brands: React.FC = () => {
         )}
       </div>
 
-      {/* Brand Form Modal - unified with shared BrandForm */}
-      {showBrandForm && (
-        <BrandForm
-          brand={editingBrand || undefined}
-          onSubmit={handleBrandFormSubmit}
-          onCancel={() => {
-            setShowBrandForm(false);
-            setEditingBrand(null);
-          }}
-        />
-      )}
-
       {/* Brand Details Modal */}
       {showBrandModal && selectedBrand && (
         <Modal
