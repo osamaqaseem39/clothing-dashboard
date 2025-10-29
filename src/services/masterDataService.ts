@@ -31,115 +31,172 @@ class MasterDataService<T extends MasterDataItem> {
   constructor(private endpoint: string) {}
 
   async getAll(): Promise<ApiResponse<T[]>> {
-    const response = await api.get(`/master-data/${this.endpoint}`);
-    const payload = response.data;
+    try {
+      const response = await api.get(`/master-data/${this.endpoint}`);
+      const payload = response.data;
 
-    // Normalize response: backend may return array directly or wrapped in { success, data }
-    if (
-      payload &&
-      typeof payload === 'object' &&
-      !Array.isArray(payload) &&
-      'success' in payload &&
-      'data' in payload &&
-      typeof (payload as any).success === 'boolean'
-    ) {
-      return payload as ApiResponse<T[]>;
+      // Normalize response: backend may return array directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<T[]>;
+      }
+
+      return {
+        success: true,
+        data: (Array.isArray(payload) ? payload : []) as T[],
+      };
+    } catch (error: any) {
+      // Handle 404 - endpoint doesn't exist, return empty array
+      if (error.response?.status === 404) {
+        return {
+          success: true,
+          data: [] as T[],
+        };
+      }
+      // For other errors, return error response
+      return {
+        success: false,
+        data: [] as T[],
+        message: error.response?.data?.message || error.message || 'Failed to load data',
+      };
     }
-
-    return {
-      success: true,
-      data: (Array.isArray(payload) ? payload : []) as T[],
-    };
   }
 
   async getById(id: string): Promise<ApiResponse<T>> {
-    const response = await api.get(`/master-data/${this.endpoint}/${id}`);
-    const payload = response.data;
+    try {
+      const response = await api.get(`/master-data/${this.endpoint}/${id}`);
+      const payload = response.data;
 
-    // Normalize response: backend may return object directly or wrapped in { success, data }
-    if (
-      payload &&
-      typeof payload === 'object' &&
-      !Array.isArray(payload) &&
-      'success' in payload &&
-      'data' in payload &&
-      typeof (payload as any).success === 'boolean'
-    ) {
-      return payload as ApiResponse<T>;
-    }
+      // Normalize response: backend may return object directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<T>;
+      }
 
-    return {
-      success: true,
-      data: payload as T,
-    };
-  }
-
-  async create(data: Partial<T>): Promise<ApiResponse<T>> {
-    const response = await api.post(`/master-data/${this.endpoint}`, data);
-    const payload = response.data;
-    
-    // Normalize response: backend may return the item directly or wrapped in { success, data }
-    if (
-      payload &&
-      typeof payload === 'object' &&
-      !Array.isArray(payload) &&
-      'success' in payload &&
-      'data' in payload &&
-      typeof payload.success === 'boolean'
-    ) {
-      // Already in ApiResponse format
-      return payload as ApiResponse<T>;
-    } else {
-      // Backend returned the item directly, wrap it
       return {
         success: true,
         data: payload as T,
+      };
+    } catch (error: any) {
+      // Handle 404 - item doesn't exist
+      if (error.response?.status === 404) {
+        return {
+          success: false,
+          data: {} as T,
+          message: 'Item not found',
+        };
+      }
+      // For other errors, return error response
+      return {
+        success: false,
+        data: {} as T,
+        message: error.response?.data?.message || error.message || 'Failed to load item',
+      };
+    }
+  }
+
+  async create(data: Partial<T>): Promise<ApiResponse<T>> {
+    try {
+      const response = await api.post(`/master-data/${this.endpoint}`, data);
+      const payload = response.data;
+      
+      // Normalize response: backend may return the item directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof payload.success === 'boolean'
+      ) {
+        // Already in ApiResponse format
+        return payload as ApiResponse<T>;
+      } else {
+        // Backend returned the item directly, wrap it
+        return {
+          success: true,
+          data: payload as T,
+        };
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        data: {} as T,
+        message: error.response?.data?.message || error.message || 'Failed to create item',
       };
     }
   }
 
   async update(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
-    const response = await api.put(`/master-data/${this.endpoint}/${id}`, data);
-    const payload = response.data;
-    
-    // Normalize response: backend may return the item directly or wrapped in { success, data }
-    if (
-      payload &&
-      typeof payload === 'object' &&
-      !Array.isArray(payload) &&
-      'success' in payload &&
-      'data' in payload &&
-      typeof payload.success === 'boolean'
-    ) {
-      // Already in ApiResponse format
-      return payload as ApiResponse<T>;
-    } else {
-      // Backend returned the item directly, wrap it
+    try {
+      const response = await api.put(`/master-data/${this.endpoint}/${id}`, data);
+      const payload = response.data;
+      
+      // Normalize response: backend may return the item directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof payload.success === 'boolean'
+      ) {
+        // Already in ApiResponse format
+        return payload as ApiResponse<T>;
+      } else {
+        // Backend returned the item directly, wrap it
+        return {
+          success: true,
+          data: payload as T,
+        };
+      }
+    } catch (error: any) {
       return {
-        success: true,
-        data: payload as T,
+        success: false,
+        data: {} as T,
+        message: error.response?.data?.message || error.message || 'Failed to update item',
       };
     }
   }
 
   async delete(id: string): Promise<ApiResponse<void>> {
-    const response = await api.delete(`/master-data/${this.endpoint}/${id}`);
-    const payload = response.data;
-    
-    // Normalize response: backend may return success object or empty response
-    if (
-      payload &&
-      typeof payload === 'object' &&
-      !Array.isArray(payload) &&
-      'success' in payload &&
-      typeof payload.success === 'boolean'
-    ) {
-      return payload as ApiResponse<void>;
-    } else {
-      // Backend returned empty or different format, wrap it
+    try {
+      const response = await api.delete(`/master-data/${this.endpoint}/${id}`);
+      const payload = response.data;
+      
+      // Normalize response: backend may return success object or empty response
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        typeof payload.success === 'boolean'
+      ) {
+        return payload as ApiResponse<void>;
+      } else {
+        // Backend returned empty or different format, wrap it
+        return {
+          success: true,
+          data: undefined,
+        };
+      }
+    } catch (error: any) {
       return {
-        success: true,
+        success: false,
         data: undefined,
+        message: error.response?.data?.message || error.message || 'Failed to delete item',
       };
     }
   }

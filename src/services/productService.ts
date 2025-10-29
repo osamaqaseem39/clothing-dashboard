@@ -27,10 +27,8 @@ export const productService = {
       categories = cid ? [cid] : undefined;
     }
 
-    // Normalize images to strings if objects contain url
-    const images = Array.isArray(productData.images)
-      ? productData.images.map((img: any) => (typeof img === 'string' ? img : img?.url)).filter(Boolean)
-      : undefined;
+    // Keep images as-is (will be normalized below to objects with url, altText, position)
+    const images = productData.images;
 
     // Strip fields rejected by backend
     const {
@@ -39,6 +37,8 @@ export const productService = {
       features,
       colors,
       sizeChartImageUrl,
+      variants, // Convert to variations below
+      categoryId, // Already converted to categories above
       // keep rest
       ...rest
     } = productData || {};
@@ -48,7 +48,7 @@ export const productService = {
 
     const copyIfDefined = (key: string, srcKey?: string) => {
       const fromKey = srcKey || key;
-      if (rest[fromKey] !== undefined && rest[fromKey] !== null) {
+      if (rest[fromKey] !== undefined && rest[fromKey] !== null && rest[fromKey] !== '') {
         whitelisted[key] = rest[fromKey];
       }
     };
@@ -57,7 +57,12 @@ export const productService = {
     copyIfDefined('name');
     whitelisted.slug = slug;
     copyIfDefined('description');
-    copyIfDefined('shortDescription');
+    // shortDescription is required by backend, use description if not provided
+    if (rest.shortDescription !== undefined && rest.shortDescription !== null && rest.shortDescription !== '') {
+      whitelisted.shortDescription = rest.shortDescription;
+    } else if (rest.description) {
+      whitelisted.shortDescription = String(rest.description).substring(0, 200);
+    }
     copyIfDefined('sku');
     whitelisted.type = type;
     copyIfDefined('status');
@@ -66,7 +71,8 @@ export const productService = {
     copyIfDefined('price');
     copyIfDefined('salePrice');
     copyIfDefined('originalPrice');
-    copyIfDefined('currency');
+    // Currency defaults to PKR if not provided (backend requirement)
+    whitelisted.currency = rest.currency || 'PKR';
 
     // Inventory
     copyIfDefined('stockQuantity');
@@ -87,10 +93,75 @@ export const productService = {
     // Relationships and taxonomy
     if (categories) whitelisted.categories = categories;
     copyIfDefined('tags');
-    copyIfDefined('brand'); // should be brand id string
+    // Normalize brand to string ID
+    if (rest.brandId) {
+      const brandId = typeof rest.brandId === 'string' ? rest.brandId : rest.brandId?._id;
+      if (brandId) whitelisted.brand = brandId;
+    } else if (rest.brand) {
+      const brandId = typeof rest.brand === 'string' ? rest.brand : rest.brand?._id;
+      if (brandId) whitelisted.brand = brandId;
+    }
+    
+    // Attributes - ensure array of strings
+    if (rest.attributes && Array.isArray(rest.attributes)) {
+      whitelisted.attributes = rest.attributes.map((attr: any) => 
+        typeof attr === 'string' ? attr : attr._id || attr.id || attr
+      ).filter(Boolean);
+    }
 
-    // Media
-    if (images) whitelisted.images = images;
+    // Media - backend expects array of objects with url, altText, position
+    if (images && Array.isArray(images)) {
+      whitelisted.images = images.map((img: any, index: number) => {
+        if (typeof img === 'string') {
+          return { url: img, position: index };
+        } else if (img && typeof img === 'object') {
+          return {
+            url: img.url || img,
+            altText: img.altText || productData.name || '',
+            position: img.position !== undefined ? img.position : index,
+          };
+        }
+        return null;
+      }).filter(Boolean);
+    }
+
+    // Variations - backend expects "variations" not "variants"
+    if (variants && Array.isArray(variants) && variants.length > 0) {
+      whitelisted.variations = variants.map((variant: any) => {
+        // Remove _id if present (for new variants)
+        const { _id, ...variantData } = variant;
+        return variantData;
+      });
+    }
+
+    // Pakistani Clothing Specific Fields
+    copyIfDefined('fabric');
+    copyIfDefined('collectionName');
+    copyIfDefined('occasion');
+    copyIfDefined('season');
+    copyIfDefined('careInstructions');
+    if (rest.modelMeasurements && typeof rest.modelMeasurements === 'object') {
+      whitelisted.modelMeasurements = rest.modelMeasurements;
+    }
+    copyIfDefined('designer');
+    if (rest.handwork && Array.isArray(rest.handwork) && rest.handwork.length > 0) {
+      whitelisted.handwork = rest.handwork;
+    }
+    copyIfDefined('colorFamily');
+    copyIfDefined('pattern');
+    copyIfDefined('sleeveLength');
+    copyIfDefined('neckline');
+    copyIfDefined('length');
+    copyIfDefined('fit');
+    copyIfDefined('ageGroup');
+    if (rest.bodyType && Array.isArray(rest.bodyType) && rest.bodyType.length > 0) {
+      whitelisted.bodyType = rest.bodyType;
+    }
+    copyIfDefined('isLimitedEdition');
+    copyIfDefined('isCustomMade');
+    copyIfDefined('customDeliveryDays');
+    copyIfDefined('sizeChart');
+    copyIfDefined('availableSizes');
 
     return whitelisted;
   },
@@ -165,21 +236,41 @@ export const productService = {
 
   // Create new product
   async createProduct(productData: any): Promise<ApiResponse<{ product: Product }>> {
-    const payload = productService.buildProductPayload(productData);
-    // Debug payload to help diagnose backend 500s
-    // eslint-disable-next-line no-console
-    console.log('createProduct payload', payload);
-    const response = await api.post('/products', payload);
-    return response.data;
+    try {
+      const payload = productService.buildProductPayload(productData);
+      // Debug payload to help diagnose backend 500s
+      // eslint-disable-next-line no-console
+      console.log('createProduct payload', payload);
+      const response = await api.post('/products', payload);
+      return response.data;
+    } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error('Error creating product:', error.response?.data || error.message);
+      return {
+        success: false,
+        data: { product: {} as Product },
+        message: error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to create product',
+      };
+    }
   },
 
   // Update product
   async updateProduct(id: string, productData: any): Promise<ApiResponse<{ product: Product }>> {
-    const payload = productService.buildProductPayload(productData);
-    // eslint-disable-next-line no-console
-    console.log('updateProduct payload', id, payload);
-    const response = await api.put(`/products/${id}`, payload);
-    return response.data;
+    try {
+      const payload = productService.buildProductPayload(productData);
+      // eslint-disable-next-line no-console
+      console.log('updateProduct payload', id, payload);
+      const response = await api.put(`/products/${id}`, payload);
+      return response.data;
+    } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error('Error updating product:', error.response?.data || error.message);
+      return {
+        success: false,
+        data: { product: {} as Product },
+        message: error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to update product',
+      };
+    }
   },
 
   // Delete product
