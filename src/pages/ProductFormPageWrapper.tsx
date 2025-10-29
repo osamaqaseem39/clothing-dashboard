@@ -46,7 +46,7 @@ const ProductFormPageWrapper: React.FC = () => {
       if (isEditing && id) {
         const productResponse = await productService.getProduct(id);
         if (productResponse.success && productResponse.data) {
-          setProduct(productResponse.data);
+          setProduct(productResponse.data.product);
         } else {
           setError('Product not found');
         }
