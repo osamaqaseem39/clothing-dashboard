@@ -47,7 +47,7 @@ export const customerService = {
   async deleteCustomer(id: string): Promise<ApiResponse<void>> {
     try {
       await api.delete(`/customers/${id}`);
-      return { success: true };
+      return { success: true, data: undefined };
     } catch (error: any) {
       return { success: false, errors: [error.response?.data?.message || 'Failed to delete customer'] };
     }

@@ -105,6 +105,7 @@ class MasterDataService<T extends MasterDataItem> {
       // Backend returned empty or different format, wrap it
       return {
         success: true,
+        data: undefined,
       };
     }
   }
