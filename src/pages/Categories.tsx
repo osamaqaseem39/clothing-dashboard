@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, Squares2X2Icon, ListBulletIcon } from '@heroicons/react/24/outline';
 import { categoryService } from '../services/categoryService';
 import type { Category } from '../types';
-import CategoryForm from '../components/products/CategoryForm';
 import CategoryTree from '../components/CategoryTree';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -13,15 +13,13 @@ import Table from '../components/ui/Table';
 import SearchInput from '../components/ui/SearchInput';
 
 const Categories: React.FC = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Category | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'tree'>('table');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
@@ -61,36 +59,6 @@ const Categories: React.FC = () => {
     setFilteredCategories(filtered);
   };
 
-  const handleCreateCategory = async (categoryData: Partial<Category>) => {
-    try {
-      setIsSubmitting(true);
-      await categoryService.createCategory(categoryData);
-      await loadCategories();
-      setShowForm(false);
-    } catch (err) {
-      setError('Failed to create category');
-      console.error('Error creating category:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleUpdateCategory = async (categoryData: Partial<Category>) => {
-    if (!editingCategory) return;
-
-    try {
-      setIsSubmitting(true);
-      await categoryService.updateCategory(editingCategory._id, categoryData);
-      await loadCategories();
-      setEditingCategory(null);
-    } catch (err) {
-      setError('Failed to update category');
-      console.error('Error updating category:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleDeleteCategory = async (category: Category) => {
     try {
       await categoryService.deleteCategory(category._id);
@@ -112,13 +80,12 @@ const Categories: React.FC = () => {
     }
   };
 
-  const openEditForm = (category: Category) => {
-    setEditingCategory(category);
+  const handleAddCategory = () => {
+    navigate('/categories/new');
   };
 
-  const closeForm = () => {
-    setShowForm(false);
-    setEditingCategory(null);
+  const handleEditCategory = (category: Category) => {
+    navigate(`/categories/${category._id}/edit`);
   };
 
   const getParentCategoryName = (parentId: string | undefined) => {
@@ -191,7 +158,7 @@ const Categories: React.FC = () => {
             )}
           </button>
           <button
-            onClick={() => openEditForm(category)}
+            onClick={() => handleEditCategory(category)}
             className="text-blue-600 hover:text-blue-800"
             title="Edit"
           >
@@ -226,7 +193,7 @@ const Categories: React.FC = () => {
           <p className="text-gray-600">Manage product categories and subcategories</p>
         </div>
         <Button
-          onClick={() => setShowForm(true)}
+          onClick={handleAddCategory}
           className="flex items-center space-x-2"
         >
           <PlusIcon className="h-5 w-5" />
@@ -350,7 +317,7 @@ const Categories: React.FC = () => {
                 <div className="mt-6 flex space-x-3">
                   <Button
                     variant="secondary"
-                    onClick={() => openEditForm(selectedCategory)}
+                    onClick={() => handleEditCategory(selectedCategory)}
                     className="flex-1"
                   >
                     Edit Category
@@ -367,27 +334,6 @@ const Categories: React.FC = () => {
             </Card>
           )}
         </div>
-      )}
-
-      {/* Category Form Modal */}
-      {showForm && (
-        <CategoryForm
-          parentCategories={categories}
-          onSubmit={handleCreateCategory}
-          onCancel={closeForm}
-          isLoading={isSubmitting}
-        />
-      )}
-
-      {/* Edit Category Form Modal */}
-      {editingCategory && (
-        <CategoryForm
-          category={editingCategory}
-          parentCategories={categories}
-          onSubmit={handleUpdateCategory}
-          onCancel={closeForm}
-          isLoading={isSubmitting}
-        />
       )}
 
       {/* Delete Confirmation Modal */}

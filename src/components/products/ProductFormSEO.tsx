@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
 import ImageUpload from '../common/ImageUpload';
+import KeywordsModal from './modals/KeywordsModal';
 
 interface ProductFormSEOProps {
   formData: Partial<Product>;
@@ -203,15 +204,13 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
         </div>
       </div>
 
-      {/* Keywords Modal would be imported here */}
-      {/* 
+      {/* Keywords Modal */}
       <KeywordsModal
         isOpen={isKeywordsModalOpen}
         onClose={() => setIsKeywordsModalOpen(false)}
         keywords={formData.seo?.keywords || []}
         onKeywordsChange={(keywords) => onNestedFieldChange('seo', 'keywords', keywords)}
       />
-      */}
     </div>
   );
 };

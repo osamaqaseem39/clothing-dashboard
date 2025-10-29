@@ -1,267 +1,326 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, PlusIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeftIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import ErrorMessage from '../components/ui/ErrorMessage';
 import { colorService, Color } from '../services/masterDataService';
 
 const ColorFormPage: React.FC = () => {
   const navigate = useNavigate();
-  const [colors, setColors] = useState<Color[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [editingColor, setEditingColor] = useState<Color | null>(null);
+  const { id } = useParams();
+  const isEditing = !!id;
+
+  const [color, setColor] = useState<Color | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     hexCode: '#000000',
     isActive: true,
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Fetch colors on component mount
   useEffect(() => {
-    fetchColors();
-  }, []);
+    fetchData();
+  }, [id]);
 
-  const fetchColors = async () => {
+  const fetchData = async () => {
     try {
       setIsLoading(true);
-      const response = await colorService.getAll();
-      if (response.success && response.data) {
-        setColors(response.data);
+      setError(null);
+
+      if (isEditing && id) {
+        const response = await colorService.getById(id);
+        if (response.success && response.data) {
+          setColor(response.data);
+          setFormData({
+            name: response.data.name,
+            hexCode: response.data.hexCode || '#000000',
+            isActive: response.data.isActive ?? true,
+          });
+        } else {
+          setError('Color not found');
+        }
       }
-    } catch (error) {
-      console.error('Error fetching colors:', error);
+    } catch (err: any) {
+      console.error('Error fetching color:', err);
+      setError(err.response?.data?.message || 'Failed to load color');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Color name is required';
+    }
+
+    if (!formData.hexCode || !/^#[0-9A-F]{6}$/i.test(formData.hexCode)) {
+      newErrors.hexCode = 'Valid hex color code is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
+    if (!validateForm()) {
+      return;
+    }
+
     try {
+      setIsSaving(true);
+      setError(null);
+
       const colorData = {
         name: formData.name.trim(),
         hexCode: formData.hexCode,
         isActive: formData.isActive,
       };
 
-      if (editingColor) {
-        await colorService.update(editingColor._id!, colorData);
+      let response;
+      if (isEditing && id) {
+        response = await colorService.update(id, colorData);
       } else {
-        await colorService.create(colorData);
+        response = await colorService.create(colorData);
       }
 
-      setShowForm(false);
-      setEditingColor(null);
-      resetForm();
-      fetchColors(); // Refresh the list
-    } catch (error) {
-      console.error('Error saving color:', error);
+      if (response.success) {
+        navigate('/master-data');
+      } else {
+        throw new Error(response.message || 'Failed to save color');
+      }
+    } catch (err: any) {
+      console.error('Error saving color:', err);
+      setError(err.response?.data?.message || 'Failed to save color');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleEdit = (color: Color) => {
-    setEditingColor(color);
-    setFormData({
-      name: color.name,
-      hexCode: color.hexCode || '#000000',
-      isActive: color.isActive ?? true,
-    });
-    setShowForm(true);
-  };
-
-  const handleDelete = async (colorId: string) => {
-    if (window.confirm('Are you sure you want to delete this color?')) {
+  const handleDelete = async () => {
+    if (!color?._id) return;
+    
+    if (window.confirm('Are you sure you want to delete this color? This action cannot be undone.')) {
       try {
-        await colorService.delete(colorId);
-        fetchColors(); // Refresh the list
-      } catch (error) {
-        console.error('Error deleting color:', error);
+        setIsSaving(true);
+        const response = await colorService.delete(color._id);
+        if (response.success) {
+          navigate('/master-data');
+        } else {
+          throw new Error(response.message || 'Failed to delete color');
+        }
+      } catch (err: any) {
+        console.error('Error deleting color:', err);
+        setError(err.response?.data?.message || 'Failed to delete color');
+      } finally {
+        setIsSaving(false);
       }
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      hexCode: '#000000',
-      isActive: true,
-    });
+  const handleFieldChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+    
+    // Clear field-specific error
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: '',
+      }));
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error && !color && isEditing) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <ErrorMessage message={error} />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate('/dashboard/settings')}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeftIcon className="h-5 w-5 mr-2" />
-            Back to Settings
-          </button>
-          <div className="h-6 w-px bg-gray-300" />
-          <h1 className="text-2xl font-bold text-gray-900">Color Management</h1>
-        </div>
-        <button
-          onClick={() => {
-            setEditingColor(null);
-            resetForm();
-            setShowForm(true);
-          }}
-          className="btn btn-primary"
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Add Color
-        </button>
-      </div>
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Left side */}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/master-data')}
+                className="flex items-center text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                Back to Master Data
+              </button>
+              <div className="h-6 w-px bg-gray-300" />
+              <h1 className="text-xl font-semibold text-gray-900">
+                {isEditing ? 'Edit Color' : 'Add New Color'}
+              </h1>
+            </div>
 
-      {/* Colors List */}
-      <div className="card">
-        <div className="overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Color
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Hex Code
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {colors.map((color) => (
-                <tr key={color._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div
-                        className="h-8 w-8 rounded-full border border-gray-300 mr-3"
-                        style={{ backgroundColor: color.hexCode || '#000000' }}
-                      />
-                      <span className="text-sm font-medium text-gray-900">{color.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {color.hexCode || '#000000'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      color.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {color.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(color)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(color._id!)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            {/* Right side - Actions */}
+            <div className="flex items-center space-x-3">
+              {isEditing && (
+                <button
+                  onClick={handleDelete}
+                  disabled={isSaving}
+                  className="flex items-center px-3 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded-md hover:bg-red-50 disabled:opacity-50"
+                >
+                  <TrashIcon className="h-4 w-4 mr-2" />
+                  Delete
+                </button>
+              )}
+              
+              <button
+                onClick={handleSubmit}
+                disabled={isSaving}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <CheckIcon className="h-4 w-4 mr-2" />
+                {isSaving ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-6 border w-full max-w-md shadow-lg rounded-md bg-white">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {editingColor ? 'Edit Color' : 'Add New Color'}
-            </h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white shadow-sm rounded-lg">
+          <div className="p-6">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Color Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color Name
+                  Color Name *
                 </label>
                 <input
                   type="text"
-                  required
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="input-field"
-                  placeholder="e.g., Red, Blue, Green"
+                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter color name (e.g., Red, Blue, Navy)"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
               </div>
 
+              {/* Hex Code */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hex Color
+                  Hex Color Code *
                 </label>
-                <div className="flex gap-2">
+                <div className="flex items-center space-x-3">
                   <input
                     type="color"
                     value={formData.hexCode}
-                    onChange={(e) => setFormData({...formData, hexCode: e.target.value})}
-                    className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                    onChange={(e) => handleFieldChange('hexCode', e.target.value)}
+                    className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
                   />
                   <input
                     type="text"
                     value={formData.hexCode}
-                    onChange={(e) => setFormData({...formData, hexCode: e.target.value})}
-                    className="input-field flex-1"
+                    onChange={(e) => handleFieldChange('hexCode', e.target.value)}
+                    className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.hexCode ? 'border-red-300' : 'border-gray-300'
+                    }`}
                     placeholder="#000000"
+                    maxLength={7}
                   />
                 </div>
+                {errors.hexCode && (
+                  <p className="mt-1 text-sm text-red-600">{errors.hexCode}</p>
+                )}
+                <p className="mt-1 text-sm text-gray-500">
+                  Choose a color using the color picker or enter a hex code
+                </p>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 text-sm text-gray-700">Active</label>
+              {/* Active Status */}
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => handleFieldChange('isActive', e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    Active (this color will be available for selection)
+                  </span>
+                </label>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
+              {/* Color Preview */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Preview
+                </label>
+                <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-md bg-gray-50">
+                  <div
+                    className="w-12 h-12 rounded border border-gray-300"
+                    style={{ backgroundColor: formData.hexCode }}
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900">{formData.name || 'Color Name'}</p>
+                    <p className="text-sm text-gray-500">{formData.hexCode}</p>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Bottom Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-500">
+                {isEditing ? 'Update color information' : 'Create a new color for your products'}
+              </div>
+              <div className="flex items-center space-x-3">
                 <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingColor(null);
-                    resetForm();
-                  }}
-                  className="btn btn-secondary"
-                  disabled={isLoading}
+                  onClick={() => navigate('/master-data')}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isLoading}
+                  onClick={handleSubmit}
+                  disabled={isSaving}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isLoading ? 'Saving...' : (editingColor ? 'Update' : 'Create')}
+                  {isSaving ? 'Saving...' : (isEditing ? 'Update Color' : 'Create Color')}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

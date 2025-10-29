@@ -33,6 +33,11 @@ class MasterDataService<T extends MasterDataItem> {
     return response.data;
   }
 
+  async getById(id: string): Promise<ApiResponse<T>> {
+    const response = await api.get(`/master-data/${this.endpoint}/${id}`);
+    return response.data;
+  }
+
   async create(data: Partial<T>): Promise<ApiResponse<T>> {
     const response = await api.post(`/master-data/${this.endpoint}`, data);
     return response.data;

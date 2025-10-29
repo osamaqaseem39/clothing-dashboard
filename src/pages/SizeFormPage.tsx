@@ -1,46 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, PlusIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeftIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import ErrorMessage from '../components/ui/ErrorMessage';
 import { sizeService, Size } from '../services/masterDataService';
 
 const SizeFormPage: React.FC = () => {
   const navigate = useNavigate();
-  const [sizes, setSizes] = useState<Size[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [editingSize, setEditingSize] = useState<Size | null>(null);
+  const { id } = useParams();
+  const isEditing = !!id;
+
+  const [size, setSize] = useState<Size | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     sizeType: 'numeric' as 'numeric' | 'alphabetic' | 'custom',
     isActive: true,
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Fetch sizes on component mount
   useEffect(() => {
-    fetchSizes();
-  }, []);
+    fetchData();
+  }, [id]);
 
-  const fetchSizes = async () => {
+  const fetchData = async () => {
     try {
       setIsLoading(true);
-      const response = await sizeService.getAll();
-      if (response.success && response.data) {
-        setSizes(response.data);
+      setError(null);
+
+      if (isEditing && id) {
+        const response = await sizeService.getById(id);
+        if (response.success && response.data) {
+          setSize(response.data);
+          setFormData({
+            name: response.data.name,
+            description: response.data.description || '',
+            sizeType: response.data.sizeType || 'numeric',
+            isActive: response.data.isActive ?? true,
+          });
+        } else {
+          setError('Size not found');
+        }
       }
-    } catch (error) {
-      console.error('Error fetching sizes:', error);
+    } catch (err: any) {
+      console.error('Error fetching size:', err);
+      setError(err.response?.data?.message || 'Failed to load size');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Size name is required';
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'Size description is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
+    if (!validateForm()) {
+      return;
+    }
+
     try {
+      setIsSaving(true);
+      setError(null);
+
       const sizeData = {
         name: formData.name.trim(),
         description: formData.description.trim(),
@@ -48,237 +86,255 @@ const SizeFormPage: React.FC = () => {
         isActive: formData.isActive,
       };
 
-      if (editingSize) {
-        await sizeService.update(editingSize._id!, sizeData);
+      let response;
+      if (isEditing && id) {
+        response = await sizeService.update(id, sizeData);
       } else {
-        await sizeService.create(sizeData);
+        response = await sizeService.create(sizeData);
       }
 
-      setShowForm(false);
-      setEditingSize(null);
-      resetForm();
-      fetchSizes(); // Refresh the list
-    } catch (error) {
-      console.error('Error saving size:', error);
+      if (response.success) {
+        navigate('/master-data');
+      } else {
+        throw new Error(response.message || 'Failed to save size');
+      }
+    } catch (err: any) {
+      console.error('Error saving size:', err);
+      setError(err.response?.data?.message || 'Failed to save size');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleEdit = (size: Size) => {
-    setEditingSize(size);
-    setFormData({
-      name: size.name,
-      description: size.description || '',
-      sizeType: size.sizeType || 'numeric',
-      isActive: size.isActive ?? true,
-    });
-    setShowForm(true);
-  };
-
-  const handleDelete = async (sizeId: string) => {
-    if (window.confirm('Are you sure you want to delete this size?')) {
+  const handleDelete = async () => {
+    if (!size?._id) return;
+    
+    if (window.confirm('Are you sure you want to delete this size? This action cannot be undone.')) {
       try {
-        await sizeService.delete(sizeId);
-        fetchSizes(); // Refresh the list
-      } catch (error) {
-        console.error('Error deleting size:', error);
+        setIsSaving(true);
+        const response = await sizeService.delete(size._id);
+        if (response.success) {
+          navigate('/master-data');
+        } else {
+          throw new Error(response.message || 'Failed to delete size');
+        }
+      } catch (err: any) {
+        console.error('Error deleting size:', err);
+        setError(err.response?.data?.message || 'Failed to delete size');
+      } finally {
+        setIsSaving(false);
       }
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      sizeType: 'numeric',
-      isActive: true,
-    });
+  const handleFieldChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+    
+    // Clear field-specific error
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: '',
+      }));
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error && !size && isEditing) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <ErrorMessage message={error} />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate('/dashboard/products')}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeftIcon className="h-5 w-5 mr-2" />
-            Back to Products
-          </button>
-          <div className="h-6 w-px bg-gray-300" />
-          <h1 className="text-2xl font-bold text-gray-900">Size Management</h1>
-        </div>
-        <button
-          onClick={() => {
-            setEditingSize(null);
-            resetForm();
-            setShowForm(true);
-          }}
-          className="btn btn-primary"
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Add Size
-        </button>
-      </div>
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Left side */}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/master-data')}
+                className="flex items-center text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                Back to Master Data
+              </button>
+              <div className="h-6 w-px bg-gray-300" />
+              <h1 className="text-xl font-semibold text-gray-900">
+                {isEditing ? 'Edit Size' : 'Add New Size'}
+              </h1>
+            </div>
 
-      {/* Sizes List */}
-      <div className="card">
-        <div className="overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sizes.map((size) => (
-                <tr key={size._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-medium text-gray-900">{size.name}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      size.sizeType === 'numeric' ? 'bg-blue-100 text-blue-800' :
-                      size.sizeType === 'alphabetic' ? 'bg-green-100 text-green-800' :
-                      'bg-purple-100 text-purple-800'
-                    }`}>
-                      {size.sizeType || 'numeric'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {size.description || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      size.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {size.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(size)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(size._id!)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            {/* Right side - Actions */}
+            <div className="flex items-center space-x-3">
+              {isEditing && (
+                <button
+                  onClick={handleDelete}
+                  disabled={isSaving}
+                  className="flex items-center px-3 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded-md hover:bg-red-50 disabled:opacity-50"
+                >
+                  <TrashIcon className="h-4 w-4 mr-2" />
+                  Delete
+                </button>
+              )}
+              
+              <button
+                onClick={handleSubmit}
+                disabled={isSaving}
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <CheckIcon className="h-4 w-4 mr-2" />
+                {isSaving ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-6 border w-full max-w-lg shadow-lg rounded-md bg-white">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {editingSize ? 'Edit Size' : 'Add New Size'}
-            </h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white shadow-sm rounded-lg">
+          <div className="p-6">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Size Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Name *
+                  Size Name *
                 </label>
                 <input
                   type="text"
-                  required
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="input-field"
-                  placeholder="e.g., S, M, L, XL or 28, 30, 32"
+                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter size name (e.g., Small, Medium, Large, 32, 34)"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
               </div>
 
+              {/* Size Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Size Type *
+                  Size Type
                 </label>
                 <select
                   value={formData.sizeType}
-                  onChange={(e) => setFormData({...formData, sizeType: e.target.value as 'numeric' | 'alphabetic' | 'custom'})}
-                  className="input-field"
+                  onChange={(e) => handleFieldChange('sizeType', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="numeric">Numeric</option>
-                  <option value="alphabetic">Alphabetic</option>
-                  <option value="custom">Custom</option>
+                  <option value="numeric">Numeric (e.g., 32, 34, 36)</option>
+                  <option value="alphabetic">Alphabetic (e.g., S, M, L, XL)</option>
+                  <option value="custom">Custom (e.g., One Size, Free Size)</option>
                 </select>
+                <p className="mt-1 text-sm text-gray-500">
+                  Choose the type of sizing system for this size
+                </p>
               </div>
 
+              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  Description *
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="input-field"
-                  rows={3}
-                  placeholder="Optional description..."
+                  onChange={(e) => handleFieldChange('description', e.target.value)}
+                  rows={4}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.description ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Describe the size, measurements, and fit information..."
                 />
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                )}
+                <p className="mt-1 text-sm text-gray-500">
+                  Provide detailed information about measurements and fit for this size
+                </p>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 text-sm text-gray-700">Active</label>
+              {/* Active Status */}
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => handleFieldChange('isActive', e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    Active (this size will be available for selection)
+                  </span>
+                </label>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
+              {/* Size Examples */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Common Size Examples
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600">
+                  <div>• Small (S)</div>
+                  <div>• Medium (M)</div>
+                  <div>• Large (L)</div>
+                  <div>• Extra Large (XL)</div>
+                  <div>• 32</div>
+                  <div>• 34</div>
+                  <div>• 36</div>
+                  <div>• 38</div>
+                  <div>• One Size</div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Bottom Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-500">
+                {isEditing ? 'Update size information' : 'Create a new size for your products'}
+              </div>
+              <div className="flex items-center space-x-3">
                 <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingSize(null);
-                    resetForm();
-                  }}
-                  className="btn btn-secondary"
-                  disabled={isLoading}
+                  onClick={() => navigate('/master-data')}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isLoading}
+                  onClick={handleSubmit}
+                  disabled={isSaving}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isLoading ? 'Saving...' : (editingSize ? 'Update' : 'Create')}
+                  {isSaving ? 'Saving...' : (isEditing ? 'Update Size' : 'Create Size')}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
+import FeaturesModal from './modals/FeaturesModal';
+import ColorsModal from './modals/ColorsModal';
+import AttributesModal from './modals/AttributesModal';
+import HandworkModal from './modals/HandworkModal';
+import BodyTypeModal from './modals/BodyTypeModal';
+import SizesModal from './modals/SizesModal';
 
 interface ProductFormAttributesProps {
   formData: Partial<Product>;
@@ -233,8 +239,7 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
         </div>
       </div>
 
-      {/* Modals would be imported here */}
-      {/* 
+      {/* Modals */}
       <FeaturesModal
         isOpen={isFeaturesModalOpen}
         onClose={() => setIsFeaturesModalOpen(false)}
@@ -276,7 +281,6 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
         sizes={formData.availableSizes || []}
         onSizesChange={(sizes) => onFieldChange('availableSizes', sizes)}
       />
-      */}
     </div>
   );
 };

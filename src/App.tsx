@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
+import ProductFormPageWrapper from './pages/ProductFormPageWrapper';
 import Categories from './pages/Categories';
 import Inventory from './pages/Inventory';
 import ProductSetup from './pages/ProductSetup';
@@ -81,6 +82,8 @@ const AppContent: React.FC = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="products" element={<Products />} />
+          <Route path="products/new" element={<ProductFormPageWrapper />} />
+          <Route path="products/:id/edit" element={<ProductFormPageWrapper />} />
           <Route path="categories" element={<Categories />} />
           <Route path="categories/new" element={<CategoryFormPage />} />
           <Route path="categories/:id/edit" element={<CategoryFormPage />} />

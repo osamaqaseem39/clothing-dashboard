@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -14,10 +15,10 @@ import { brandService } from '../services/brandService';
 import type { Product, Category, Brand, ProductFilters as ProductFiltersType } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
-import ProductForm from '../components/products/ProductForm';
 import ProductFilters from '../components/products/ProductFilters';
 
 const Products: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,8 +28,6 @@ const Products: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -104,38 +103,12 @@ const Products: React.FC = () => {
     }
   };
 
-  const handleProductSubmit = async (productData: Partial<Product>) => {
-    try {
-      if (editingProduct) {
-        const response = await productService.updateProduct(editingProduct._id, productData);
-        if (response.success) {
-          setProducts(products.map(p => 
-            p._id === editingProduct._id ? { ...p, ...productData } : p
-          ));
-        }
-      } else {
-        const response = await productService.createProduct(productData);
-        if (response.success && response.data) {
-          setProducts([response.data.product, ...products]);
-        }
-      }
-      setShowProductForm(false);
-      setEditingProduct(null);
-      await fetchProducts();
-    } catch (error) {
-      console.error('Error saving product:', error);
-      setError('Failed to save product');
-    }
-  };
-
   const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setShowProductForm(true);
+    navigate(`/products/${product._id}/edit`);
   };
 
   const handleAddProduct = () => {
-    setEditingProduct(null);
-    setShowProductForm(true);
+    navigate('/products/new');
   };
 
   const handleSearchChange = (value: string) => {
@@ -439,20 +412,6 @@ const Products: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Product Form Modal */}
-      {showProductForm && (
-        <ProductForm
-          product={editingProduct || undefined}
-          categories={categories}
-          brands={brands}
-          onSubmit={handleProductSubmit}
-          onCancel={() => {
-            setShowProductForm(false);
-            setEditingProduct(null);
-          }}
-        />
       )}
 
       {/* Product Filters Modal */}
