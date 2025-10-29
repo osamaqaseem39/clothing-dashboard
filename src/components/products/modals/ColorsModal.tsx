@@ -230,12 +230,21 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
                 </button>
               </div>
               <ImageUpload
-                currentImage={colorImages[editingColorId]}
-                onImageChange={(url) => {
+                onImageUpload={(url) => {
                   if (url && editingColorId) {
                     updateColorImage(editingColorId, url);
+                    setEditingColorId(null);
                   }
                 }}
+                existingImages={editingColorId && colorImages[editingColorId] ? [colorImages[editingColorId]] : []}
+                onImageRemove={() => {
+                  if (editingColorId) {
+                    const newImages = { ...colorImages };
+                    delete newImages[editingColorId];
+                    setColorImages(newImages);
+                  }
+                }}
+                maxImages={1}
               />
             </div>
           </div>
