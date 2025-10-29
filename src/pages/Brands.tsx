@@ -13,7 +13,7 @@ import type { Brand } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import Modal from '../components/ui/Modal';
-import BrandForm from '../components/products/BrandForm';
+import { useNavigate } from 'react-router-dom';
 
 const Brands: React.FC = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -24,21 +24,9 @@ const Brands: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
-  const [showBrandForm, setShowBrandForm] = useState(false);
-  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const navigate = useNavigate();
   const [showBrandModal, setShowBrandModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
-
-  // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    slug: '',
-    description: '',
-    website: '',
-    logo: '',
-    country: '',
-    isActive: true,
-  });
 
   useEffect(() => {
     fetchBrands();
@@ -82,72 +70,13 @@ const Brands: React.FC = () => {
     }
   };
 
-  const handleBrandSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Build payload to match backend DTO and omit empty strings
-      const payload: any = {
-        name: formData.name.trim(),
-        slug: formData.slug.trim(),
-        description: formData.description.trim() || undefined,
-        website: formData.website.trim() || undefined,
-        country: formData.country.trim() || undefined,
-        isActive: formData.isActive,
-      };
-      if (formData.logo && formData.logo.trim() !== '') {
-        payload.logo = formData.logo.trim();
-      }
-
-      if (editingBrand) {
-        const response = await brandService.updateBrand(editingBrand._id, payload);
-        if (response.success) {
-          setBrands(brands.map(b => 
-            b._id === editingBrand._id ? { ...b, ...payload } : b
-          ));
-        }
-      } else {
-        const response = await brandService.createBrand(payload);
-        if (response.success && response.data) {
-          setBrands([response.data, ...brands]);
-        }
-      }
-      setShowBrandForm(false);
-      setEditingBrand(null);
-      resetForm();
-    } catch (error) {
-      console.error('Error saving brand:', error);
-      setError('Failed to save brand');
-    }
-  };
 
   const handleEditBrand = (brand: Brand) => {
-    setEditingBrand(brand);
-    setShowBrandForm(true);
+    navigate(`/dashboard/brands/${brand._id}/edit`);
   };
 
   const handleAddBrand = () => {
-    setEditingBrand(null);
-    setShowBrandForm(true);
-  };
-
-  // Unified BrandForm submit handler (reuses shared component)
-  const handleBrandFormSubmit = async (brandData: Partial<Brand>) => {
-    try {
-      if (editingBrand) {
-        const response = await brandService.updateBrand(editingBrand._id, brandData);
-        if (response.success && response.data) {
-          setBrands(brands.map(b => b._id === editingBrand._id ? response.data as Brand : b));
-        }
-      } else {
-        const response = await brandService.createBrand(brandData);
-        if (response.success && response.data) {
-          setBrands([response.data as Brand, ...brands]);
-        }
-      }
-    } finally {
-      setShowBrandForm(false);
-      setEditingBrand(null);
-    }
+    navigate('/dashboard/brands/new');
   };
 
   const handleViewBrand = (brand: Brand) => {
@@ -155,17 +84,6 @@ const Brands: React.FC = () => {
     setShowBrandModal(true);
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      slug: '',
-      description: '',
-      website: '',
-      logo: '',
-      country: '',
-      isActive: true,
-    });
-  };
 
   const getStatusColor = (isActive: boolean) => {
     return isActive 

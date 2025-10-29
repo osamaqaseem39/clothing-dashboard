@@ -16,6 +16,12 @@ import Customers from './pages/Customers';
 import Brands from './pages/Brands';
 import BrandFormPage from './pages/BrandFormPage';
 import CategoryFormPage from './pages/CategoryFormPage';
+import ColorFormPage from './pages/ColorFormPage';
+import MaterialFormPage from './pages/MaterialFormPage';
+import OccasionFormPage from './pages/OccasionFormPage';
+import SeasonFormPage from './pages/SeasonFormPage';
+import SizeFormPage from './pages/SizeFormPage';
+import MasterDataPage from './pages/MasterDataPage';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Cart from './pages/Cart';
@@ -85,6 +91,14 @@ const AppContent: React.FC = () => {
           <Route path="brands" element={<Brands />} />
           <Route path="brands/new" element={<BrandFormPage />} />
           <Route path="brands/:id/edit" element={<BrandFormPage />} />
+          
+          {/* Master Data Routes */}
+          <Route path="colors" element={<ColorFormPage />} />
+          <Route path="materials" element={<MaterialFormPage />} />
+          <Route path="occasions" element={<OccasionFormPage />} />
+          <Route path="seasons" element={<SeasonFormPage />} />
+          <Route path="sizes" element={<SizeFormPage />} />
+          <Route path="master-data" element={<MasterDataPage />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
         </Route>
