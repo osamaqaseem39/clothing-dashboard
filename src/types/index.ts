@@ -497,7 +497,9 @@ export interface ProductFilters {
   limit?: number;
   search?: string;
   category?: string;
+  categories?: string[];
   brand?: string;
+  brands?: string[];
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
@@ -529,7 +531,7 @@ export interface ProductFilters {
     min: number;
     max: number;
   };
-  rating?: {
+  rating?: number | {
     min: number;
     max: number;
   };

@@ -2,6 +2,55 @@ import api from './api';
 import { ApiResponse, Product, ProductFilters } from '../types';
 
 export const productService = {
+  // Normalize dashboard product shape to backend-accepted payload
+  buildProductPayload(productData: any) {
+    const allowedTypes = new Set(['simple', 'variable', 'grouped', 'external']);
+
+    // Derive slug
+    const rawSlug = productData.slug || productData.seo?.slug || productData.name || '';
+    const slug = String(rawSlug)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+
+    // Ensure type is valid
+    const type = allowedTypes.has(productData.type) ? productData.type : 'simple';
+
+    // Normalize categories to array of strings (ids)
+    let categories: string[] | undefined = undefined;
+    if (Array.isArray(productData.categories)) {
+      categories = productData.categories.map((c: any) => (typeof c === 'string' ? c : c?._id || c?.id)).filter(Boolean);
+    } else if (productData.categoryId) {
+      const cid = typeof productData.categoryId === 'string' ? productData.categoryId : productData.categoryId?._id;
+      categories = cid ? [cid] : undefined;
+    }
+
+    // Normalize images to strings if objects contain url
+    const images = Array.isArray(productData.images)
+      ? productData.images.map((img: any) => (typeof img === 'string' ? img : img?.url)).filter(Boolean)
+      : undefined;
+
+    // Strip fields rejected by backend
+    const {
+      seo, // nested SEO object not supported by backend
+      isActive,
+      features,
+      colors,
+      sizeChartImageUrl,
+      // keep rest
+      ...rest
+    } = productData || {};
+
+    return {
+      ...rest,
+      slug,
+      type,
+      ...(categories ? { categories } : {}),
+      ...(images ? { images } : {}),
+    };
+  },
   // Get all products with filters
   async getProducts(filters?: ProductFilters, page: number = 1, limit: number = 20): Promise<ApiResponse<any>> {
     const params = new URLSearchParams();
@@ -42,13 +91,15 @@ export const productService = {
 
   // Create new product
   async createProduct(productData: any): Promise<ApiResponse<{ product: Product }>> {
-    const response = await api.post('/products', productData);
+    const payload = productService.buildProductPayload(productData);
+    const response = await api.post('/products', payload);
     return response.data;
   },
 
   // Update product
   async updateProduct(id: string, productData: any): Promise<ApiResponse<{ product: Product }>> {
-    const response = await api.put(`/products/${id}`, productData);
+    const payload = productService.buildProductPayload(productData);
+    const response = await api.put(`/products/${id}`, payload);
     return response.data;
   },
 
