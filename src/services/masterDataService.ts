@@ -1,4 +1,5 @@
 import api from './api';
+import { Attribute } from '../types';
 
 export interface MasterDataItem {
   _id: string;
@@ -122,7 +123,7 @@ export const fitService = new MasterDataService<MasterDataItem>('fits');
 export const ageGroupService = new MasterDataService<MasterDataItem>('age-groups');
 export const colorFamilyService = new MasterDataService<MasterDataItem>('color-families');
 export const careInstructionService = new MasterDataService<MasterDataItem>('care-instructions');
-export const attributeService = new MasterDataService<MasterDataItem>('attributes');
+export const attributeService = new MasterDataService<Attribute>('attributes');
 export const featureService = new MasterDataService<MasterDataItem>('features');
 export const tagService = new MasterDataService<MasterDataItem>('tags');
 export const sizeService = new MasterDataService<Size>('sizes');

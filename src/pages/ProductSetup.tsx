@@ -11,6 +11,7 @@ import {
   SunIcon,
   TagIcon,
   LinkIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import type { Category, Brand } from '../types';
 import { useNavigate } from 'react-router-dom';
@@ -446,6 +447,111 @@ const ProductSetup: React.FC = () => {
             <div className="ml-4 flex-1">
               <h4 className="font-medium text-gray-900">Sizes</h4>
               <p className="text-sm text-gray-500">Manage product sizes and size charts</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Patterns */}
+          <button
+            onClick={() => navigate('/dashboard/patterns')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-pink-300 hover:bg-pink-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-pink-500">
+              <SwatchIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Patterns</h4>
+              <p className="text-sm text-gray-500">Manage pattern types</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Sleeve Lengths */}
+          <button
+            onClick={() => navigate('/dashboard/sleeve-lengths')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-indigo-500">
+              <TagIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Sleeve Lengths</h4>
+              <p className="text-sm text-gray-500">Manage sleeve length options</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Necklines */}
+          <button
+            onClick={() => navigate('/dashboard/necklines')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-teal-300 hover:bg-teal-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-teal-500">
+              <TagIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Necklines</h4>
+              <p className="text-sm text-gray-500">Manage neckline styles</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Garment Lengths */}
+          <button
+            onClick={() => navigate('/dashboard/lengths')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-yellow-500">
+              <TagIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Garment Lengths</h4>
+              <p className="text-sm text-gray-500">Manage length options</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Fits */}
+          <button
+            onClick={() => navigate('/dashboard/fits')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-cyan-300 hover:bg-cyan-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-cyan-500">
+              <TagIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Fits</h4>
+              <p className="text-sm text-gray-500">Manage fit types</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Age Groups */}
+          <button
+            onClick={() => navigate('/dashboard/age-groups')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-amber-500">
+              <TagIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Age Groups</h4>
+              <p className="text-sm text-gray-500">Manage age group categories</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Color Families */}
+          <button
+            onClick={() => navigate('/dashboard/color-families')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-violet-300 hover:bg-violet-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-violet-500">
+              <SwatchIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Color Families</h4>
+              <p className="text-sm text-gray-500">Manage color family groups</p>
             </div>
             <ArrowRightIcon className="h-5 w-5 text-gray-400" />
           </button>
