@@ -36,13 +36,51 @@ export const brandService = {
   // Create new brand
   async createBrand(brandData: Partial<Brand>): Promise<ApiResponse<Brand>> {
     const response = await api.post('/brands', brandData);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<Brand>;
+    } else {
+      // Backend returned the item directly, wrap it
+      return {
+        success: true,
+        data: payload as Brand,
+      };
+    }
   },
 
   // Update brand
   async updateBrand(id: string, brandData: Partial<Brand>): Promise<ApiResponse<Brand>> {
     const response = await api.put(`/brands/${id}`, brandData);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<Brand>;
+    } else {
+      // Backend returned the item directly, wrap it
+      return {
+        success: true,
+        data: payload as Brand,
+      };
+    }
   },
 
   // Delete brand

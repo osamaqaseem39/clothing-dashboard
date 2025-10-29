@@ -12,6 +12,7 @@ export interface MasterDataItem {
 
 export interface Color extends MasterDataItem {
   hexCode?: string;
+  imageUrl?: string;
 }
 
 export interface Size extends MasterDataItem {
@@ -88,7 +89,23 @@ class MasterDataService<T extends MasterDataItem> {
 
   async delete(id: string): Promise<ApiResponse<void>> {
     const response = await api.delete(`/master-data/${this.endpoint}/${id}`);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return success object or empty response
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      return payload as ApiResponse<void>;
+    } else {
+      // Backend returned empty or different format, wrap it
+      return {
+        success: true,
+      };
+    }
   }
 }
 
@@ -103,6 +120,7 @@ export const necklineService = new MasterDataService<MasterDataItem>('necklines'
 export const lengthService = new MasterDataService<MasterDataItem>('lengths');
 export const fitService = new MasterDataService<MasterDataItem>('fits');
 export const ageGroupService = new MasterDataService<MasterDataItem>('age-groups');
+export const colorFamilyService = new MasterDataService<MasterDataItem>('color-families');
 export const careInstructionService = new MasterDataService<MasterDataItem>('care-instructions');
 export const attributeService = new MasterDataService<MasterDataItem>('attributes');
 export const featureService = new MasterDataService<MasterDataItem>('features');

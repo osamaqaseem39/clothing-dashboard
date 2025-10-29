@@ -34,13 +34,51 @@ export const categoryService = {
   // Create new category
   async createCategory(categoryData: Partial<Category>): Promise<ApiResponse<Category>> {
     const response = await api.post('/categories', categoryData);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<Category>;
+    } else {
+      // Backend returned the item directly, wrap it
+      return {
+        success: true,
+        data: payload as Category,
+      };
+    }
   },
 
   // Update category
   async updateCategory(id: string, categoryData: Partial<Category>): Promise<ApiResponse<Category>> {
     const response = await api.put(`/categories/${id}`, categoryData);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<Category>;
+    } else {
+      // Backend returned the item directly, wrap it
+      return {
+        success: true,
+        data: payload as Category,
+      };
+    }
   },
 
   // Delete category

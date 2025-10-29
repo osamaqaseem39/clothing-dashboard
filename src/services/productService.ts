@@ -96,32 +96,63 @@ export const productService = {
   },
   // Get all products with filters
   async getProducts(filters?: ProductFilters, page: number = 1, limit: number = 20): Promise<ApiResponse<any>> {
-    const params = new URLSearchParams();
+    // Backend NestJS only accepts PaginationDto (page, limit, sortBy, sortOrder) for most endpoints
+    // Use specific endpoints based on filter priority: search > category > published > default
     
-    if (filters?.search) params.append('search', filters.search);
-    if (filters?.category) {
-      // Backend expects categories as array, so we wrap single category in array
-      const categoryArray = Array.isArray(filters.category) ? filters.category : [filters.category];
-      categoryArray.forEach(cat => params.append('categories', cat));
-    }
-    if (filters?.categories) {
-      filters.categories.forEach(cat => params.append('categories', cat));
-    }
-    if (filters?.brand) params.append('brand', filters.brand);
-    if (filters?.brands) {
-      filters.brands.forEach(brand => params.append('brands', brand));
-    }
-    if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
-    if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
-    if (filters?.inStock !== undefined) params.append('inStock', filters.inStock.toString());
-    if (filters?.rating) params.append('rating', filters.rating.toString());
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.sortBy) params.append('sortBy', filters.sortBy);
-    if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
+    // Extract page and limit from filters if provided, otherwise use function parameters
+    const actualPage = filters?.page ?? page;
+    const actualLimit = filters?.limit ?? limit;
     
-    params.append('page', page.toString());
-    params.append('limit', limit.toString());
+    const buildPaginationParams = () => {
+      const params = new URLSearchParams();
+      if (filters?.sortBy) params.append('sortBy', filters.sortBy);
+      if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
+      params.append('page', actualPage.toString());
+      params.append('limit', actualLimit.toString());
+      return params;
+    };
 
+    // Priority 1: Published products with category or search
+    // Note: Backend endpoints don't combine status with other filters well,
+    // so we use the most specific endpoint and filter client-side if needed
+    if (filters?.status === 'published' && filters?.category) {
+      // Use category endpoint, then filter for published status client-side if needed
+      const categoryId = Array.isArray(filters.category) ? filters.category[0] : filters.category;
+      const params = buildPaginationParams();
+      const suffix = params.toString() ? `?${params.toString()}` : '';
+      const response = await api.get(`/products/category/${categoryId}${suffix}`);
+      // Response structure varies, so return as-is and let caller handle filtering
+      return response.data;
+    }
+
+    // Priority 2: Search queries
+    if (filters?.search) {
+      const params = buildPaginationParams();
+      params.append('q', filters.search);
+      const suffix = params.toString() ? `?${params.toString()}` : '';
+      const response = await api.get(`/products/search${suffix}`);
+      return response.data;
+    }
+
+    // Priority 3: Category filtering (without published status requirement)
+    if (filters?.category) {
+      const categoryId = Array.isArray(filters.category) ? filters.category[0] : filters.category;
+      const params = buildPaginationParams();
+      const suffix = params.toString() ? `?${params.toString()}` : '';
+      const response = await api.get(`/products/category/${categoryId}${suffix}`);
+      return response.data;
+    }
+
+    // Priority 4: Published products only - use dedicated endpoint
+    if (filters?.status === 'published') {
+      const params = buildPaginationParams();
+      const suffix = params.toString() ? `?${params.toString()}` : '';
+      const response = await api.get(`/products/published${suffix}`);
+      return response.data;
+    }
+
+    // Default: use base /products endpoint with only pagination params
+    const params = buildPaginationParams();
     const response = await api.get(`/products?${params.toString()}`);
     return response.data;
   },

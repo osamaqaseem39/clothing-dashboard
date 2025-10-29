@@ -91,7 +91,7 @@ const SeasonFormPage: React.FC = () => {
       }
 
       if (response.success) {
-        navigate('/master-data');
+        navigate('/dashboard/seasons');
       } else {
         throw new Error(response.message || 'Failed to save season');
       }
@@ -164,11 +164,11 @@ const SeasonFormPage: React.FC = () => {
             {/* Left side */}
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => navigate('/master-data')}
+                onClick={() => navigate('/dashboard/seasons')}
                 className="flex items-center text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeftIcon className="h-5 w-5 mr-2" />
-                Back to Master Data
+                Back to Seasons
               </button>
               <div className="h-6 w-px bg-gray-300" />
               <h1 className="text-xl font-semibold text-gray-900">
@@ -296,7 +296,7 @@ const SeasonFormPage: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => navigate('/master-data')}
+                  onClick={() => navigate('/dashboard/seasons')}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   Cancel

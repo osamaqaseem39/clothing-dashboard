@@ -5,6 +5,12 @@ import {
   BuildingStorefrontIcon,
   CogIcon,
   ArrowRightIcon,
+  SwatchIcon,
+  CubeIcon,
+  CalendarDaysIcon,
+  SunIcon,
+  TagIcon,
+  LinkIcon,
 } from '@heroicons/react/24/outline';
 import type { Category, Brand } from '../types';
 import { useNavigate } from 'react-router-dom';
@@ -350,11 +356,125 @@ const ProductSetup: React.FC = () => {
         )}
       </div>
 
+      {/* Master Data Links Section */}
+      <div className="card">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Master Data Setup</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage dropdown options and master data used in product forms
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/dashboard/master-data')}
+            className="btn btn-secondary"
+          >
+            <LinkIcon className="h-4 w-4 mr-2" />
+            View All
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Occasions */}
+          <button
+            onClick={() => navigate('/dashboard/occasions')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-purple-500">
+              <CalendarDaysIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Occasions</h4>
+              <p className="text-sm text-gray-500">Manage occasions like Formal, Casual, Wedding</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Seasons */}
+          <button
+            onClick={() => navigate('/dashboard/seasons')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-orange-500">
+              <SunIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Seasons</h4>
+              <p className="text-sm text-gray-500">Manage seasonal categories</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Materials */}
+          <button
+            onClick={() => navigate('/dashboard/materials')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-green-500">
+              <CubeIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Materials</h4>
+              <p className="text-sm text-gray-500">Manage fabric types and materials</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Colors */}
+          <button
+            onClick={() => navigate('/dashboard/colors')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-blue-500">
+              <SwatchIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Colors</h4>
+              <p className="text-sm text-gray-500">Manage product colors and color families</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Sizes */}
+          <button
+            onClick={() => navigate('/dashboard/sizes')}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-red-500">
+              <TagIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Sizes</h4>
+              <p className="text-sm text-gray-500">Manage product sizes and size charts</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+
+          {/* Master Data Hub */}
+          <button
+            onClick={() => navigate('/dashboard/master-data')}
+            className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-300 hover:bg-gray-50 transition-colors text-left"
+          >
+            <div className="flex-shrink-0 p-3 rounded-lg bg-gray-100">
+              <CogIcon className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="ml-4 flex-1">
+              <h4 className="font-medium text-gray-900">Master Data Hub</h4>
+              <p className="text-sm text-gray-500">View all master data in one place</p>
+            </div>
+            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+          </button>
+        </div>
+      </div>
+
       {/* Quick Actions */}
       <div className="card">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors">
+          <button 
+            onClick={() => navigate('/dashboard/products/new')}
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors"
+          >
             <div className="flex items-center">
               <PlusIcon className="h-6 w-6 text-primary-600 mr-3" />
               <div>
@@ -377,8 +497,6 @@ const ProductSetup: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Forms moved to dedicated routes */}
     </div>
   );
 };

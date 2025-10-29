@@ -18,8 +18,11 @@ import Brands from './pages/Brands';
 import BrandFormPage from './pages/BrandFormPage';
 import CategoryFormPage from './pages/CategoryFormPage';
 import ColorFormPage from './pages/ColorFormPage';
+import MaterialsPage from './pages/MaterialsPage';
 import MaterialFormPage from './pages/MaterialFormPage';
+import OccasionsPage from './pages/OccasionsPage';
 import OccasionFormPage from './pages/OccasionFormPage';
+import SeasonsPage from './pages/SeasonsPage';
 import SeasonFormPage from './pages/SeasonFormPage';
 import SizeFormPage from './pages/SizeFormPage';
 import MasterDataPage from './pages/MasterDataPage';
@@ -97,9 +100,15 @@ const AppContent: React.FC = () => {
           
           {/* Master Data Routes */}
           <Route path="colors" element={<ColorFormPage />} />
-          <Route path="materials" element={<MaterialFormPage />} />
-          <Route path="occasions" element={<OccasionFormPage />} />
-          <Route path="seasons" element={<SeasonFormPage />} />
+          <Route path="materials" element={<MaterialsPage />} />
+          <Route path="materials/new" element={<MaterialFormPage />} />
+          <Route path="materials/:id/edit" element={<MaterialFormPage />} />
+          <Route path="occasions" element={<OccasionsPage />} />
+          <Route path="occasions/new" element={<OccasionFormPage />} />
+          <Route path="occasions/:id/edit" element={<OccasionFormPage />} />
+          <Route path="seasons" element={<SeasonsPage />} />
+          <Route path="seasons/new" element={<SeasonFormPage />} />
+          <Route path="seasons/:id/edit" element={<SeasonFormPage />} />
           <Route path="sizes" element={<SizeFormPage />} />
           <Route path="master-data" element={<MasterDataPage />} />
           <Route path="analytics" element={<Analytics />} />

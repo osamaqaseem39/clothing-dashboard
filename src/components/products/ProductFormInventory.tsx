@@ -153,45 +153,6 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
         </div>
       </div>
 
-      {/* Size Chart */}
-      <div className="border-t pt-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Size Chart</h2>
-        
-        {/* Size Chart ID */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Size Chart ID
-          </label>
-          <input
-            type="text"
-            value={formData.sizeChart || ''}
-            onChange={(e) => onFieldChange('sizeChart', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter size chart ID"
-          />
-        </div>
-
-        {/* Available Sizes */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Available Sizes
-          </label>
-          <div className="flex flex-wrap gap-2 min-h-[2rem]">
-            {formData.availableSizes?.map((size, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-              >
-                {size}
-              </span>
-            ))}
-            {(!formData.availableSizes || formData.availableSizes.length === 0) && (
-              <span className="text-gray-500 text-sm">No sizes added</span>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Model Measurements */}
       <div className="border-t pt-6">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Model Measurements</h2>

@@ -62,7 +62,7 @@ export interface Product {
   categories: string[];
   tags: string[];
   brand: string;
-  attributes: string[];
+  attributes: string[]; // Array of Attribute IDs
   variations: ProductVariant[];
   images: (string | {
     url: string;
@@ -76,7 +76,10 @@ export interface Product {
   isNew: boolean;
   isSale: boolean;
   features: string[];
-  colors: string[];
+  colors: Array<{
+    colorId: string;
+    imageUrl?: string;
+  }>;
   inStock: boolean;
   stockCount: number;
   shippingWeight: number;
@@ -124,6 +127,24 @@ export interface Product {
   brandId?: Brand;
   variants?: ProductVariant[];
   category?: Category; // Alias for categoryId
+}
+
+export interface Attribute {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface Color {
+  _id: string;
+  name: string;
+  slug?: string;
+  hexCode?: string;
+  imageUrl?: string;
+  description?: string;
+  isActive?: boolean;
 }
 
 export interface SizeChart {
