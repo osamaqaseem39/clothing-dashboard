@@ -269,7 +269,7 @@ const Categories: React.FC = () => {
           <CategoryTree
             categories={filteredCategories}
             onCategorySelect={setSelectedCategory}
-            onCategoryEdit={openEditForm}
+            onCategoryEdit={handleEditCategory}
             onCategoryDelete={setDeleteConfirm}
             selectedCategoryId={selectedCategory?._id}
             showActions={true}
