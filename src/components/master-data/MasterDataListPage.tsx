@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { MasterDataItem, ApiResponse } from '../../services/masterDataService';
+import LoadingSpinner from '../ui/LoadingSpinner';
 
 interface MasterDataServiceType {
   getAll: () => Promise<ApiResponse<MasterDataItem[]>>;
@@ -10,7 +11,6 @@ interface MasterDataServiceType {
   update: (id: string, data: Partial<MasterDataItem>) => Promise<ApiResponse<MasterDataItem>>;
   delete: (id: string) => Promise<ApiResponse<void>>;
 }
-import LoadingSpinner from '../ui/LoadingSpinner';
 
 interface MasterDataListPageProps {
   service: MasterDataServiceType;
