@@ -43,7 +43,10 @@ interface ProductFormData {
   images: string[];
   // UI-specific fields
   features?: string[];
-  colors?: string[];
+  colors?: Array<{
+    colorId: string;
+    imageUrl?: string;
+  }>;
   attributes: string[];
   // Pakistani Clothing Specific Fields
   fabric?: string;
@@ -867,7 +870,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
                   >
-                    {color}
+                    {color.colorId}
                   </span>
                 ))}
                 {(!formData.colors || formData.colors.length === 0) && (
