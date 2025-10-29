@@ -49,6 +49,26 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   const [occasionsState, setOccasionsState] = useState<any[]>(occasions);
   const [seasonsState, setSeasonsState] = useState<any[]>(seasons);
 
+  useEffect(() => {
+    setCategoriesState(categories);
+  }, [categories]);
+
+  useEffect(() => {
+    setBrandsState(brands);
+  }, [brands]);
+
+  useEffect(() => {
+    setMaterialsState(materials);
+  }, [materials]);
+
+  useEffect(() => {
+    setOccasionsState(occasions);
+  }, [occasions]);
+
+  useEffect(() => {
+    setSeasonsState(seasons);
+  }, [seasons]);
+
   const [showCreateCategory, setShowCreateCategory] = useState(false);
   const [showCreateBrand, setShowCreateBrand] = useState(false);
   const [showCreateMaterial, setShowCreateMaterial] = useState(false);
@@ -426,8 +446,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         onSubmit={async (values) => {
           const res = await categoryService.createCategory({ name: values.name, description: values.description });
           if (res.success && res.data) {
-            setCategoriesState(prev => [res.data, ...prev]);
-            handleFieldChange('categories', [res.data._id]);
+            const newCategory = res.data;
+            setCategoriesState(prev => [newCategory, ...prev]);
+            handleFieldChange('categories', [newCategory._id]);
           } else {
             throw new Error(res.message || 'Failed to create category');
           }
@@ -442,8 +463,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         onSubmit={async (values) => {
           const res = await brandService.createBrand({ name: values.name, description: values.description });
           if (res.success && res.data) {
-            setBrandsState(prev => [res.data, ...prev]);
-            handleFieldChange('brand', res.data._id);
+            const newBrand = res.data;
+            setBrandsState(prev => [newBrand, ...prev]);
+            handleFieldChange('brand', newBrand._id);
           } else {
             throw new Error(res.message || 'Failed to create brand');
           }
@@ -458,8 +480,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         onSubmit={async (values) => {
           const res = await materialService.create({ name: values.name, description: values.description });
           if (res.success && res.data) {
-            setMaterialsState(prev => [res.data, ...prev]);
-            handleFieldChange('fabric', res.data.name);
+            const newMaterial = res.data;
+            setMaterialsState(prev => [newMaterial, ...prev]);
+            handleFieldChange('fabric', newMaterial.name);
           } else {
             throw new Error(res.message || 'Failed to create fabric type');
           }
@@ -474,8 +497,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         onSubmit={async (values) => {
           const res = await occasionService.create({ name: values.name, description: values.description });
           if (res.success && res.data) {
-            setOccasionsState(prev => [res.data, ...prev]);
-            handleFieldChange('occasion', res.data.name);
+            const newOccasion = res.data;
+            setOccasionsState(prev => [newOccasion, ...prev]);
+            handleFieldChange('occasion', newOccasion.name);
           } else {
             throw new Error(res.message || 'Failed to create occasion');
           }
@@ -490,8 +514,9 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         onSubmit={async (values) => {
           const res = await seasonService.create({ name: values.name, description: values.description });
           if (res.success && res.data) {
-            setSeasonsState(prev => [res.data, ...prev]);
-            handleFieldChange('season', res.data.name);
+            const newSeason = res.data;
+            setSeasonsState(prev => [newSeason, ...prev]);
+            handleFieldChange('season', newSeason.name);
           } else {
             throw new Error(res.message || 'Failed to create season');
           }
