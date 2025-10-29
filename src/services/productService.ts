@@ -57,11 +57,14 @@ export const productService = {
     copyIfDefined('name');
     whitelisted.slug = slug;
     copyIfDefined('description');
-    // shortDescription is required by backend, use description if not provided
-    if (rest.shortDescription !== undefined && rest.shortDescription !== null && rest.shortDescription !== '') {
-      whitelisted.shortDescription = rest.shortDescription;
-    } else if (rest.description) {
-      whitelisted.shortDescription = String(rest.description).substring(0, 200);
+    // shortDescription is required by backend and cannot be empty
+    if (rest.shortDescription && String(rest.shortDescription).trim() !== '') {
+      whitelisted.shortDescription = String(rest.shortDescription).trim();
+    } else if (rest.description && String(rest.description).trim() !== '') {
+      whitelisted.shortDescription = String(rest.description).trim().substring(0, 200);
+    } else {
+      // Fallback to name if description is also empty
+      whitelisted.shortDescription = productData.name || 'Product';
     }
     copyIfDefined('sku');
     whitelisted.type = type;
@@ -110,28 +113,110 @@ export const productService = {
     }
 
     // Media - backend expects array of objects with url, altText, position
-    if (images && Array.isArray(images)) {
+    if (images && Array.isArray(images) && images.length > 0) {
       whitelisted.images = images.map((img: any, index: number) => {
-        if (typeof img === 'string') {
-          return { url: img, position: index };
-        } else if (img && typeof img === 'object') {
-          return {
-            url: img.url || img,
-            altText: img.altText || productData.name || '',
-            position: img.position !== undefined ? img.position : index,
+        if (typeof img === 'string' && img.trim() !== '') {
+          return { 
+            url: img.trim(), 
+            altText: productData.name || '',
+            position: index 
           };
+        } else if (img && typeof img === 'object') {
+          const url = img.url || (typeof img === 'string' ? img : '');
+          if (url && url.trim() !== '') {
+            return {
+              url: url.trim(),
+              altText: img.altText || productData.name || '',
+              position: img.position !== undefined && typeof img.position === 'number' ? img.position : index,
+            };
+          }
         }
         return null;
-      }).filter(Boolean);
+      }).filter((img: any) => img !== null && img.url && img.url.trim() !== '');
     }
 
     // Variations - backend expects "variations" not "variants"
+    // Each variation has its own: attributes, images, prices, and inventory
     if (variants && Array.isArray(variants) && variants.length > 0) {
-      whitelisted.variations = variants.map((variant: any) => {
+      whitelisted.variations = variants.map((variant: any, index: number) => {
         // Remove _id if present (for new variants)
         const { _id, ...variantData } = variant;
-        return variantData;
-      });
+        
+        const normalizedVariant: any = {};
+        
+        // Basic variant info
+        if (variantData.name !== undefined) normalizedVariant.name = variantData.name;
+        if (variantData.sku !== undefined && variantData.sku !== '') normalizedVariant.sku = variantData.sku;
+        
+        // Pricing - each variation has its own prices
+        if (variantData.price !== undefined && variantData.price !== null) {
+          normalizedVariant.price = Number(variantData.price) || 0;
+        }
+        if (variantData.salePrice !== undefined && variantData.salePrice !== null) {
+          normalizedVariant.salePrice = Number(variantData.salePrice) || 0;
+        }
+        if (variantData.comparePrice !== undefined && variantData.comparePrice !== null) {
+          normalizedVariant.comparePrice = Number(variantData.comparePrice) || 0;
+        }
+        if (variantData.costPrice !== undefined && variantData.costPrice !== null) {
+          normalizedVariant.costPrice = Number(variantData.costPrice) || 0;
+        }
+        
+        // Inventory - each variation has its own stock
+        if (variantData.stockQuantity !== undefined && variantData.stockQuantity !== null) {
+          normalizedVariant.stockQuantity = Number(variantData.stockQuantity) || 0;
+        }
+        if (variantData.stockStatus !== undefined) {
+          normalizedVariant.stockStatus = variantData.stockStatus;
+        }
+        
+        // Attributes - each variation has its own attributes
+        // Backend expects array of strings (attribute IDs), frontend might send Record<string, string>
+        if (variantData.attributes !== undefined) {
+          if (Array.isArray(variantData.attributes)) {
+            // Already an array, normalize to strings
+            normalizedVariant.attributes = variantData.attributes.map((attr: any) => 
+              typeof attr === 'string' ? attr : attr._id || attr.id || attr
+            ).filter(Boolean);
+          } else if (variantData.attributes && typeof variantData.attributes === 'object') {
+            // Convert Record<string, string> to array of values or keys
+            // Based on backend, it expects attribute IDs, so we take the values
+            normalizedVariant.attributes = Object.values(variantData.attributes).filter(Boolean);
+          }
+        }
+        
+        // Images - each variation has its own images
+        // Backend expects array of strings (image URLs or IDs)
+        if (variantData.images && Array.isArray(variantData.images) && variantData.images.length > 0) {
+          normalizedVariant.images = variantData.images.map((img: any) => {
+            if (typeof img === 'string' && img.trim() !== '') {
+              return img.trim();
+            } else if (img && typeof img === 'object' && img.url) {
+              return img.url.trim();
+            }
+            return null;
+          }).filter((url: any) => url && url !== '');
+        }
+        
+        // Physical properties
+        if (variantData.weight !== undefined && variantData.weight !== null) {
+          normalizedVariant.weight = Number(variantData.weight) || 0;
+        }
+        if (variantData.dimensions && typeof variantData.dimensions === 'object') {
+          normalizedVariant.dimensions = {
+            length: Number(variantData.dimensions.length) || 0,
+            width: Number(variantData.dimensions.width) || 0,
+            height: Number(variantData.dimensions.height) || 0,
+          };
+        }
+        
+        // Status
+        if (variantData.isActive !== undefined) {
+          normalizedVariant.isActive = Boolean(variantData.isActive);
+        }
+        
+        return normalizedVariant;
+      }).filter((v: any) => v !== null && v !== undefined);
     }
 
     // Pakistani Clothing Specific Fields

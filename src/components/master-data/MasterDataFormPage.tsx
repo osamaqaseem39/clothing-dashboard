@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../ui/LoadingSpinner';
@@ -44,16 +44,12 @@ const MasterDataFormPage: React.FC<MasterDataFormPageProps> = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      if (isEditing && id) {
+      if (id) {
         const response = await service.getById(id);
         if (response.success && response.data) {
           setItem(response.data);
@@ -65,6 +61,14 @@ const MasterDataFormPage: React.FC<MasterDataFormPageProps> = ({
         } else {
           setError(`${singularTitle} not found`);
         }
+      } else {
+        // Not editing - initialize form for new item
+        setItem(null);
+        setFormData({
+          name: '',
+          description: '',
+          isActive: true,
+        });
       }
     } catch (err: any) {
       console.error(`Error fetching ${singularTitle.toLowerCase()}:`, err);
@@ -72,7 +76,11 @@ const MasterDataFormPage: React.FC<MasterDataFormPageProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id, service, singularTitle]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
