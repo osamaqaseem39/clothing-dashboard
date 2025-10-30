@@ -1038,7 +1038,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Fabric Type</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Fabric' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Fabric' })}>+ Add new fabric type</button>
                 </div>
                 <select
                   value={formData.fabric}
@@ -1068,7 +1068,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Occasion</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Occasion' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Occasion' })}>+ Add new occasion</button>
                 </div>
                 <select
                   value={formData.occasion}
@@ -1085,7 +1085,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Season</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Season' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Season' })}>+ Add new season</button>
                 </div>
                 <select
                   value={formData.season}
@@ -1118,7 +1118,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Color Family</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Color Family' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Color Family' })}>+ Add new color family</button>
                 </div>
                 <select
                   value={formData.colorFamily}
@@ -1135,7 +1135,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Pattern</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Pattern' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Pattern' })}>+ Add new pattern</button>
                 </div>
                 <select
                   value={formData.pattern}
@@ -1152,7 +1152,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Sleeve Length</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Sleeve Length' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Sleeve Length' })}>+ Add new sleeve length</button>
                 </div>
                 <select
                   value={formData.sleeveLength}
@@ -1172,7 +1172,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Neckline</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Neckline' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Neckline' })}>+ Add new neckline</button>
                 </div>
                 <select
                   value={formData.neckline}
@@ -1189,7 +1189,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Length</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Length' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Length' })}>+ Add new length</button>
                 </div>
                 <select
                   value={formData.length}
@@ -1206,7 +1206,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Fit</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Fit' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Fit' })}>+ Add new fit</button>
                 </div>
                 <select
                   value={formData.fit}
@@ -1223,7 +1223,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Age Group</label>
-                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Age Group' })}>Add New</button>
+                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Age Group' })}>+ Add new age group</button>
                 </div>
                 <select
                   value={formData.ageGroup}
