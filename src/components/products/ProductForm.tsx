@@ -189,42 +189,24 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }>({ type: null });
 
   // Local option lists to allow appending newly created values
-  const [fabricOptions, setFabricOptions] = useState<string[]>([
-    'Cotton','Silk','Lawn','Chiffon','Linen','Georgette','Organza','Velvet','Other'
-  ]);
-  const [occasionOptions, setOccasionOptions] = useState<string[]>([
-    'Formal','Casual','Wedding','Party','Office','Traditional','Festive'
-  ]);
-  const [seasonOptions, setSeasonOptions] = useState<string[]>([
-    'Summer','Winter','Spring','Fall','All Season'
-  ]);
-  const [colorFamilyOptions, setColorFamilyOptions] = useState<string[]>([
-    'Pastels','Brights','Neutrals','Dark','Earthy','Jewel Tones'
-  ]);
-  const [patternOptions, setPatternOptions] = useState<string[]>([
-    'Solid','Floral','Geometric','Abstract','Striped','Polka Dot','Embroidered'
-  ]);
-  const [sleeveLengthOptions, setSleeveLengthOptions] = useState<string[]>([
-    'Sleeveless','Short','3/4','Long','Full'
-  ]);
-  const [necklineOptions, setNecklineOptions] = useState<string[]>([
-    'Round','V-neck','Boat','High','Off-shoulder','Halter','Sweetheart'
-  ]);
-  const [lengthOptions, setLengthOptions] = useState<string[]>([
-    'Short','Medium','Long','Floor Length','Ankle Length'
-  ]);
-  const [fitOptions, setFitOptions] = useState<string[]>([
-    'Loose','Fitted','Semi-fitted','Oversized','A-line','Straight'
-  ]);
-  const [ageGroupOptions, setAgeGroupOptions] = useState<string[]>([
-    'Young Adult','Adult','Mature'
-  ]);
+  const [fabricOptions, setFabricOptions] = useState<string[]>([]);
+  const [occasionOptions, setOccasionOptions] = useState<string[]>([]);
+  const [seasonOptions, setSeasonOptions] = useState<string[]>([]);
+  const [colorFamilyOptions, setColorFamilyOptions] = useState<string[]>([]);
+  const [patternOptions, setPatternOptions] = useState<string[]>([]);
+  const [sleeveLengthOptions, setSleeveLengthOptions] = useState<string[]>([]);
+  const [necklineOptions, setNecklineOptions] = useState<string[]>([]);
+  const [lengthOptions, setLengthOptions] = useState<string[]>([]);
+  const [fitOptions, setFitOptions] = useState<string[]>([]);
+  const [ageGroupOptions, setAgeGroupOptions] = useState<string[]>([]);
+  const [isOptionsLoading, setIsOptionsLoading] = useState<boolean>(false);
 
   // Load master data options
   useEffect(() => {
     let isMounted = true;
     const loadOptions = async () => {
       try {
+        setIsOptionsLoading(true);
         const [
           colorFamiliesRes,
           patternsRes,
@@ -251,19 +233,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         if (!isMounted) return;
 
-        if (colorFamiliesRes.success && colorFamiliesRes.data) setColorFamilyOptions(colorFamiliesRes.data.map((i: any) => i.name));
-        if (patternsRes.success && patternsRes.data) setPatternOptions(patternsRes.data.map((i: any) => i.name));
-        if (sleeveLengthsRes.success && sleeveLengthsRes.data) setSleeveLengthOptions(sleeveLengthsRes.data.map((i: any) => i.name));
-        if (necklinesRes.success && necklinesRes.data) setNecklineOptions(necklinesRes.data.map((i: any) => i.name));
-        if (lengthsRes.success && lengthsRes.data) setLengthOptions(lengthsRes.data.map((i: any) => i.name));
-        if (fitsRes.success && fitsRes.data) setFitOptions(fitsRes.data.map((i: any) => i.name));
-        if (ageGroupsRes.success && ageGroupsRes.data) setAgeGroupOptions(ageGroupsRes.data.map((i: any) => i.name));
-        if (fabricsRes.success && fabricsRes.data) setFabricOptions(fabricsRes.data.map((i: any) => i.name));
-        if (occasionsRes.success && occasionsRes.data) setOccasionOptions(occasionsRes.data.map((i: any) => i.name));
-        if (seasonsRes.success && seasonsRes.data) setSeasonOptions(seasonsRes.data.map((i: any) => i.name));
+        const sortByName = (arr: any[]) => arr.map((i: any) => i.name).sort((a: string, b: string) => a.localeCompare(b));
+        if (colorFamiliesRes.success && colorFamiliesRes.data) setColorFamilyOptions(sortByName(colorFamiliesRes.data));
+        if (patternsRes.success && patternsRes.data) setPatternOptions(sortByName(patternsRes.data));
+        if (sleeveLengthsRes.success && sleeveLengthsRes.data) setSleeveLengthOptions(sortByName(sleeveLengthsRes.data));
+        if (necklinesRes.success && necklinesRes.data) setNecklineOptions(sortByName(necklinesRes.data));
+        if (lengthsRes.success && lengthsRes.data) setLengthOptions(sortByName(lengthsRes.data));
+        if (fitsRes.success && fitsRes.data) setFitOptions(sortByName(fitsRes.data));
+        if (ageGroupsRes.success && ageGroupsRes.data) setAgeGroupOptions(sortByName(ageGroupsRes.data));
+        if (fabricsRes.success && fabricsRes.data) setFabricOptions(sortByName(fabricsRes.data));
+        if (occasionsRes.success && occasionsRes.data) setOccasionOptions(sortByName(occasionsRes.data));
+        if (seasonsRes.success && seasonsRes.data) setSeasonOptions(sortByName(seasonsRes.data));
       } catch (err) {
         // Swallow errors, keep defaults
         console.error('Failed to load master data options', err);
+      } finally {
+        setIsOptionsLoading(false);
       }
     };
     loadOptions();

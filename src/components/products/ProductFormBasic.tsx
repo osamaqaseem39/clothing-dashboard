@@ -12,6 +12,13 @@ interface ProductFormBasicProps {
   materials?: Array<{ _id: string; name: string }>;
   occasions?: Array<{ _id: string; name: string }>;
   seasons?: Array<{ _id: string; name: string }>;
+  colorFamilies?: Array<{ _id: string; name: string }>;
+  patterns?: Array<{ _id: string; name: string }>;
+  sleeveLengths?: Array<{ _id: string; name: string }>;
+  necklines?: Array<{ _id: string; name: string }>;
+  lengths?: Array<{ _id: string; name: string }>;
+  fits?: Array<{ _id: string; name: string }>;
+  ageGroups?: Array<{ _id: string; name: string }>;
   onFieldChange: (field: string, value: any) => void;
   onNestedFieldChange: (parentField: string, field: string, value: any) => void;
   onAddCategory?: () => void;
@@ -19,6 +26,13 @@ interface ProductFormBasicProps {
   onAddMaterial?: () => void;
   onAddOccasion?: () => void;
   onAddSeason?: () => void;
+  onAddColorFamily?: () => void;
+  onAddPattern?: () => void;
+  onAddSleeveLength?: () => void;
+  onAddNeckline?: () => void;
+  onAddLength?: () => void;
+  onAddFit?: () => void;
+  onAddAgeGroup?: () => void;
 }
 
 const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
@@ -29,6 +43,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
   materials = [],
   occasions = [],
   seasons = [],
+  colorFamilies = [],
+  patterns = [],
+  sleeveLengths = [],
+  necklines = [],
+  lengths = [],
+  fits = [],
+  ageGroups = [],
   onFieldChange,
   onNestedFieldChange,
   onAddCategory,
@@ -36,6 +57,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
   onAddMaterial,
   onAddOccasion,
   onAddSeason,
+  onAddColorFamily,
+  onAddPattern,
+  onAddSleeveLength,
+  onAddNeckline,
+  onAddLength,
+  onAddFit,
+  onAddAgeGroup,
 }) => {
   const [isHandworkModalOpen, setIsHandworkModalOpen] = useState(false);
   const [isBodyTypeModalOpen, setIsBodyTypeModalOpen] = useState(false);
@@ -293,13 +321,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Color Family</option>
-              <option value="Pastels">Pastels</option>
-              <option value="Brights">Brights</option>
-              <option value="Neutrals">Neutrals</option>
-              <option value="Dark">Dark</option>
-              <option value="Earthy">Earthy</option>
-              <option value="Jewel Tones">Jewel Tones</option>
+              {colorFamilies.map(cf => (
+                <option key={cf._id} value={cf.name}>{cf.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddColorFamily} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new color family
+            </button>
           </div>
 
           <div>
@@ -312,14 +340,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Pattern</option>
-              <option value="Solid">Solid</option>
-              <option value="Floral">Floral</option>
-              <option value="Geometric">Geometric</option>
-              <option value="Abstract">Abstract</option>
-              <option value="Striped">Striped</option>
-              <option value="Polka Dot">Polka Dot</option>
-              <option value="Embroidered">Embroidered</option>
+              {patterns.map(p => (
+                <option key={p._id} value={p.name}>{p.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddPattern} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new pattern
+            </button>
           </div>
 
           <div>
@@ -332,12 +359,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Sleeve Length</option>
-              <option value="Sleeveless">Sleeveless</option>
-              <option value="Short">Short</option>
-              <option value="3/4">3/4</option>
-              <option value="Long">Long</option>
-              <option value="Full">Full</option>
+              {sleeveLengths.map(s => (
+                <option key={s._id} value={s.name}>{s.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddSleeveLength} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new sleeve length
+            </button>
           </div>
         </div>
 
@@ -353,14 +381,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Neckline</option>
-              <option value="Round">Round</option>
-              <option value="V-neck">V-neck</option>
-              <option value="Boat">Boat</option>
-              <option value="High">High</option>
-              <option value="Off-shoulder">Off-shoulder</option>
-              <option value="Halter">Halter</option>
-              <option value="Sweetheart">Sweetheart</option>
+              {necklines.map(n => (
+                <option key={n._id} value={n.name}>{n.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddNeckline} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new neckline
+            </button>
           </div>
 
           <div>
@@ -373,12 +400,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Length</option>
-              <option value="Short">Short</option>
-              <option value="Medium">Medium</option>
-              <option value="Long">Long</option>
-              <option value="Floor Length">Floor Length</option>
-              <option value="Ankle Length">Ankle Length</option>
+              {lengths.map(l => (
+                <option key={l._id} value={l.name}>{l.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddLength} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new length
+            </button>
           </div>
 
           <div>
@@ -391,13 +419,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Fit</option>
-              <option value="Loose">Loose</option>
-              <option value="Fitted">Fitted</option>
-              <option value="Semi-fitted">Semi-fitted</option>
-              <option value="Oversized">Oversized</option>
-              <option value="A-line">A-line</option>
-              <option value="Straight">Straight</option>
+              {fits.map(f => (
+                <option key={f._id} value={f.name}>{f.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddFit} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new fit
+            </button>
           </div>
 
           <div>
@@ -410,10 +438,13 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Age Group</option>
-              <option value="Young Adult">Young Adult</option>
-              <option value="Adult">Adult</option>
-              <option value="Mature">Mature</option>
+              {ageGroups.map(a => (
+                <option key={a._id} value={a.name}>{a.name}</option>
+              ))}
             </select>
+            <button type="button" onClick={onAddAgeGroup} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
+              + Add new age group
+            </button>
           </div>
         </div>
 
