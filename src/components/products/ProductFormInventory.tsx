@@ -41,8 +41,8 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
           <input
             type="number"
             min="0"
-            value={formData.stockQuantity || 0}
-            onChange={(e) => onFieldChange('stockQuantity', parseInt(e.target.value) || 0)}
+            value={formData.stockQuantity === 0 ? '' : (formData.stockQuantity || '')}
+            onChange={(e) => onFieldChange('stockQuantity', e.target.value === '' ? 0 : (parseInt(e.target.value) || 0))}
             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
               errors.stockQuantity ? 'border-red-300' : 'border-gray-300'
             }`}
@@ -95,8 +95,8 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={formData.price || 0}
-              onChange={(e) => onFieldChange('price', parseFloat(e.target.value) || 0)}
+              value={formData.price === 0 ? '' : (formData.price || '')}
+              onChange={(e) => onFieldChange('price', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
               className={`w-full pl-8 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 errors.price ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -119,8 +119,8 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={formData.salePrice || 0}
-              onChange={(e) => onFieldChange('salePrice', parseFloat(e.target.value) || 0)}
+              value={formData.salePrice === 0 ? '' : (formData.salePrice || '')}
+              onChange={(e) => onFieldChange('salePrice', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
               className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="0.00"
             />
@@ -141,8 +141,8 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={formData.originalPrice || 0}
-              onChange={(e) => onFieldChange('originalPrice', parseFloat(e.target.value) || 0)}
+              value={formData.originalPrice === 0 ? '' : (formData.originalPrice || '')}
+              onChange={(e) => onFieldChange('originalPrice', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
               className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="0.00"
             />

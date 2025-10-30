@@ -81,11 +81,11 @@ const Categories: React.FC = () => {
   };
 
   const handleAddCategory = () => {
-    navigate('/categories/new');
+    navigate('/dashboard/categories/new');
   };
 
   const handleEditCategory = (category: Category) => {
-    navigate(`/categories/${category._id}/edit`);
+    navigate(`/dashboard/categories/${category._id}/edit`);
   };
 
   const getParentCategoryName = (parentId: string | undefined) => {

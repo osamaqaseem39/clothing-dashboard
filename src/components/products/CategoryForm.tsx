@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Category } from '../../types';
+import ImageUpload from '../common/ImageUpload';
 
 interface CategoryFormProps {
   category?: Category;
@@ -23,6 +24,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
     description: category?.description || '',
     parentId: category?.parentId || '',
     isActive: category?.isActive ?? true,
+    image: category?.image || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -61,6 +63,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
     // Only include parentId if it's not empty
     if (formData.parentId && formData.parentId.trim() !== '') {
       categoryData.parentId = formData.parentId;
+    }
+
+    // Include image if present
+    if (formData.image && formData.image.trim() !== '') {
+      categoryData.image = formData.image.trim();
     }
 
     await onSubmit(categoryData);
@@ -188,6 +195,22 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               className="input-field"
               placeholder="Enter category description"
             />
+          </div>
+
+          {/* Image */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category Image
+            </label>
+            <ImageUpload
+              existingImages={formData.image ? [formData.image] : []}
+              maxImages={1}
+              onImageUpload={(url) => handleChange('image', url)}
+              onImageRemove={() => handleChange('image', '')}
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              Upload a representative image for this category.
+            </p>
           </div>
 
           {/* Status */}

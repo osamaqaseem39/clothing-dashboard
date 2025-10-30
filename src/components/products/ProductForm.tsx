@@ -666,8 +666,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.01"
-                        value={variant.price}
-                        onChange={(e) => handleVariantChange(index, 'price', parseFloat(e.target.value) || 0)}
+                        value={variant.price === 0 ? '' : variant.price}
+                        onChange={(e) => handleVariantChange(index, 'price', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
                         className={`input-field ${errors[`variant-${index}-price`] ? 'border-red-300' : ''}`}
                         placeholder="0.00"
                       />
@@ -683,8 +683,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.01"
-                        value={variant.comparePrice}
-                        onChange={(e) => handleVariantChange(index, 'comparePrice', parseFloat(e.target.value) || 0)}
+                        value={variant.comparePrice === 0 ? '' : (variant.comparePrice || '')}
+                        onChange={(e) => handleVariantChange(index, 'comparePrice', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
                         className="input-field"
                         placeholder="0.00"
                       />
@@ -697,8 +697,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.01"
-                        value={variant.costPrice}
-                        onChange={(e) => handleVariantChange(index, 'costPrice', parseFloat(e.target.value) || 0)}
+                        value={variant.costPrice === 0 ? '' : (variant.costPrice || '')}
+                        onChange={(e) => handleVariantChange(index, 'costPrice', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
                         className="input-field"
                         placeholder="0.00"
                       />
@@ -710,8 +710,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       </label>
                       <input
                         type="number"
-                        value={variant.stockQuantity}
-                        onChange={(e) => handleVariantChange(index, 'stockQuantity', parseInt(e.target.value) || 0)}
+                        value={variant.stockQuantity === 0 ? '' : variant.stockQuantity}
+                        onChange={(e) => handleVariantChange(index, 'stockQuantity', e.target.value === '' ? 0 : (parseInt(e.target.value) || 0))}
                         className={`input-field ${errors[`variant-${index}-stock`] ? 'border-red-300' : ''}`}
                         placeholder="0"
                       />
@@ -727,8 +727,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.01"
-                        value={variant.weight}
-                        onChange={(e) => handleVariantChange(index, 'weight', parseFloat(e.target.value) || 0)}
+                        value={variant.weight === 0 ? '' : variant.weight}
+                        onChange={(e) => handleVariantChange(index, 'weight', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
                         className="input-field"
                         placeholder="0.00"
                       />
@@ -741,10 +741,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.1"
-                        value={variant.dimensions.length}
+                        value={variant.dimensions.length === 0 ? '' : variant.dimensions.length}
                         onChange={(e) => handleVariantChange(index, 'dimensions', {
                           ...variant.dimensions,
-                          length: parseFloat(e.target.value) || 0,
+                          length: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                         })}
                         className="input-field"
                         placeholder="0.0"
@@ -758,10 +758,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.1"
-                        value={variant.dimensions.width}
+                        value={variant.dimensions.width === 0 ? '' : variant.dimensions.width}
                         onChange={(e) => handleVariantChange(index, 'dimensions', {
                           ...variant.dimensions,
-                          width: parseFloat(e.target.value) || 0,
+                          width: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                         })}
                         className="input-field"
                         placeholder="0.0"
@@ -775,10 +775,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <input
                         type="number"
                         step="0.1"
-                        value={variant.dimensions.height}
+                        value={variant.dimensions.height === 0 ? '' : variant.dimensions.height}
                         onChange={(e) => handleVariantChange(index, 'dimensions', {
                           ...variant.dimensions,
-                          height: parseFloat(e.target.value) || 0,
+                          height: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                         })}
                         className="input-field"
                         placeholder="0.0"

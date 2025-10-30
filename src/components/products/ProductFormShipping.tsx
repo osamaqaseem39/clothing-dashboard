@@ -27,8 +27,8 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={formData.weight || 0}
-              onChange={(e) => onFieldChange('weight', parseFloat(e.target.value) || 0)}
+              value={formData.weight === 0 ? '' : (formData.weight || '')}
+              onChange={(e) => onFieldChange('weight', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
               className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="0.00"
             />
@@ -49,10 +49,10 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
                   type="number"
                   step="0.1"
                   min="0"
-                  value={formData.dimensions?.length || 0}
+                  value={(formData.dimensions?.length || 0) === 0 ? '' : (formData.dimensions?.length || '')}
                   onChange={(e) => onFieldChange('dimensions', {
                     ...formData.dimensions,
-                    length: parseFloat(e.target.value) || 0,
+                    length: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                   })}
                   className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.0"
@@ -67,10 +67,10 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
                   type="number"
                   step="0.1"
                   min="0"
-                  value={formData.dimensions?.width || 0}
+                  value={(formData.dimensions?.width || 0) === 0 ? '' : (formData.dimensions?.width || '')}
                   onChange={(e) => onFieldChange('dimensions', {
                     ...formData.dimensions,
-                    width: parseFloat(e.target.value) || 0,
+                    width: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                   })}
                   className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.0"
@@ -85,10 +85,10 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
                   type="number"
                   step="0.1"
                   min="0"
-                  value={formData.dimensions?.height || 0}
+                  value={(formData.dimensions?.height || 0) === 0 ? '' : (formData.dimensions?.height || '')}
                   onChange={(e) => onFieldChange('dimensions', {
                     ...formData.dimensions,
-                    height: parseFloat(e.target.value) || 0,
+                    height: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                   })}
                   className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.0"
@@ -109,8 +109,8 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={formData.shippingWeight || 0}
-              onChange={(e) => onFieldChange('shippingWeight', parseFloat(e.target.value) || 0)}
+              value={formData.shippingWeight === 0 ? '' : (formData.shippingWeight || '')}
+              onChange={(e) => onFieldChange('shippingWeight', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
               className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="0.00"
             />
@@ -134,10 +134,10 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
                   type="number"
                   step="0.1"
                   min="0"
-                  value={formData.shippingDimensions?.length || 0}
+                  value={(formData.shippingDimensions?.length || 0) === 0 ? '' : (formData.shippingDimensions?.length || '')}
                   onChange={(e) => onFieldChange('shippingDimensions', {
                     ...formData.shippingDimensions,
-                    length: parseFloat(e.target.value) || 0,
+                    length: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                   })}
                   className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.0"
@@ -152,10 +152,10 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
                   type="number"
                   step="0.1"
                   min="0"
-                  value={formData.shippingDimensions?.width || 0}
+                  value={(formData.shippingDimensions?.width || 0) === 0 ? '' : (formData.shippingDimensions?.width || '')}
                   onChange={(e) => onFieldChange('shippingDimensions', {
                     ...formData.shippingDimensions,
-                    width: parseFloat(e.target.value) || 0,
+                    width: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                   })}
                   className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.0"
@@ -170,10 +170,10 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
                   type="number"
                   step="0.1"
                   min="0"
-                  value={formData.shippingDimensions?.height || 0}
+                  value={(formData.shippingDimensions?.height || 0) === 0 ? '' : (formData.shippingDimensions?.height || '')}
                   onChange={(e) => onFieldChange('shippingDimensions', {
                     ...formData.shippingDimensions,
-                    height: parseFloat(e.target.value) || 0,
+                    height: e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0),
                   })}
                   className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.0"
@@ -221,8 +221,8 @@ const ProductFormShipping: React.FC<ProductFormShippingProps> = ({
               <input
                 type="number"
                 min="0"
-                value={formData.customDeliveryDays || 0}
-                onChange={(e) => onFieldChange('customDeliveryDays', parseInt(e.target.value) || 0)}
+                value={(formData.customDeliveryDays || 0) === 0 ? '' : (formData.customDeliveryDays || '')}
+                onChange={(e) => onFieldChange('customDeliveryDays', e.target.value === '' ? 0 : (parseInt(e.target.value) || 0))}
                 className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="0"
               />

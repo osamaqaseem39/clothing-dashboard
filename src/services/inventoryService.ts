@@ -1,11 +1,28 @@
 import api from './api';
 import { ApiResponse, Inventory } from '../types';
 
+function normalizeInventoryResponse(payload: any): ApiResponse<Inventory[] | any> {
+  // Already normalized shape
+  if (payload && typeof payload === 'object' && 'success' in payload) {
+    return payload;
+  }
+  // Array response
+  if (Array.isArray(payload)) {
+    return { success: true, data: payload } as ApiResponse<Inventory[]>;
+  }
+  // Common paginated shape { data: [], total, page, limit, totalPages }
+  if (payload && Array.isArray(payload.data)) {
+    return { success: true, data: payload.data } as ApiResponse<Inventory[]>;
+  }
+  // Direct object
+  return { success: true, data: [] as Inventory[] };
+}
+
 export const inventoryService = {
   // Get all inventory items
   async getInventory(): Promise<ApiResponse<Inventory[]>> {
     const response = await api.get('/inventory');
-    return response.data;
+    return normalizeInventoryResponse(response.data) as ApiResponse<Inventory[]>;
   },
 
   // Get inventory by product ID
@@ -17,13 +34,13 @@ export const inventoryService = {
   // Get low stock items
   async getLowStock(): Promise<ApiResponse<Inventory[]>> {
     const response = await api.get('/inventory/low-stock');
-    return response.data;
+    return normalizeInventoryResponse(response.data) as ApiResponse<Inventory[]>;
   },
 
   // Get out of stock items
   async getOutOfStock(): Promise<ApiResponse<Inventory[]>> {
     const response = await api.get('/inventory/out-of-stock');
-    return response.data;
+    return normalizeInventoryResponse(response.data) as ApiResponse<Inventory[]>;
   },
 
   // Get inventory statistics
