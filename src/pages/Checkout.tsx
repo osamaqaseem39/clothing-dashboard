@@ -188,7 +188,6 @@ const CheckoutPage: React.FC = () => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'PKR',
-      currency: 'PKR',
     }).format(amount);
   };
 
