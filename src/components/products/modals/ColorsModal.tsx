@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { Color } from '../../../services/masterDataService';
 import { colorService } from '../../../services/masterDataService';
-import ImageUpload from '../../common/ImageUpload';
 
 interface ColorSelection {
   colorId: string;
@@ -25,20 +24,12 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
   const [availableColors, setAvailableColors] = useState<Color[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingColorId, setEditingColorId] = useState<string | null>(null);
-  const [colorImages, setColorImages] = useState<Record<string, string>>({});
+  // We no longer upload per-product images for colors.
 
   useEffect(() => {
     if (isOpen) {
       fetchColors();
-      // Load existing color images
-      const images: Record<string, string> = {};
-      colors.forEach(color => {
-        if (color.imageUrl) {
-          images[color.colorId] = color.imageUrl;
-        }
-      });
-      setColorImages(images);
+      // nothing else to init
     }
   }, [isOpen]);
 
@@ -60,31 +51,13 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
     const existingColor = colors.find(c => c.colorId === colorId);
     if (existingColor) {
       onColorsChange(colors.filter(c => c.colorId !== colorId));
-      const newImages = { ...colorImages };
-      delete newImages[colorId];
-      setColorImages(newImages);
     } else {
-      onColorsChange([...colors, { colorId, imageUrl: colorImages[colorId] || undefined }]);
+      // attach the master color imageUrl for reference if present
+      const master = availableColors.find(c => c._id === colorId);
+      onColorsChange([...colors, { colorId, imageUrl: master?.imageUrl }]);
     }
   };
-
-  const updateColorImage = (colorId: string, imageUrl: string) => {
-    const newImages = { ...colorImages, [colorId]: imageUrl };
-    setColorImages(newImages);
-    
-    // Update the color selection
-    const updatedColors = colors.map(c => 
-      c.colorId === colorId ? { ...c, imageUrl } : c
-    );
-    
-    // If color is not in selection yet, add it
-    if (!colors.find(c => c.colorId === colorId)) {
-      updatedColors.push({ colorId, imageUrl });
-    }
-    
-    onColorsChange(updatedColors);
-    setEditingColorId(null);
-  };
+ 
 
   const filteredColors = availableColors.filter(color =>
     color.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -96,7 +69,7 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
       <div className="relative top-20 mx-auto p-6 border w-full max-w-4xl shadow-lg rounded-md bg-white">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Select Product Colors with Images</h3>
+          <h3 className="text-lg font-medium text-gray-900">Select Product Colors</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -106,7 +79,7 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
         </div>
 
         <p className="text-sm text-gray-600 mb-4">
-          Select colors from the database and optionally add product images for each color. Color images will be displayed on the product page.
+          Select colors from master data. Each color's swatch image (if any) comes from the color itself.
         </p>
 
         {/* Search */}
@@ -134,7 +107,7 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredColors.map((color) => {
                   const isSelected = colors.some(c => c.colorId === color._id);
-                  const colorImage = colorImages[color._id] || colors.find(c => c.colorId === color._id)?.imageUrl;
+                  const colorImage = color.imageUrl;
                   
                   return (
                     <div
@@ -186,26 +159,10 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
                             <p className="text-xs text-gray-500 mt-1">{color.hexCode}</p>
                           )}
                           {!colorImage && (
-                            <p className="text-xs text-orange-600 mt-1">No product image</p>
+                            <p className="text-xs text-orange-600 mt-1">No swatch image</p>
                           )}
                         </div>
                       </button>
-                      
-                      {/* Image Upload Button */}
-                      {isSelected && (
-                        <div className="px-3 pb-3">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingColorId(editingColorId === color._id ? null : color._id);
-                            }}
-                            className="w-full text-xs px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-                          >
-                            {colorImage ? 'Change Image' : 'Add Product Image'}
-                          </button>
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -214,41 +171,7 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
           </div>
         )}
 
-        {/* Image Upload Modal for selected color */}
-        {editingColorId && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-[60]">
-            <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-medium">
-                  Upload Image for {availableColors.find(c => c._id === editingColorId)?.name}
-                </h4>
-                <button
-                  onClick={() => setEditingColorId(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
-              </div>
-              <ImageUpload
-                onImageUpload={(url) => {
-                  if (url && editingColorId) {
-                    updateColorImage(editingColorId, url);
-                    setEditingColorId(null);
-                  }
-                }}
-                existingImages={editingColorId && colorImages[editingColorId] ? [colorImages[editingColorId]] : []}
-                onImageRemove={() => {
-                  if (editingColorId) {
-                    const newImages = { ...colorImages };
-                    delete newImages[editingColorId];
-                    setColorImages(newImages);
-                  }
-                }}
-                maxImages={1}
-              />
-            </div>
-          </div>
-        )}
+        {/* No per-product color image upload */}
 
         {/* Selected Count */}
         {colors.length > 0 && (

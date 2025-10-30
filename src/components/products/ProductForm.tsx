@@ -713,6 +713,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <span className="ml-2 text-sm text-gray-700">Active</span>
                     </label>
                   </div>
+
+                  {/* Variant Images */}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Variant Images
+                    </label>
+                    <ImageUpload
+                      existingImages={variant.images || []}
+                      onImageUpload={(url) => {
+                        handleVariantChange(index, 'images', [...(variant.images || []), url]);
+                      }}
+                      onImageRemove={(imgIndex) => {
+                        const next = [...(variant.images || [])];
+                        next.splice(imgIndex, 1);
+                        handleVariantChange(index, 'images', next);
+                      }}
+                      maxImages={10}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Upload multiple images specific to this variant.</p>
+                  </div>
                 </div>
               ))}
             </div>
