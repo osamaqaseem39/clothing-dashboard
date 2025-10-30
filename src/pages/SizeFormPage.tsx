@@ -102,7 +102,7 @@ const SizeFormPage: React.FC = () => {
       }
 
       if (response.success) {
-        navigate('/master-data');
+        navigate('/dashboard/sizes');
       } else {
         const errorMessage = response.message || 'Failed to save size';
         setError(errorMessage);
@@ -128,7 +128,7 @@ const SizeFormPage: React.FC = () => {
         setIsSaving(true);
         const response = await sizeService.delete(size._id);
         if (response.success) {
-          navigate('/master-data');
+          navigate('/dashboard/sizes');
         } else {
           throw new Error(response.message || 'Failed to delete size');
         }

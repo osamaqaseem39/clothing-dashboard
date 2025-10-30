@@ -18,6 +18,7 @@ import Brands from './pages/Brands';
 import BrandFormPage from './pages/BrandFormPage';
 import CategoryFormPage from './pages/CategoryFormPage';
 import ColorFormPage from './pages/ColorFormPage';
+import ColorsPage from './pages/ColorsPage';
 import MaterialsPage from './pages/MaterialsPage';
 import MaterialFormPage from './pages/MaterialFormPage';
 import OccasionsPage from './pages/OccasionsPage';
@@ -25,6 +26,7 @@ import OccasionFormPage from './pages/OccasionFormPage';
 import SeasonsPage from './pages/SeasonsPage';
 import SeasonFormPage from './pages/SeasonFormPage';
 import SizeFormPage from './pages/SizeFormPage';
+import SizesPage from './pages/SizesPage';
 import PatternsPage from './pages/PatternsPage';
 import PatternFormPage from './pages/PatternFormPage';
 import SleeveLengthsPage from './pages/SleeveLengthsPage';
@@ -113,7 +115,9 @@ const AppContent: React.FC = () => {
           <Route path="brands/:id/edit" element={<BrandFormPage />} />
           
           {/* Master Data Routes */}
-          <Route path="colors" element={<ColorFormPage />} />
+          <Route path="colors" element={<ColorsPage />} />
+          <Route path="colors/new" element={<ColorFormPage />} />
+          <Route path="colors/:id/edit" element={<ColorFormPage />} />
           <Route path="materials" element={<MaterialsPage />} />
           <Route path="materials/new" element={<MaterialFormPage />} />
           <Route path="materials/:id/edit" element={<MaterialFormPage />} />
@@ -123,7 +127,9 @@ const AppContent: React.FC = () => {
           <Route path="seasons" element={<SeasonsPage />} />
           <Route path="seasons/new" element={<SeasonFormPage />} />
           <Route path="seasons/:id/edit" element={<SeasonFormPage />} />
-          <Route path="sizes" element={<SizeFormPage />} />
+          <Route path="sizes" element={<SizesPage />} />
+          <Route path="sizes/new" element={<SizeFormPage />} />
+          <Route path="sizes/:id/edit" element={<SizeFormPage />} />
           <Route path="patterns" element={<PatternsPage />} />
           <Route path="patterns/new" element={<PatternFormPage />} />
           <Route path="patterns/:id/edit" element={<PatternFormPage />} />

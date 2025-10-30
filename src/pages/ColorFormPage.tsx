@@ -92,7 +92,7 @@ const ColorFormPage: React.FC = () => {
       }
 
       if (response.success) {
-        navigate('/master-data');
+        navigate('/dashboard/colors');
       } else {
         const errorMessage = response.message || 'Failed to save color';
         setError(errorMessage);
@@ -118,7 +118,7 @@ const ColorFormPage: React.FC = () => {
         setIsSaving(true);
         const response = await colorService.delete(color._id);
         if (response.success) {
-          navigate('/master-data');
+          navigate('/dashboard/colors');
         } else {
           throw new Error(response.message || 'Failed to delete color');
         }
