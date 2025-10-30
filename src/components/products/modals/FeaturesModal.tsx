@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { MasterDataItem } from '../../../services/masterDataService';
 import { featureService } from '../../../services/masterDataService';
+import QuickAddMasterDataModal from '../../master-data/QuickAddMasterDataModal';
 
 interface FeaturesModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({
   const [availableFeatures, setAvailableFeatures] = useState<MasterDataItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,12 +61,21 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({
       <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-gray-900">Select Product Features</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XMarkIcon className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsQuickAddOpen(true)}
+              className="text-sm px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Add New
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
         </div>
 
         <p className="text-sm text-gray-600 mb-4">
@@ -141,6 +152,16 @@ const FeaturesModal: React.FC<FeaturesModalProps> = ({
             Done
           </button>
         </div>
+        <QuickAddMasterDataModal
+          isOpen={isQuickAddOpen}
+          onClose={() => setIsQuickAddOpen(false)}
+          title="Feature"
+          service={featureService as any}
+          onCreated={(created: any) => {
+            setAvailableFeatures(prev => [...prev, created]);
+            onFeaturesChange([...(features || []), created.name]);
+          }}
+        />
       </div>
     </div>
   );

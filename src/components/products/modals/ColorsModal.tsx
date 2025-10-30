@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { Color } from '../../../services/masterDataService';
 import { colorService } from '../../../services/masterDataService';
+import QuickAddMasterDataModal from '../../master-data/QuickAddMasterDataModal';
 
 interface ColorSelection {
   colorId: string;
@@ -25,6 +26,8 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   // We no longer upload per-product images for colors.
+
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -70,12 +73,21 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
       <div className="relative top-20 mx-auto p-6 border w-full max-w-4xl shadow-lg rounded-md bg-white">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-gray-900">Select Product Colors</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XMarkIcon className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsQuickAddOpen(true)}
+              className="text-sm px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Add New
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
         </div>
 
         <p className="text-sm text-gray-600 mb-4">
@@ -190,6 +202,17 @@ const ColorsModal: React.FC<ColorsModalProps> = ({
             Done
           </button>
         </div>
+        <QuickAddMasterDataModal
+          isOpen={isQuickAddOpen}
+          onClose={() => setIsQuickAddOpen(false)}
+          title="Color"
+          service={colorService as any}
+          onCreated={(created: any) => {
+            setAvailableColors(prev => [...prev, created]);
+            onColorsChange([...colors, { colorId: created._id, imageUrl: created.imageUrl }]);
+          }}
+          showDescription={true}
+        />
       </div>
     </div>
   );

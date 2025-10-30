@@ -10,6 +10,19 @@ import FeaturesModal from './modals/FeaturesModal';
 import ColorsModal from './modals/ColorsModal';
 import AttributesModal from './modals/AttributesModal';
 import ImageUpload from '../common/ImageUpload';
+import QuickAddMasterDataModal from '../master-data/QuickAddMasterDataModal';
+import { 
+  colorFamilyService,
+  patternService,
+  sleeveLengthService,
+  necklineService,
+  lengthService,
+  fitService,
+  ageGroupService,
+  materialService,
+  occasionService,
+  seasonService,
+} from '../../services/masterDataService';
 
 interface ProductFormProps {
   product?: Product;
@@ -170,6 +183,42 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
   const [isColorsModalOpen, setIsColorsModalOpen] = useState(false);
   const [isAttributesModalOpen, setIsAttributesModalOpen] = useState(false);
+  // Quick add modal states
+  const [quickAdd, setQuickAdd] = useState<{
+    type: null | 'Color Family' | 'Pattern' | 'Sleeve Length' | 'Neckline' | 'Length' | 'Fit' | 'Age Group' | 'Fabric' | 'Occasion' | 'Season';
+  }>({ type: null });
+
+  // Local option lists to allow appending newly created values
+  const [fabricOptions, setFabricOptions] = useState<string[]>([
+    'Cotton','Silk','Lawn','Chiffon','Linen','Georgette','Organza','Velvet','Other'
+  ]);
+  const [occasionOptions, setOccasionOptions] = useState<string[]>([
+    'Formal','Casual','Wedding','Party','Office','Traditional','Festive'
+  ]);
+  const [seasonOptions, setSeasonOptions] = useState<string[]>([
+    'Summer','Winter','Spring','Fall','All Season'
+  ]);
+  const [colorFamilyOptions, setColorFamilyOptions] = useState<string[]>([
+    'Pastels','Brights','Neutrals','Dark','Earthy','Jewel Tones'
+  ]);
+  const [patternOptions, setPatternOptions] = useState<string[]>([
+    'Solid','Floral','Geometric','Abstract','Striped','Polka Dot','Embroidered'
+  ]);
+  const [sleeveLengthOptions, setSleeveLengthOptions] = useState<string[]>([
+    'Sleeveless','Short','3/4','Long','Full'
+  ]);
+  const [necklineOptions, setNecklineOptions] = useState<string[]>([
+    'Round','V-neck','Boat','High','Off-shoulder','Halter','Sweetheart'
+  ]);
+  const [lengthOptions, setLengthOptions] = useState<string[]>([
+    'Short','Medium','Long','Floor Length','Ankle Length'
+  ]);
+  const [fitOptions, setFitOptions] = useState<string[]>([
+    'Loose','Fitted','Semi-fitted','Oversized','A-line','Straight'
+  ]);
+  const [ageGroupOptions, setAgeGroupOptions] = useState<string[]>([
+    'Young Adult','Adult','Mature'
+  ]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -937,24 +986,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
             {/* Row 1: Fabric, Collection, Occasion, Season */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Fabric Type
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Fabric Type</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Fabric' })}>Add New</button>
+                </div>
                 <select
                   value={formData.fabric}
                   onChange={(e) => handleChange('fabric', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Fabric</option>
-                  <option value="Cotton">Cotton</option>
-                  <option value="Silk">Silk</option>
-                  <option value="Lawn">Lawn</option>
-                  <option value="Chiffon">Chiffon</option>
-                  <option value="Linen">Linen</option>
-                  <option value="Georgette">Georgette</option>
-                  <option value="Organza">Organza</option>
-                  <option value="Velvet">Velvet</option>
-                  <option value="Other">Other</option>
+                  {fabricOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
@@ -972,40 +1016,36 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Occasion
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Occasion</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Occasion' })}>Add New</button>
+                </div>
                 <select
                   value={formData.occasion}
                   onChange={(e) => handleChange('occasion', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Occasion</option>
-                  <option value="Formal">Formal</option>
-                  <option value="Casual">Casual</option>
-                  <option value="Wedding">Wedding</option>
-                  <option value="Party">Party</option>
-                  <option value="Office">Office</option>
-                  <option value="Traditional">Traditional</option>
-                  <option value="Festive">Festive</option>
+                  {occasionOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Season
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Season</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Season' })}>Add New</button>
+                </div>
                 <select
                   value={formData.season}
                   onChange={(e) => handleChange('season', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Season</option>
-                  <option value="Summer">Summer</option>
-                  <option value="Winter">Winter</option>
-                  <option value="Spring">Spring</option>
-                  <option value="Fall">Fall</option>
-                  <option value="All Season">All Season</option>
+                  {seasonOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -1026,59 +1066,53 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color Family
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Color Family</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Color Family' })}>Add New</button>
+                </div>
                 <select
                   value={formData.colorFamily}
                   onChange={(e) => handleChange('colorFamily', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Color Family</option>
-                  <option value="Pastels">Pastels</option>
-                  <option value="Brights">Brights</option>
-                  <option value="Neutrals">Neutrals</option>
-                  <option value="Dark">Dark</option>
-                  <option value="Earthy">Earthy</option>
-                  <option value="Jewel Tones">Jewel Tones</option>
+                  {colorFamilyOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Pattern
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Pattern</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Pattern' })}>Add New</button>
+                </div>
                 <select
                   value={formData.pattern}
                   onChange={(e) => handleChange('pattern', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Pattern</option>
-                  <option value="Solid">Solid</option>
-                  <option value="Floral">Floral</option>
-                  <option value="Geometric">Geometric</option>
-                  <option value="Abstract">Abstract</option>
-                  <option value="Striped">Striped</option>
-                  <option value="Polka Dot">Polka Dot</option>
-                  <option value="Embroidered">Embroidered</option>
+                  {patternOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sleeve Length
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Sleeve Length</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Sleeve Length' })}>Add New</button>
+                </div>
                 <select
                   value={formData.sleeveLength}
                   onChange={(e) => handleChange('sleeveLength', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Sleeve Length</option>
-                  <option value="Sleeveless">Sleeveless</option>
-                  <option value="Short">Short</option>
-                  <option value="3/4">3/4</option>
-                  <option value="Long">Long</option>
-                  <option value="Full">Full</option>
+                  {sleeveLengthOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -1086,76 +1120,137 @@ const ProductForm: React.FC<ProductFormProps> = ({
             {/* Row 3: Neckline, Length, Fit, Age Group */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Neckline
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Neckline</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Neckline' })}>Add New</button>
+                </div>
                 <select
                   value={formData.neckline}
                   onChange={(e) => handleChange('neckline', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Neckline</option>
-                  <option value="Round">Round</option>
-                  <option value="V-neck">V-neck</option>
-                  <option value="Boat">Boat</option>
-                  <option value="High">High</option>
-                  <option value="Off-shoulder">Off-shoulder</option>
-                  <option value="Halter">Halter</option>
-                  <option value="Sweetheart">Sweetheart</option>
+                  {necklineOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Length
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Length</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Length' })}>Add New</button>
+                </div>
                 <select
                   value={formData.length}
                   onChange={(e) => handleChange('length', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Length</option>
-                  <option value="Short">Short</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Long">Long</option>
-                  <option value="Floor Length">Floor Length</option>
-                  <option value="Ankle Length">Ankle Length</option>
+                  {lengthOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Fit
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Fit</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Fit' })}>Add New</button>
+                </div>
                 <select
                   value={formData.fit}
                   onChange={(e) => handleChange('fit', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Fit</option>
-                  <option value="Loose">Loose</option>
-                  <option value="Fitted">Fitted</option>
-                  <option value="Semi-fitted">Semi-fitted</option>
-                  <option value="Oversized">Oversized</option>
-                  <option value="A-line">A-line</option>
-                  <option value="Straight">Straight</option>
+                  {fitOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Age Group
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Age Group</label>
+                  <button type="button" className="text-xs text-blue-600" onClick={() => setQuickAdd({ type: 'Age Group' })}>Add New</button>
+                </div>
                 <select
                   value={formData.ageGroup}
                   onChange={(e) => handleChange('ageGroup', e.target.value)}
                   className="input-field"
                 >
                   <option value="">Select Age Group</option>
-                  <option value="Young Adult">Young Adult</option>
-                  <option value="Adult">Adult</option>
-                  <option value="Mature">Mature</option>
+                  {ageGroupOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
+          {/* Quick Add Modal Dispatcher */}
+          {quickAdd.type && (
+            <QuickAddMasterDataModal
+              isOpen={true}
+              onClose={() => setQuickAdd({ type: null })}
+              title={quickAdd.type}
+              service={
+                quickAdd.type === 'Color Family' ? (colorFamilyService as any) :
+                quickAdd.type === 'Pattern' ? (patternService as any) :
+                quickAdd.type === 'Sleeve Length' ? (sleeveLengthService as any) :
+                quickAdd.type === 'Neckline' ? (necklineService as any) :
+                quickAdd.type === 'Length' ? (lengthService as any) :
+                quickAdd.type === 'Fit' ? (fitService as any) :
+                quickAdd.type === 'Age Group' ? (ageGroupService as any) :
+                quickAdd.type === 'Fabric' ? (materialService as any) :
+                quickAdd.type === 'Occasion' ? (occasionService as any) :
+                (seasonService as any)
+              }
+              onCreated={(created: any) => {
+                const name = created.name;
+                switch (quickAdd.type) {
+                  case 'Color Family':
+                    setColorFamilyOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('colorFamily', name);
+                    break;
+                  case 'Pattern':
+                    setPatternOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('pattern', name);
+                    break;
+                  case 'Sleeve Length':
+                    setSleeveLengthOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('sleeveLength', name);
+                    break;
+                  case 'Neckline':
+                    setNecklineOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('neckline', name);
+                    break;
+                  case 'Length':
+                    setLengthOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('length', name);
+                    break;
+                  case 'Fit':
+                    setFitOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('fit', name);
+                    break;
+                  case 'Age Group':
+                    setAgeGroupOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('ageGroup', name);
+                    break;
+                  case 'Fabric':
+                    setFabricOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('fabric', name);
+                    break;
+                  case 'Occasion':
+                    setOccasionOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('occasion', name);
+                    break;
+                  case 'Season':
+                    setSeasonOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                    handleChange('season', name);
+                    break;
+                }
+                setQuickAdd({ type: null });
+              }}
+            />
+          )}
               </div>
             </div>
 
