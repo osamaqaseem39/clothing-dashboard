@@ -26,7 +26,7 @@ const Settings: React.FC = () => {
     storeEmail: 'contact@myecommercestore.com',
     storePhone: '+1 (555) 123-4567',
     storeAddress: '123 Commerce St, Business City, BC 12345',
-    currency: 'USD',
+    currency: 'PKR',
     timezone: 'America/New_York',
     language: 'en',
   });
@@ -60,7 +60,7 @@ const Settings: React.FC = () => {
     paypalEnabled: true,
     applePayEnabled: false,
     googlePayEnabled: false,
-    defaultCurrency: 'USD',
+    defaultCurrency: 'PKR',
     taxRate: 8.5,
     shippingCost: 5.99,
   });
@@ -188,7 +188,7 @@ const Settings: React.FC = () => {
                   onChange={(e) => setStoreSettings({...storeSettings, currency: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
-                  <option value="USD">USD ($)</option>
+                  <option value="PKR">PKR (₨)</option>
                   <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
                   <option value="CAD">CAD (C$)</option>
@@ -456,7 +456,7 @@ const Settings: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Shipping Cost ($)
+                    Shipping Cost (PKR)
                   </label>
                   <input
                     type="number"
