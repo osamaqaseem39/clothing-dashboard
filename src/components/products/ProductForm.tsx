@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Product, Category, Brand, ProductVariant } from '../../types';
 import TagsModal from './modals/TagsModal';
@@ -219,6 +219,56 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [ageGroupOptions, setAgeGroupOptions] = useState<string[]>([
     'Young Adult','Adult','Mature'
   ]);
+
+  // Load master data options
+  useEffect(() => {
+    let isMounted = true;
+    const loadOptions = async () => {
+      try {
+        const [
+          colorFamiliesRes,
+          patternsRes,
+          sleeveLengthsRes,
+          necklinesRes,
+          lengthsRes,
+          fitsRes,
+          ageGroupsRes,
+          fabricsRes,
+          occasionsRes,
+          seasonsRes,
+        ] = await Promise.all([
+          colorFamilyService.getAll(),
+          patternService.getAll(),
+          sleeveLengthService.getAll(),
+          necklineService.getAll(),
+          lengthService.getAll(),
+          fitService.getAll(),
+          ageGroupService.getAll(),
+          materialService.getAll(),
+          occasionService.getAll(),
+          seasonService.getAll(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (colorFamiliesRes.success && colorFamiliesRes.data) setColorFamilyOptions(colorFamiliesRes.data.map((i: any) => i.name));
+        if (patternsRes.success && patternsRes.data) setPatternOptions(patternsRes.data.map((i: any) => i.name));
+        if (sleeveLengthsRes.success && sleeveLengthsRes.data) setSleeveLengthOptions(sleeveLengthsRes.data.map((i: any) => i.name));
+        if (necklinesRes.success && necklinesRes.data) setNecklineOptions(necklinesRes.data.map((i: any) => i.name));
+        if (lengthsRes.success && lengthsRes.data) setLengthOptions(lengthsRes.data.map((i: any) => i.name));
+        if (fitsRes.success && fitsRes.data) setFitOptions(fitsRes.data.map((i: any) => i.name));
+        if (ageGroupsRes.success && ageGroupsRes.data) setAgeGroupOptions(ageGroupsRes.data.map((i: any) => i.name));
+        if (fabricsRes.success && fabricsRes.data) setFabricOptions(fabricsRes.data.map((i: any) => i.name));
+        if (occasionsRes.success && occasionsRes.data) setOccasionOptions(occasionsRes.data.map((i: any) => i.name));
+        if (seasonsRes.success && seasonsRes.data) setSeasonOptions(seasonsRes.data.map((i: any) => i.name));
+      } catch (err) {
+        // Swallow errors, keep defaults
+        console.error('Failed to load master data options', err);
+      }
+    };
+    loadOptions();
+    return () => { isMounted = false; };
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
