@@ -551,6 +551,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const newMaterial = res.data;
             setMaterialsState(prev => [newMaterial, ...prev]);
             handleFieldChange('fabric', newMaterial.name);
+            setShowCreateMaterial(false);
           } else {
             throw new Error(res.message || 'Failed to create fabric type');
           }
@@ -568,6 +569,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const newOccasion = res.data;
             setOccasionsState(prev => [newOccasion, ...prev]);
             handleFieldChange('occasion', newOccasion.name);
+            setShowCreateOccasion(false);
           } else {
             throw new Error(res.message || 'Failed to create occasion');
           }
@@ -585,6 +587,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const newSeason = res.data;
             setSeasonsState(prev => [newSeason, ...prev]);
             handleFieldChange('season', newSeason.name);
+            setShowCreateSeason(false);
           } else {
             throw new Error(res.message || 'Failed to create season');
           }
@@ -602,6 +605,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setColorFamiliesState(prev => [item, ...prev]);
             handleFieldChange('colorFamily', item.name);
+            setShowCreateColorFamily(false);
           } else {
             throw new Error(res.message || 'Failed to create color family');
           }
@@ -619,6 +623,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setPatternsState(prev => [item, ...prev]);
             handleFieldChange('pattern', item.name);
+            setShowCreatePattern(false);
           } else {
             throw new Error(res.message || 'Failed to create pattern');
           }
@@ -636,6 +641,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setSleeveLengthsState(prev => [item, ...prev]);
             handleFieldChange('sleeveLength', item.name);
+            setShowCreateSleeveLength(false);
           } else {
             throw new Error(res.message || 'Failed to create sleeve length');
           }
@@ -653,6 +659,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setNecklinesState(prev => [item, ...prev]);
             handleFieldChange('neckline', item.name);
+            setShowCreateNeckline(false);
           } else {
             throw new Error(res.message || 'Failed to create neckline');
           }
@@ -670,6 +677,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setLengthsState(prev => [item, ...prev]);
             handleFieldChange('length', item.name);
+            setShowCreateLength(false);
           } else {
             throw new Error(res.message || 'Failed to create length');
           }
@@ -687,6 +695,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setFitsState(prev => [item, ...prev]);
             handleFieldChange('fit', item.name);
+            setShowCreateFit(false);
           } else {
             throw new Error(res.message || 'Failed to create fit');
           }
@@ -704,6 +713,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             const item = res.data;
             setAgeGroupsState(prev => [item, ...prev]);
             handleFieldChange('ageGroup', item.name);
+            setShowCreateAgeGroup(false);
           } else {
             throw new Error(res.message || 'Failed to create age group');
           }
