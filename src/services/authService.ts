@@ -19,7 +19,7 @@ export const authService = {
 
   // Get current user profile
   async getCurrentUser(): Promise<ApiResponse<{ user: User }>> {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/auth/profile');
     return response.data;
   },
 
@@ -49,7 +49,7 @@ export const authService = {
 
   // Refresh token
   async refreshToken(): Promise<ApiResponse<{ token: string }>> {
-    const response = await api.post('/auth/refresh-token');
+    const response = await api.post('/auth/refresh');
     return response.data;
   },
 

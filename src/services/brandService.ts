@@ -4,7 +4,11 @@ import { ApiResponse, Brand } from '../types';
 export const brandService = {
   // Get all brands
   async getBrands(): Promise<ApiResponse<Brand[]>> {
-    const response = await api.get('/brands');
+    // Use active brands endpoint and normalize paginated/array responses
+    const params = new URLSearchParams();
+    params.append('page', '1');
+    params.append('limit', '1000');
+    const response = await api.get(`/brands/active?${params.toString()}`);
     const payload = response.data;
     // Normalize both paginated and plain-array responses
     if (Array.isArray(payload)) {
