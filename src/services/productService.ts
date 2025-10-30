@@ -135,6 +135,19 @@ export const productService = {
       }).filter((img: any) => img !== null && img.url && img.url.trim() !== '');
     }
 
+    // Colors - backend expects array of { colorId, imageUrl? }
+    if (colors && Array.isArray(colors) && colors.length > 0) {
+      whitelisted.colors = colors
+        .map((c: any) => {
+          if (!c) return null;
+          const colorId = typeof c === 'string' ? c : c.colorId;
+          if (!colorId) return null;
+          const imageUrl = typeof c === 'object' ? c.imageUrl : undefined;
+          return imageUrl ? { colorId, imageUrl } : { colorId };
+        })
+        .filter(Boolean);
+    }
+
     // Variations - backend expects "variations" not "variants"
     // Each variation has its own: attributes, images, prices, and inventory
     if (variants && Array.isArray(variants) && variants.length > 0) {
@@ -338,6 +351,19 @@ export const productService = {
     }
     // Object with products or docs
     if (payload && typeof payload === 'object') {
+      // Common shape: { data: Product[], total, page, limit, totalPages }
+      if (Array.isArray(payload.data)) {
+        return {
+          success: true,
+          data: {
+            products: payload.data,
+            totalPages: payload.totalPages || 1,
+            total: payload.total,
+            page: payload.page,
+            limit: payload.limit,
+          },
+        } as any;
+      }
       if (Array.isArray(payload.products)) {
         return { success: true, data: { products: payload.products, totalPages: payload.totalPages || 1 } };
       }
