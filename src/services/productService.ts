@@ -277,8 +277,8 @@ export const productService = {
       const params = buildPaginationParams();
       const suffix = params.toString() ? `?${params.toString()}` : '';
       const response = await api.get(`/products/category/${categoryId}${suffix}`);
-      // Response structure varies, so return as-is and let caller handle filtering
-      return response.data;
+      const payload = response.data;
+      return productService.normalizeProductsResponse(payload);
     }
 
     // Priority 2: Search queries
@@ -287,7 +287,8 @@ export const productService = {
       params.append('q', filters.search);
       const suffix = params.toString() ? `?${params.toString()}` : '';
       const response = await api.get(`/products/search${suffix}`);
-      return response.data;
+      const payload = response.data;
+      return productService.normalizeProductsResponse(payload);
     }
 
     // Priority 3: Category filtering (without published status requirement)
@@ -296,7 +297,8 @@ export const productService = {
       const params = buildPaginationParams();
       const suffix = params.toString() ? `?${params.toString()}` : '';
       const response = await api.get(`/products/category/${categoryId}${suffix}`);
-      return response.data;
+      const payload = response.data;
+      return productService.normalizeProductsResponse(payload);
     }
 
     // Priority 4: Published products only - use dedicated endpoint
@@ -304,13 +306,46 @@ export const productService = {
       const params = buildPaginationParams();
       const suffix = params.toString() ? `?${params.toString()}` : '';
       const response = await api.get(`/products/published${suffix}`);
-      return response.data;
+      const payload = response.data;
+      return productService.normalizeProductsResponse(payload);
     }
 
     // Default: use base /products endpoint with only pagination params
     const params = buildPaginationParams();
     const response = await api.get(`/products?${params.toString()}`);
-    return response.data;
+    const payload = response.data;
+    return productService.normalizeProductsResponse(payload);
+  },
+
+  normalizeProductsResponse(payload: any): ApiResponse<any> {
+    // If already normalized
+    if (payload && typeof payload === 'object' && 'success' in payload && typeof payload.success === 'boolean') {
+      // Ensure data.products exists even if backend returns array directly inside data
+      const data = payload.data;
+      if (Array.isArray(data)) {
+        return { success: true, data: { products: data, totalPages: 1 } };
+      }
+      if (data && Array.isArray(data.products)) return payload;
+      // Some backends use docs
+      if (data && Array.isArray(data.docs)) {
+        return { success: true, data: { products: data.docs, totalPages: data.totalPages || 1 } };
+      }
+      return payload;
+    }
+    // Array response
+    if (Array.isArray(payload)) {
+      return { success: true, data: { products: payload, totalPages: 1 } };
+    }
+    // Object with products or docs
+    if (payload && typeof payload === 'object') {
+      if (Array.isArray(payload.products)) {
+        return { success: true, data: { products: payload.products, totalPages: payload.totalPages || 1 } };
+      }
+      if (Array.isArray(payload.docs)) {
+        return { success: true, data: { products: payload.docs, totalPages: payload.totalPages || 1 } };
+      }
+    }
+    return { success: true, data: { products: [], totalPages: 1 } };
   },
 
   // Get single product by ID
@@ -327,7 +362,16 @@ export const productService = {
       // eslint-disable-next-line no-console
       console.log('createProduct payload', payload);
       const response = await api.post('/products', payload);
-      return response.data;
+      const payloadResp = response.data;
+      // Normalize to ApiResponse shape
+      if (payloadResp && typeof payloadResp === 'object' && 'success' in payloadResp) {
+        return payloadResp;
+      }
+      if (payloadResp && (payloadResp.product || payloadResp._id)) {
+        const product = payloadResp.product || payloadResp;
+        return { success: true, data: { product } };
+      }
+      return { success: true, data: { product: payloadResp as Product } };
     } catch (error: any) {
       // eslint-disable-next-line no-console
       console.error('Error creating product:', error.response?.data || error.message);
@@ -346,7 +390,15 @@ export const productService = {
       // eslint-disable-next-line no-console
       console.log('updateProduct payload', id, payload);
       const response = await api.put(`/products/${id}`, payload);
-      return response.data;
+      const payloadResp = response.data;
+      if (payloadResp && typeof payloadResp === 'object' && 'success' in payloadResp) {
+        return payloadResp;
+      }
+      if (payloadResp && (payloadResp.product || payloadResp._id)) {
+        const product = payloadResp.product || payloadResp;
+        return { success: true, data: { product } };
+      }
+      return { success: true, data: { product: payloadResp as Product } };
     } catch (error: any) {
       // eslint-disable-next-line no-console
       console.error('Error updating product:', error.response?.data || error.message);
