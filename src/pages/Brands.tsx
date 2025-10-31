@@ -27,6 +27,8 @@ const Brands: React.FC = () => {
   const navigate = useNavigate();
   const [showBrandModal, setShowBrandModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBrands();
@@ -58,15 +60,21 @@ const Brands: React.FC = () => {
     if (!brandToDelete) return;
 
     try {
+      setIsDeleting(true);
       const response = await brandService.deleteBrand(brandToDelete._id);
       if (response.success) {
         setBrands(brands.filter(b => b._id !== brandToDelete._id));
         setShowDeleteModal(false);
         setBrandToDelete(null);
+        setSuccessMessage('Brand deleted successfully');
+        // Refresh the list from server to ensure consistency
+        fetchBrands();
       }
     } catch (err: any) {
       console.error('Error deleting brand:', err);
       setError(err.response?.data?.message || 'Failed to delete brand');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -123,6 +131,17 @@ const Brands: React.FC = () => {
           Add Brand
         </button>
       </div>
+
+      {/* Success message */}
+      {successMessage && (
+        <div className="rounded-md bg-green-50 p-4 border border-green-200">
+          <div className="flex">
+            <div className="ml-0">
+              <h3 className="text-sm font-medium text-green-800">{successMessage}</h3>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <div className="card">
@@ -349,9 +368,10 @@ const Brands: React.FC = () => {
               </button>
               <button
                 onClick={confirmDelete}
-                className="btn btn-danger"
+                className={`btn btn-danger ${isDeleting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={isDeleting}
               >
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
