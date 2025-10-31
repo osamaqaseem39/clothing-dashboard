@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { BellIcon, MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
-import CartIcon from '../ui/CartIcon';
 
 const Header: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -50,8 +49,7 @@ const Header: React.FC = () => {
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
-          {/* Cart Icon */}
-          <CartIcon />
+          {/* Removed Cart Icon */}
 
           {/* Notifications */}
           <div className="relative">

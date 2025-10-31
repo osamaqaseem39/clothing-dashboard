@@ -36,6 +36,8 @@ const Products: React.FC = () => {
     page: 1,
     limit: 10,
   });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -91,15 +93,21 @@ const Products: React.FC = () => {
     if (!productToDelete) return;
 
     try {
+      setIsDeleting(true);
       const response = await productService.deleteProduct(productToDelete._id);
       if (response.success) {
         setProducts(products.filter(p => p._id !== productToDelete._id));
         setShowDeleteModal(false);
         setProductToDelete(null);
+        setSuccessMessage('Product deleted successfully');
+        // Re-fetch to keep pagination/filters consistent
+        fetchProducts();
       }
     } catch (err: any) {
       console.error('Error deleting product:', err);
       setError(err.response?.data?.message || 'Failed to delete product');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -178,6 +186,17 @@ const Products: React.FC = () => {
           Add Product
         </button>
       </div>
+
+      {/* Success message */}
+      {successMessage && (
+        <div className="rounded-md bg-green-50 p-4 border border-green-200">
+          <div className="flex">
+            <div className="ml-0">
+              <h3 className="text-sm font-medium text-green-800">{successMessage}</h3>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters and search */}
       <div className="card">
@@ -404,9 +423,10 @@ const Products: React.FC = () => {
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="btn btn-danger"
+                  className={`btn btn-danger ${isDeleting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled={isDeleting}
                 >
-                  Delete
+                  {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
             </div>

@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
-  ShoppingBagIcon,
   UsersIcon,
-  ShoppingCartIcon,
   ChartBarIcon,
   CogIcon,
   BuildingStorefrontIcon,
@@ -20,7 +18,6 @@ import {
   PresentationChartLineIcon,
   WrenchScrewdriverIcon,
   BuildingOfficeIcon,
-  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
@@ -41,9 +38,6 @@ const Sidebar: React.FC = () => {
 
   const navigation: SidebarItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
-    { name: 'Shop', href: '/shop', icon: ShoppingBagIcon },
-    { name: 'Cart', href: '/cart', icon: ShoppingCartIcon },
-    { name: 'Checkout', href: '/checkout', icon: CreditCardIcon },
     { name: 'Products', href: '/dashboard/products', icon: CubeIcon },
     { name: 'Categories', href: '/dashboard/categories', icon: TagIcon },
     { name: 'Inventory', href: '/dashboard/inventory', icon: CubeIcon },

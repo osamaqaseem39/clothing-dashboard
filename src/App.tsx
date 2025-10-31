@@ -44,10 +44,7 @@ import ColorFamilyFormPage from './pages/ColorFamilyFormPage';
 import MasterDataPage from './pages/MasterDataPage';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import OrderConfirmation from './pages/OrderConfirmation';
-import Shop from './pages/Shop';
+// Removed Cart, Checkout, Shop from dashboard
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -156,49 +153,7 @@ const AppContent: React.FC = () => {
           <Route path="settings" element={<Settings />} />
         </Route>
 
-        {/* Shop route */}
-        <Route
-          path="/shop"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Shop />} />
-        </Route>
-
-        {/* Cart and Checkout routes */}
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Cart />} />
-        </Route>
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Checkout />} />
-        </Route>
-        <Route
-          path="/order-confirmation/:orderId"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<OrderConfirmation />} />
-        </Route>
+        {/* Removed Shop, Cart, Checkout, and Order Confirmation routes */}
 
         {/* Redirect root to dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

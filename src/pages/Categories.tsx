@@ -22,6 +22,8 @@ const Categories: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<Category | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'tree'>('table');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadCategories();
@@ -61,12 +63,16 @@ const Categories: React.FC = () => {
 
   const handleDeleteCategory = async (category: Category) => {
     try {
+      setIsDeleting(true);
       await categoryService.deleteCategory(category._id);
       await loadCategories();
       setDeleteConfirm(null);
+      setSuccessMessage('Category deleted successfully');
     } catch (err) {
       setError('Failed to delete category');
       console.error('Error deleting category:', err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -200,6 +206,17 @@ const Categories: React.FC = () => {
           <span>Add Category</span>
         </Button>
       </div>
+
+      {/* Success message */}
+      {successMessage && (
+        <div className="rounded-md bg-green-50 p-4 border border-green-200">
+          <div className="flex">
+            <div className="ml-0">
+              <h3 className="text-sm font-medium text-green-800">{successMessage}</h3>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
@@ -358,8 +375,9 @@ const Categories: React.FC = () => {
               <Button
                 variant="danger"
                 onClick={() => handleDeleteCategory(deleteConfirm)}
+                disabled={isDeleting}
               >
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
             </div>
           </div>

@@ -24,6 +24,8 @@ const Inventory: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<InventoryType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -111,15 +113,21 @@ const Inventory: React.FC = () => {
     if (!itemToDelete) return;
 
     try {
+      setIsDeleting(true);
       const response = await inventoryService.deleteInventory(itemToDelete._id);
       if (response.success) {
         setInventory(inventory.filter(item => item._id !== itemToDelete._id));
         setShowDeleteModal(false);
         setItemToDelete(null);
+        setSuccessMessage('Inventory record deleted successfully');
+        // Refresh from server for accuracy
+        loadInventory();
       }
     } catch (err) {
       setError('Failed to delete inventory item');
       console.error('Error deleting inventory item:', err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -335,6 +343,17 @@ const Inventory: React.FC = () => {
           <span>Add Stock</span>
         </Button>
       </div>
+
+      {/* Success message */}
+      {successMessage && (
+        <div className="rounded-md bg-green-50 p-4 border border-green-200">
+          <div className="flex">
+            <div className="ml-0">
+              <h3 className="text-sm font-medium text-green-800">{successMessage}</h3>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
@@ -724,9 +743,10 @@ const Inventory: React.FC = () => {
               </button>
               <button
                 onClick={confirmDelete}
-                className="btn btn-danger"
+                className={`btn btn-danger ${isDeleting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={isDeleting}
               >
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
