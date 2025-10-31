@@ -71,9 +71,17 @@ export const productService = {
     copyIfDefined('status');
 
     // Pricing
-    copyIfDefined('price');
-    copyIfDefined('salePrice');
-    copyIfDefined('originalPrice');
+    const priceNum = Number(rest.price);
+    const salePriceNum = Number(rest.salePrice);
+    if (!Number.isNaN(priceNum)) {
+      whitelisted.price = priceNum;
+    }
+    if (!Number.isNaN(salePriceNum) && salePriceNum > 0 && (!Number.isNaN(priceNum) ? salePriceNum < priceNum : true)) {
+      whitelisted.salePrice = salePriceNum;
+    }
+    if (rest.originalPrice !== undefined && rest.originalPrice !== null && rest.originalPrice !== '') {
+      whitelisted.originalPrice = Number(rest.originalPrice);
+    }
     // Currency defaults to PKR if not provided (backend requirement)
     whitelisted.currency = rest.currency || 'PKR';
 
@@ -166,7 +174,11 @@ export const productService = {
           normalizedVariant.price = Number(variantData.price) || 0;
         }
         if (variantData.salePrice !== undefined && variantData.salePrice !== null) {
-          normalizedVariant.salePrice = Number(variantData.salePrice) || 0;
+          const vSale = Number(variantData.salePrice) || 0;
+          const vPrice = Number(variantData.price) || 0;
+          if (vSale > 0 && (vPrice === 0 || vSale < vPrice)) {
+            normalizedVariant.salePrice = vSale;
+          }
         }
         if (variantData.comparePrice !== undefined && variantData.comparePrice !== null) {
           normalizedVariant.comparePrice = Number(variantData.comparePrice) || 0;

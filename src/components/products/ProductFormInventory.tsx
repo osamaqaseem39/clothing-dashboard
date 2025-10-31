@@ -48,6 +48,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
             }`}
             placeholder="0"
           />
+          <p className="mt-1 text-sm text-gray-500">Enter available quantity (0 or higher).</p>
           {errors.stockQuantity && (
             <p className="mt-1 text-sm text-red-600">{errors.stockQuantity}</p>
           )}
@@ -103,6 +104,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               placeholder="0.00"
             />
           </div>
+          <p className="mt-1 text-sm text-gray-500">Base selling price before any discounts.</p>
           {errors.price && (
             <p className="mt-1 text-sm text-red-600">{errors.price}</p>
           )}
@@ -121,13 +123,16 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               min="0"
               value={formData.salePrice === 0 ? '' : (formData.salePrice || '')}
               onChange={(e) => onFieldChange('salePrice', e.target.value === '' ? 0 : (parseFloat(e.target.value) || 0))}
-              className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full pl-8 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.salePrice ? 'border-red-300' : 'border-gray-300'
+              }`}
               placeholder="0.00"
             />
           </div>
-          <p className="mt-1 text-sm text-gray-500">
-            Leave empty to disable sale pricing
-          </p>
+          {errors.salePrice && (
+            <p className="mt-1 text-sm text-red-600">{errors.salePrice}</p>
+          )}
+          <p className="mt-1 text-sm text-gray-500">Must be lower than Regular Price. Leave empty to disable sale pricing.</p>
         </div>
 
         {/* Cost Price */}

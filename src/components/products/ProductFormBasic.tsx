@@ -87,6 +87,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
             }`}
             placeholder="Enter product name"
           />
+          <p className="mt-1 text-sm text-gray-500">Use a clear, descriptive title (min 3 characters).</p>
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name}</p>
           )}
@@ -106,6 +107,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
             }`}
             placeholder="Enter SKU"
           />
+          <p className="mt-1 text-sm text-gray-500">Allowed: letters, numbers, dashes, underscores, and dots.</p>
           {errors.sku && (
             <p className="mt-1 text-sm text-red-600">{errors.sku}</p>
           )}
@@ -125,6 +127,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
             }`}
             placeholder="Enter product description"
           />
+          <p className="mt-1 text-sm text-gray-500">Provide key details, materials, and care (min 20 characters).</p>
           {errors.description && (
             <p className="mt-1 text-sm text-red-600">{errors.description}</p>
           )}
@@ -162,6 +165,10 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-sm text-gray-500">Choose the most relevant category.</p>
+            {errors.categories && (
+              <p className="mt-1 text-sm text-red-600">{errors.categories}</p>
+            )}
             <button type="button" onClick={onAddCategory} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
               + Add new category
             </button>
@@ -183,6 +190,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-sm text-gray-500">Optional but recommended for brand-aware shoppers.</p>
             <button type="button" onClick={onAddBrand} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
               + Add new brand
             </button>

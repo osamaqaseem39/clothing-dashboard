@@ -242,14 +242,20 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
 
     if (!formData.name?.trim()) {
       newErrors.name = 'Product name is required';
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = 'Name must be at least 3 characters';
     }
 
     if (!formData.description?.trim()) {
       newErrors.description = 'Product description is required';
+    } else if (formData.description.trim().length < 20) {
+      newErrors.description = 'Description should be at least 20 characters';
     }
 
     if (!formData.sku?.trim()) {
       newErrors.sku = 'SKU is required';
+    } else if (!/^[A-Za-z0-9._-]+$/.test(formData.sku.trim())) {
+      newErrors.sku = 'SKU can only contain letters, numbers, dashes, underscores, and dots';
     }
 
     if (!formData.price || formData.price <= 0) {
@@ -258,6 +264,24 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
 
     if (formData.stockQuantity === undefined || formData.stockQuantity < 0) {
       newErrors.stockQuantity = 'Stock quantity cannot be negative';
+    }
+
+    // Pricing relationship validation
+    const priceNum = Number(formData.price || 0);
+    const salePriceNum = Number(formData.salePrice || 0);
+    if (salePriceNum > 0 && priceNum > 0 && salePriceNum >= priceNum) {
+      newErrors.salePrice = 'Sale price must be less than regular price';
+    }
+
+    // Category required
+    const categoriesVal = Array.isArray(formData.categories) ? formData.categories : (formData.categories ? [formData.categories as any] : []);
+    if (!categoriesVal || categoriesVal.length === 0) {
+      newErrors.categories = 'Please select a category';
+    }
+
+    // At least one image recommended/required
+    if (!formData.images || (Array.isArray(formData.images) && formData.images.length === 0)) {
+      newErrors.images = 'Please add at least one product image';
     }
 
     setErrors(newErrors);
