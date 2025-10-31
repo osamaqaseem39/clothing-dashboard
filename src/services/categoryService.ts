@@ -4,8 +4,11 @@ import { ApiResponse, Category } from '../types';
 export const categoryService = {
   // Get all categories
   async getCategories(): Promise<ApiResponse<Category[]>> {
-    // Use active categories endpoint for latest backend and normalize
-    const response = await api.get('/categories/active');
+    // Fetch all categories (not only active) and normalize paginated/array responses
+    const params = new URLSearchParams();
+    params.append('page', '1');
+    params.append('limit', '1000');
+    const response = await api.get(`/categories?${params.toString()}`);
     const payload = response.data;
     if (Array.isArray(payload)) {
       return { success: true, data: payload };
