@@ -409,7 +409,7 @@ const SizeChartModal: React.FC<SizeChartModalProps> = ({
                   />
                   <input
                     type="text"
-                    placeholder="Bust"
+                    placeholder="Chest"
                     value={size.measurements.bust}
                     onChange={(e) => updateSize(index, 'bust', e.target.value)}
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"

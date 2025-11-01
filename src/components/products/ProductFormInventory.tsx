@@ -180,7 +180,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bust</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Chest</label>
             <input
               type="text"
               value={formData.modelMeasurements?.bust || ''}

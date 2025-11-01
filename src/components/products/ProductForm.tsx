@@ -135,9 +135,30 @@ const ProductForm: React.FC<ProductFormProps> = ({
         images: [],
         isActive: true,
       },
-    ],
-    // Images - extract URLs if objects, otherwise use as strings
-    images: (product?.images || []).map((img: any) => typeof img === 'string' ? img : img.url),
+    ].map((variant: any) => {
+      // Clean dimensions to remove _id if present
+      if (variant.dimensions && variant.dimensions._id) {
+        const { _id, ...cleanDimensions } = variant.dimensions;
+        return { ...variant, dimensions: cleanDimensions };
+      }
+      return variant;
+    }),
+    // Images - extract URLs if objects, filter out ObjectIds (24 hex chars) that aren't URLs
+    images: (product?.images || []).map((img: any) => {
+      if (typeof img === 'string') {
+        // Check if it's a valid URL (starts with http/https) or if it's an ObjectId
+        // ObjectIds are 24 hex characters, URLs start with http/https
+        if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) {
+          return img;
+        }
+        // If it looks like an ObjectId (24 hex chars), filter it out - it's not a valid image URL
+        if (/^[0-9a-fA-F]{24}$/.test(img)) {
+          return null; // Filter out ObjectIds
+        }
+        return img; // Keep other strings that might be relative paths
+      }
+      return img?.url || null;
+    }).filter((img: any) => img !== null && img !== undefined),
     // UI-specific fields
     features: product?.features || [],
     colors: product?.colors || [],
@@ -148,7 +169,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
     occasion: product?.occasion || '',
     season: product?.season || '',
     careInstructions: product?.careInstructions || '',
-    modelMeasurements: product?.modelMeasurements || {
+    modelMeasurements: product?.modelMeasurements ? (() => {
+      // Clean modelMeasurements: remove _id if present and only keep height
+      const measurements = product.modelMeasurements as any;
+      const { _id, bust, waist, hips, height, ...rest } = measurements;
+      return {
+        height: height || '',
+        bust: '',
+        waist: '',
+        hips: '',
+      };
+    })() : {
       height: '',
       bust: '',
       waist: '',
@@ -318,10 +349,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
       isActive: formData.isActive,
       status: formData.status as any,
       seo: formData.seo,
-      variants: formData.variants.map(variant => ({
-        ...variant,
-        _id: '', // Add empty _id for new variants
-      })),
+      variants: formData.variants.map(variant => {
+        // Clean dimensions to remove _id if present
+        const dimensions = variant.dimensions || { length: 0, width: 0, height: 0 };
+        const cleanDimensions = '_id' in dimensions ? (({ _id, ...rest }) => rest)(dimensions as any) : dimensions;
+        return {
+          ...variant,
+          _id: '', // Add empty _id for new variants
+          dimensions: cleanDimensions,
+        };
+      }),
       images: imageObjects as any,
       // UI-specific fields
       features: formData.features && formData.features.length > 0 ? formData.features : undefined,
@@ -333,7 +370,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
       occasion: formData.occasion || undefined,
       season: formData.season || undefined,
       careInstructions: formData.careInstructions || undefined,
-      modelMeasurements: formData.modelMeasurements && (formData.modelMeasurements.height || formData.modelMeasurements.bust || formData.modelMeasurements.waist || formData.modelMeasurements.hips) ? formData.modelMeasurements : undefined,
+      modelMeasurements: formData.modelMeasurements && formData.modelMeasurements.height ? {
+        height: formData.modelMeasurements.height,
+        bust: '',
+        waist: '',
+        hips: '',
+      } : undefined,
       designer: formData.designer || undefined,
       handwork: formData.handwork && formData.handwork.length > 0 ? formData.handwork : undefined,
       colorFamily: formData.colorFamily || undefined,
@@ -1409,61 +1451,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
             {/* Model Measurements */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Model Measurements (for size reference)
+                Model Height (for size reference)
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Height</label>
-                  <input
-                    type="text"
-                    value={formData.modelMeasurements?.height || ''}
-                    onChange={(e) => handleChange('modelMeasurements', {
-                      ...formData.modelMeasurements,
-                      height: e.target.value,
-                    })}
-                    className="input-field"
-                    placeholder="e.g., 5'6&quot;"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Bust</label>
-                  <input
-                    type="text"
-                    value={formData.modelMeasurements?.bust || ''}
-                    onChange={(e) => handleChange('modelMeasurements', {
-                      ...formData.modelMeasurements,
-                      bust: e.target.value,
-                    })}
-                    className="input-field"
-                    placeholder="e.g., 34&quot;"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Waist</label>
-                  <input
-                    type="text"
-                    value={formData.modelMeasurements?.waist || ''}
-                    onChange={(e) => handleChange('modelMeasurements', {
-                      ...formData.modelMeasurements,
-                      waist: e.target.value,
-                    })}
-                    className="input-field"
-                    placeholder="e.g., 28&quot;"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">Hips</label>
-                  <input
-                    type="text"
-                    value={formData.modelMeasurements?.hips || ''}
-                    onChange={(e) => handleChange('modelMeasurements', {
-                      ...formData.modelMeasurements,
-                      hips: e.target.value,
-                    })}
-                    className="input-field"
-                    placeholder="e.g., 36&quot;"
-                  />
-                </div>
+              <div className="w-full md:w-1/3">
+                <input
+                  type="text"
+                  value={formData.modelMeasurements?.height || ''}
+                  onChange={(e) => handleChange('modelMeasurements', {
+                    height: e.target.value,
+                    bust: '',
+                    waist: '',
+                    hips: '',
+                  })}
+                  className="input-field"
+                  placeholder="e.g., 5'6&quot;"
+                />
               </div>
             </div>
 
