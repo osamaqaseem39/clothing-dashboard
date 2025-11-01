@@ -388,8 +388,50 @@ export const productService = {
 
   // Get single product by ID
   async getProduct(id: string): Promise<ApiResponse<{ product: Product }>> {
-    const response = await api.get(`/products/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/products/${id}`);
+      const payload = response.data;
+      
+      // Normalize response - backend may return product directly or wrapped
+      if (payload && typeof payload === 'object') {
+        // If already in ApiResponse format with success property
+        if ('success' in payload && typeof payload.success === 'boolean') {
+          // Ensure data.product exists
+          if (payload.data && payload.data.product) {
+            return payload;
+          }
+          // If data is the product itself, wrap it
+          if (payload.data && payload.data._id) {
+            return {
+              success: true,
+              data: { product: payload.data },
+            };
+          }
+          return payload;
+        }
+        // If payload is the product directly
+        if (payload._id) {
+          return {
+            success: true,
+            data: { product: payload },
+          };
+        }
+      }
+      
+      // Default fallback
+      return {
+        success: false,
+        data: { product: {} as Product },
+        message: 'Invalid product response',
+      };
+    } catch (error: any) {
+      console.error('Error fetching product:', error.response?.data || error.message);
+      return {
+        success: false,
+        data: { product: {} as Product },
+        message: error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to fetch product',
+      };
+    }
   },
 
   // Create new product

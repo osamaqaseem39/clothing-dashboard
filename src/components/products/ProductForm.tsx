@@ -204,6 +204,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<string>('basic');
   
   // Modal states
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
@@ -315,9 +316,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
       }
       if (variant.price <= 0) {
         newErrors[`variant-${index}-price`] = 'Price must be greater than 0';
-      }
-      if (variant.stockQuantity < 0) {
-        newErrors[`variant-${index}-stock`] = 'Stock quantity cannot be negative';
       }
     });
 
@@ -493,9 +491,83 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </button>
         </div>
 
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+            <button
+              type="button"
+              onClick={() => setActiveTab('basic')}
+              className={`${
+                activeTab === 'basic'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Basic Information
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('properties')}
+              className={`${
+                activeTab === 'properties'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Clothing Properties
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('measurements')}
+              className={`${
+                activeTab === 'measurements'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Measurements
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('features')}
+              className={`${
+                activeTab === 'features'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Features & Details
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('images')}
+              className={`${
+                activeTab === 'images'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Images
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('seo')}
+              className={`${
+                activeTab === 'seo'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              SEO
+            </button>
+          </nav>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Basic Information Tab */}
+          {activeTab === 'basic' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Product Name *
@@ -748,22 +820,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Stock Quantity *
-                      </label>
-                      <input
-                        type="number"
-                        value={variant.stockQuantity === 0 ? '' : variant.stockQuantity}
-                        onChange={(e) => handleVariantChange(index, 'stockQuantity', e.target.value === '' ? 0 : (parseInt(e.target.value) || 0))}
-                        className={`input-field ${errors[`variant-${index}-stock`] ? 'border-red-300' : ''}`}
-                        placeholder="0"
-                      />
-                      {errors[`variant-${index}-stock`] && (
-                        <p className="mt-1 text-xs text-red-600">{errors[`variant-${index}-stock`]}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Weight (kg)
                       </label>
                       <input
@@ -863,205 +919,112 @@ const ProductForm: React.FC<ProductFormProps> = ({
               ))}
             </div>
           </div>
+            </div>
+          )}
 
-          {/* SEO Settings */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">SEO Settings</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  SEO Title
-                </label>
-                <input
-                  type="text"
-                  value={formData.seo.title}
-                  onChange={(e) => handleChange('seo', { ...formData.seo, title: e.target.value })}
-                  className="input-field"
-                  placeholder="SEO title"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  SEO Slug
-                </label>
-                <input
-                  type="text"
-                  value={formData.seo.slug}
-                  onChange={(e) => handleChange('seo', { ...formData.seo, slug: e.target.value })}
-                  className="input-field"
-                  placeholder="seo-friendly-url"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Meta Description
-                </label>
-                <textarea
-                  value={formData.seo.description}
-                  onChange={(e) => handleChange('seo', { ...formData.seo, description: e.target.value })}
-                  rows={3}
-                  className="input-field"
-                  placeholder="Meta description for search engines"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Keywords
+          {/* SEO Tab */}
+          {activeTab === 'seo' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    SEO Title
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => setIsKeywordsModalOpen(true)}
-                    className="btn btn-secondary text-sm"
-                  >
-                    <PlusIcon className="h-4 w-4 mr-1" />
-                    Manage Keywords
-                  </button>
+                  <input
+                    type="text"
+                    value={formData.seo.title}
+                    onChange={(e) => handleChange('seo', { ...formData.seo, title: e.target.value })}
+                    className="input-field"
+                    placeholder="SEO title"
+                  />
                 </div>
-                <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                  {formData.seo.keywords.map((keyword, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    SEO Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.seo.slug}
+                    onChange={(e) => handleChange('seo', { ...formData.seo, slug: e.target.value })}
+                    className="input-field"
+                    placeholder="seo-friendly-url"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Meta Description
+                  </label>
+                  <textarea
+                    value={formData.seo.description}
+                    onChange={(e) => handleChange('seo', { ...formData.seo, description: e.target.value })}
+                    rows={3}
+                    className="input-field"
+                    placeholder="Meta description for search engines"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Keywords
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsKeywordsModalOpen(true)}
+                      className="btn btn-secondary text-sm"
                     >
-                      {keyword}
-                    </span>
-                  ))}
-                  {formData.seo.keywords.length === 0 && (
-                    <span className="text-gray-500 text-sm">No keywords added</span>
-                  )}
+                      <PlusIcon className="h-4 w-4 mr-1" />
+                      Manage Keywords
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                    {formData.seo.keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                    {formData.seo.keywords.length === 0 && (
+                      <span className="text-gray-500 text-sm">No keywords added</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <div className="flex gap-6">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.seo.noIndex}
+                        onChange={(e) => handleChange('seo', { ...formData.seo, noIndex: e.target.checked })}
+                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">No Index</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.seo.noFollow}
+                        onChange={(e) => handleChange('seo', { ...formData.seo, noFollow: e.target.checked })}
+                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">No Follow</span>
+                    </label>
+                  </div>
                 </div>
               </div>
-
-              <div className="md:col-span-2">
-                <div className="flex gap-6">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.seo.noIndex}
-                      onChange={(e) => handleChange('seo', { ...formData.seo, noIndex: e.target.checked })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">No Index</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.seo.noFollow}
-                      onChange={(e) => handleChange('seo', { ...formData.seo, noFollow: e.target.checked })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">No Follow</span>
-                  </label>
-                </div>
-              </div>
             </div>
-          </div>
+          )}
 
-          {/* UI-Specific Fields */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Product Details</h3>
-            
-            {/* Features */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Product Features
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setIsFeaturesModalOpen(true)}
-                  className="btn btn-secondary text-sm"
-                >
-                  <PlusIcon className="h-4 w-4 mr-1" />
-                  Manage Features
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {formData.features?.map((feature, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                  >
-                    {feature}
-                  </span>
-                ))}
-                {(!formData.features || formData.features.length === 0) && (
-                  <span className="text-gray-500 text-sm">No features added</span>
-                )}
-              </div>
-            </div>
-
-            {/* Colors */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Available Colors
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setIsColorsModalOpen(true)}
-                  className="btn btn-secondary text-sm"
-                >
-                  <PlusIcon className="h-4 w-4 mr-1" />
-                  Manage Colors
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {formData.colors?.map((color, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                  >
-                    {color.colorId}
-                  </span>
-                ))}
-                {(!formData.colors || formData.colors.length === 0) && (
-                  <span className="text-gray-500 text-sm">No colors added</span>
-                )}
-              </div>
-            </div>
-
-            {/* Attributes */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Product Attributes
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setIsAttributesModalOpen(true)}
-                  className="btn btn-secondary text-sm"
-                >
-                  <PlusIcon className="h-4 w-4 mr-1" />
-                  Manage Attributes
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {formData.attributes?.map((attribute, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                  >
-                    {attribute}
-                  </span>
-                ))}
-                {(!formData.attributes || formData.attributes.length === 0) && (
-                  <span className="text-gray-500 text-sm">No attributes added</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Pakistani Clothing Specific Fields */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Clothing Details</h3>
-            
-            {/* Row 1: Fabric, Collection, Occasion, Season */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* Clothing Properties Tab */}
+          {activeTab === 'properties' && (
+            <div className="space-y-6">
+              {/* Row 1: Fabric, Collection, Occasion, Season */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">Fabric Type</label>
@@ -1330,9 +1293,187 @@ const ProductForm: React.FC<ProductFormProps> = ({
           )}
               </div>
             </div>
+            </div>
+          )}
 
-            {/* Handwork Details */}
-            <div className="mb-6">
+          {/* Measurements Tab */}
+          {activeTab === 'measurements' && (
+            <div className="space-y-6">
+              {/* Model Measurements */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Model Height (for size reference)
+                </label>
+                <div className="w-full md:w-1/3">
+                  <input
+                    type="text"
+                    value={formData.modelMeasurements?.height || ''}
+                    onChange={(e) => handleChange('modelMeasurements', {
+                      height: e.target.value,
+                      bust: '',
+                      waist: '',
+                      hips: '',
+                    })}
+                    className="input-field"
+                    placeholder="e.g., 5'6&quot;"
+                  />
+                </div>
+              </div>
+
+              {/* Available Sizes */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Available Sizes
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsSizesModalOpen(true)}
+                    className="btn btn-secondary text-sm"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    Manage Sizes
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                  {formData.availableSizes?.map((size, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      {size}
+                    </span>
+                  ))}
+                  {(!formData.availableSizes || formData.availableSizes.length === 0) && (
+                    <span className="text-gray-500 text-sm">No sizes added</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Size Chart */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Size Chart ID
+                </label>
+                <input
+                  type="text"
+                  value={formData.sizeChart}
+                  onChange={(e) => handleChange('sizeChart', e.target.value)}
+                  placeholder="Enter size chart ID"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Size Chart Image */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Size Chart Image
+                </label>
+                <ImageUpload
+                  onImageUpload={(url) => handleChange('sizeChartImageUrl', url)}
+                  onImageRemove={() => handleChange('sizeChartImageUrl', '')}
+                  existingImages={formData.sizeChartImageUrl ? [formData.sizeChartImageUrl] : []}
+                  maxImages={1}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Features & Details Tab */}
+          {activeTab === 'features' && (
+            <div className="space-y-6">
+              {/* Features */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Product Features
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsFeaturesModalOpen(true)}
+                    className="btn btn-secondary text-sm"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    Manage Features
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                  {formData.features?.map((feature, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                  {(!formData.features || formData.features.length === 0) && (
+                    <span className="text-gray-500 text-sm">No features added</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Colors */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Available Colors
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsColorsModalOpen(true)}
+                    className="btn btn-secondary text-sm"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    Manage Colors
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                  {formData.colors?.map((color, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                    >
+                      {color.colorId}
+                    </span>
+                  ))}
+                  {(!formData.colors || formData.colors.length === 0) && (
+                    <span className="text-gray-500 text-sm">No colors added</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Attributes */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Product Attributes
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsAttributesModalOpen(true)}
+                    className="btn btn-secondary text-sm"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    Manage Attributes
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 min-h-[2rem]">
+                  {formData.attributes?.map((attribute, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      {attribute}
+                    </span>
+                  ))}
+                  {(!formData.attributes || formData.attributes.length === 0) && (
+                    <span className="text-gray-500 text-sm">No attributes added</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Handwork Details */}
+              <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Handwork Details
@@ -1391,86 +1532,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </div>
             </div>
 
-            {/* Available Sizes */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Available Sizes
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setIsSizesModalOpen(true)}
-                  className="btn btn-secondary text-sm"
-                >
-                  <PlusIcon className="h-4 w-4 mr-1" />
-                  Manage Sizes
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {formData.availableSizes?.map((size, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                  >
-                    {size}
-                  </span>
-                ))}
-                {(!formData.availableSizes || formData.availableSizes.length === 0) && (
-                  <span className="text-gray-500 text-sm">No sizes added</span>
-                )}
-              </div>
-            </div>
-
-            {/* Size Chart */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Size Chart ID
-              </label>
-              <input
-                type="text"
-                value={formData.sizeChart}
-                onChange={(e) => handleChange('sizeChart', e.target.value)}
-                placeholder="Enter size chart ID"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Size Chart Image */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Size Chart Image
-              </label>
-              <ImageUpload
-                onImageUpload={(url) => handleChange('sizeChartImageUrl', url)}
-                onImageRemove={() => handleChange('sizeChartImageUrl', '')}
-                existingImages={formData.sizeChartImageUrl ? [formData.sizeChartImageUrl] : []}
-                maxImages={1}
-              />
-            </div>
-
-            {/* Model Measurements */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Model Height (for size reference)
-              </label>
-              <div className="w-full md:w-1/3">
-                <input
-                  type="text"
-                  value={formData.modelMeasurements?.height || ''}
-                  onChange={(e) => handleChange('modelMeasurements', {
-                    height: e.target.value,
-                    bust: '',
-                    waist: '',
-                    hips: '',
-                  })}
-                  className="input-field"
-                  placeholder="e.g., 5'6&quot;"
-                />
-              </div>
-            </div>
-
-            {/* Special Features */}
-            <div className="mb-6">
+              {/* Special Features */}
+              <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Special Features
               </label>
@@ -1512,24 +1575,27 @@ const ProductForm: React.FC<ProductFormProps> = ({
               )}
             </div>
 
-            {/* Care Instructions */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Care Instructions
-              </label>
-              <textarea
-                value={formData.careInstructions}
-                onChange={(e) => handleChange('careInstructions', e.target.value)}
-                rows={3}
-                className="input-field"
-                placeholder="e.g., Dry clean only, Hand wash in cold water, Do not bleach"
-              />
+              {/* Care Instructions */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Care Instructions
+                </label>
+                <textarea
+                  value={formData.careInstructions}
+                  onChange={(e) => handleChange('careInstructions', e.target.value)}
+                  rows={3}
+                  className="input-field"
+                  placeholder="e.g., Dry clean only, Hand wash in cold water, Do not bleach"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Images */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Product Images</h3>
+          {/* Images Tab */}
+          {activeTab === 'images' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Product Images</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {formData.images.map((image, index) => (
                 <div key={index} className="relative">
@@ -1554,7 +1620,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 <PlusIcon className="h-8 w-8" />
               </button>
             </div>
-          </div>
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-3 pt-6 border-t">

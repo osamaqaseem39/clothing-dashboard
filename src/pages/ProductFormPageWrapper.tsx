@@ -80,10 +80,10 @@ const ProductFormPageWrapper: React.FC = () => {
       // Fetch product if editing
       if (isEditing && id) {
         const productResponse = await productService.getProduct(id);
-        if (productResponse.success && productResponse.data) {
+        if (productResponse.success && productResponse.data?.product) {
           setProduct(productResponse.data.product);
         } else {
-          setError('Product not found');
+          setError(productResponse.message || 'Product not found');
         }
       }
     } catch (err: any) {
