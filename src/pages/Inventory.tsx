@@ -31,13 +31,15 @@ const Inventory: React.FC = () => {
   const [formData, setFormData] = useState({
     productName: '',
     sku: '',
+    productId: '',
+    size: '',
     currentStock: 0,
     availableStock: 0,
     reorderPoint: 0,
     reorderQuantity: 0,
     costPrice: 0,
     sellingPrice: 0,
-    warehouse: '',
+    warehouse: 'main',
     status: 'in_stock' as 'in_stock' | 'low_stock' | 'out_of_stock' | 'discontinued',
   });
 
@@ -136,13 +138,15 @@ const Inventory: React.FC = () => {
     setFormData({
       productName: item.productName || '',
       sku: item.sku || '',
+      productId: item.productId || '',
+      size: item.size || '',
       currentStock: item.currentStock || 0,
       availableStock: item.availableStock || 0,
       reorderPoint: item.reorderPoint || 0,
       reorderQuantity: item.reorderQuantity || 0,
       costPrice: item.costPrice || 0,
       sellingPrice: item.sellingPrice || 0,
-      warehouse: item.warehouse || '',
+      warehouse: item.warehouse || 'main',
       status: item.status || 'in_stock',
     });
     setShowForm(true);
@@ -163,13 +167,15 @@ const Inventory: React.FC = () => {
     setFormData({
       productName: '',
       sku: '',
+      productId: '',
+      size: '',
       currentStock: 0,
       availableStock: 0,
       reorderPoint: 0,
       reorderQuantity: 0,
       costPrice: 0,
       sellingPrice: 0,
-      warehouse: '',
+      warehouse: 'main',
       status: 'in_stock' as 'in_stock' | 'low_stock' | 'out_of_stock' | 'discontinued',
     });
   };
@@ -235,6 +241,11 @@ const Inventory: React.FC = () => {
           <div>
             <div className="font-medium text-gray-900">{item.productName}</div>
             <div className="text-sm text-gray-500">SKU: {item.sku}</div>
+            {item.size && (
+              <div className="text-xs text-amber-600 font-medium mt-1">
+                Size: {item.size}
+              </div>
+            )}
           </div>
         </div>
       ),
@@ -505,6 +516,38 @@ const Inventory: React.FC = () => {
                     onChange={(e) => setFormData({...formData, sku: e.target.value})}
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Product ID *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.productId}
+                    onChange={(e) => setFormData({...formData, productId: e.target.value})}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="Product MongoDB ID"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Size
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.size}
+                    onChange={(e) => setFormData({...formData, size: e.target.value})}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="e.g., S, M, L, XL (optional)"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Leave empty if product has no size variations
+                  </p>
                 </div>
               </div>
 

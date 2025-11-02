@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircleIcon, 
   XCircleIcon, 
   ClockIcon,
   BanknotesIcon,
   CubeIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  PlusIcon,
+  MinusIcon
 } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
 
@@ -15,12 +17,55 @@ interface ProductFormInventoryProps {
   onFieldChange: (field: string, value: any) => void;
 }
 
+interface SizeInventory {
+  size: string;
+  quantity: number;
+}
+
 const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
   formData,
   errors,
   onFieldChange,
 }) => {
   const hasSizes = formData.availableSizes && formData.availableSizes.length > 0;
+  
+  // Initialize size-wise inventory state
+  const [sizeInventory, setSizeInventory] = useState<SizeInventory[]>([]);
+
+  // Initialize or update size inventory when availableSizes change
+  useEffect(() => {
+    if (hasSizes && formData.availableSizes) {
+      const currentSizes = formData.availableSizes;
+      const existing = sizeInventory.filter(si => currentSizes.includes(si.size));
+      const newSizes = currentSizes
+        .filter(size => !existing.find(e => e.size === size))
+        .map(size => ({ size, quantity: 0 }));
+      
+      // Remove sizes that are no longer in availableSizes
+      const filtered = existing.filter(si => currentSizes.includes(si.size));
+      
+      setSizeInventory([...filtered, ...newSizes]);
+    } else {
+      setSizeInventory([]);
+    }
+  }, [formData.availableSizes]);
+
+  // Calculate total stock from size-wise inventory
+  useEffect(() => {
+    if (hasSizes && sizeInventory.length > 0) {
+      const total = sizeInventory.reduce((sum, si) => sum + si.quantity, 0);
+      if (formData.stockQuantity !== total) {
+        onFieldChange('stockQuantity', total);
+      }
+    }
+  }, [sizeInventory]);
+
+  const handleSizeQuantityChange = (size: string, quantity: number) => {
+    const updated = sizeInventory.map(si => 
+      si.size === size ? { ...si, quantity: Math.max(0, quantity) } : si
+    );
+    setSizeInventory(updated);
+  };
 
   return (
     <div className="space-y-6">
@@ -81,34 +126,102 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
             </p>
           </div>
 
-          {/* Stock Quantity */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              {hasSizes ? 'Total Stock Quantity' : 'Stock Quantity'} *
-            </label>
-            <div className="relative">
-              <CubeIcon className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 pointer-events-none" />
-              <input
-                type="number"
-                min="0"
-                value={formData.stockQuantity === 0 ? '' : (formData.stockQuantity || '')}
-                onChange={(e) => onFieldChange('stockQuantity', e.target.value === '' ? 0 : (parseInt(e.target.value) || 0))}
-                className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.stockQuantity ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                }`}
-                placeholder="0"
-              />
+          {/* Size-wise Inventory Management */}
+          {hasSizes && formData.availableSizes && formData.availableSizes.length > 0 ? (
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Stock by Size *
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Manage inventory quantity for each available size
+                  </p>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  Total: <span className="text-blue-600">{sizeInventory.reduce((sum, si) => sum + si.quantity, 0)}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {formData.availableSizes.map((size) => {
+                  const sizeInv = sizeInventory.find(si => si.size === size) || { size, quantity: 0 };
+                  return (
+                    <div key={size} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                      <div className="w-20 flex-shrink-0">
+                        <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                          {size}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Quantity
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleSizeQuantityChange(size, sizeInv.quantity - 1)}
+                            disabled={sizeInv.quantity <= 0}
+                            className="flex items-center justify-center w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <MinusIcon className="h-4 w-4" />
+                          </button>
+                          <input
+                            type="number"
+                            min="0"
+                            value={sizeInv.quantity === 0 ? '' : sizeInv.quantity}
+                            onChange={(e) => handleSizeQuantityChange(size, parseInt(e.target.value) || 0)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-medium"
+                            placeholder="0"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleSizeQuantityChange(size, sizeInv.quantity + 1)}
+                            className="flex items-center justify-center w-8 h-8 rounded-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+                          >
+                            <PlusIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500 mb-1">Available</div>
+                        <div className="text-lg font-semibold text-gray-900">{sizeInv.quantity}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {errors.stockQuantity && (
+                <p className="mt-2 text-sm text-red-600">{errors.stockQuantity}</p>
+              )}
             </div>
-            <p className="mt-2 text-xs text-gray-500">
-              {hasSizes 
-                ? 'Total quantity across all sizes. Individual size quantities are managed in the inventory module.'
-                : 'Enter available quantity (0 or higher)'
-              }
-            </p>
-            {errors.stockQuantity && (
-              <p className="mt-1 text-sm text-red-600">{errors.stockQuantity}</p>
-            )}
-          </div>
+          ) : (
+            /* Standard Stock Quantity (when no sizes) */
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Stock Quantity *
+              </label>
+              <div className="relative">
+                <CubeIcon className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 pointer-events-none" />
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.stockQuantity === 0 ? '' : (formData.stockQuantity || '')}
+                  onChange={(e) => onFieldChange('stockQuantity', e.target.value === '' ? 0 : (parseInt(e.target.value) || 0))}
+                  className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.stockQuantity ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+                  }`}
+                  placeholder="0"
+                />
+              </div>
+              <p className="mt-2 text-xs text-gray-500">
+                Enter available quantity (0 or higher)
+              </p>
+              {errors.stockQuantity && (
+                <p className="mt-1 text-sm text-red-600">{errors.stockQuantity}</p>
+              )}
+            </div>
+          )}
 
           {/* Stock Management Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
