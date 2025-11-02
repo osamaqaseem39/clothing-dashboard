@@ -102,6 +102,7 @@ export interface Product {
     bust: string;
     waist: string;
     hips: string;
+    sizeWearing: string;
   };
   designer: string;
   handwork: string[];

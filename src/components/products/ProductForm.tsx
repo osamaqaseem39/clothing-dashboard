@@ -72,6 +72,7 @@ interface ProductFormData {
     bust: string;
     waist: string;
     hips: string;
+    sizeWearing: string;
   };
   designer?: string;
   handwork?: string[];
@@ -103,8 +104,28 @@ const ProductForm: React.FC<ProductFormProps> = ({
     name: product?.name || '',
     description: product?.description || '',
     type: product?.type || 'simple',
-    categoryId: typeof product?.categoryId === 'object' ? product.categoryId._id : product?.categoryId || '',
-    brandId: typeof product?.brandId === 'object' ? product.brandId._id : product?.brandId || '',
+    categoryId: product?.categoryId
+      ? (typeof product.categoryId === 'object' && '_id' in product.categoryId
+        ? (product.categoryId as any)._id
+        : typeof product.categoryId === 'string'
+        ? product.categoryId
+        : Array.isArray(product.categories) && product.categories.length > 0
+        ? (typeof product.categories[0] === 'object' && '_id' in product.categories[0]
+          ? (product.categories[0] as any)._id
+          : product.categories[0] as string)
+        : '')
+      : '',
+    brandId: product?.brandId
+      ? (typeof product.brandId === 'object' && '_id' in product.brandId
+        ? (product.brandId as any)._id
+        : typeof product.brandId === 'string'
+        ? product.brandId
+        : typeof product.brand === 'object' && product.brand && '_id' in product.brand
+        ? (product.brand as any)._id
+        : typeof product.brand === 'string'
+        ? product.brand
+        : '')
+      : '',
     tags: product?.tags || [],
     isActive: product?.isActive ?? true,
     status: product?.status || 'draft',
@@ -170,20 +191,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
     season: product?.season || '',
     careInstructions: product?.careInstructions || '',
     modelMeasurements: product?.modelMeasurements ? (() => {
-      // Clean modelMeasurements: remove _id if present and only keep height
+      // Clean modelMeasurements: remove _id if present
       const measurements = product.modelMeasurements as any;
-      const { _id, bust, waist, hips, height, ...rest } = measurements;
+      const { _id, ...rest } = measurements;
       return {
-        height: height || '',
-        bust: '',
-        waist: '',
-        hips: '',
+        height: measurements.height || '',
+        bust: measurements.bust || '',
+        waist: measurements.waist || '',
+        hips: measurements.hips || '',
+        sizeWearing: measurements.sizeWearing || '',
       };
     })() : {
       height: '',
       bust: '',
       waist: '',
       hips: '',
+      sizeWearing: '',
     },
     designer: product?.designer || '',
     handwork: product?.handwork || [],
@@ -205,6 +228,76 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<string>('basic');
+  
+  // Update form data when product prop changes (important for edit mode when product loads asynchronously)
+  useEffect(() => {
+    if (product) {
+      // Extract categoryId - handle both object and string formats
+      const categoryId = typeof product.categoryId === 'object' && product.categoryId && '_id' in product.categoryId
+        ? (product.categoryId as any)._id
+        : typeof product.categoryId === 'string'
+        ? product.categoryId
+        : Array.isArray(product.categories) && product.categories.length > 0
+        ? (typeof product.categories[0] === 'object' && product.categories[0] && '_id' in product.categories[0]
+          ? (product.categories[0] as any)._id
+          : product.categories[0] as string)
+        : '';
+      
+      // Extract brandId - handle both object and string formats
+      const brandId = typeof product.brandId === 'object' && product.brandId && '_id' in product.brandId
+        ? (product.brandId as any)._id
+        : typeof product.brandId === 'string'
+        ? product.brandId
+        : typeof product.brand === 'object' && product.brand && '_id' in product.brand
+        ? (product.brand as any)._id
+        : typeof product.brand === 'string'
+        ? product.brand
+        : '';
+      
+      setFormData(prev => ({
+        ...prev,
+        name: product.name || prev.name,
+        description: product.description || prev.description,
+        type: product.type || prev.type,
+        categoryId: categoryId || prev.categoryId,
+        brandId: brandId || prev.brandId,
+        tags: product.tags || prev.tags,
+        isActive: product.isActive ?? prev.isActive,
+        status: product.status || prev.status,
+        seo: {
+          title: product.seo?.title || prev.seo.title,
+          description: product.seo?.description || prev.seo.description,
+          keywords: product.seo?.keywords || prev.seo.keywords,
+          slug: product.seo?.slug || prev.seo.slug,
+          canonicalUrl: product.seo?.canonicalUrl || prev.seo.canonicalUrl,
+          ogImage: product.seo?.ogImage || prev.seo.ogImage,
+          noIndex: product.seo?.noIndex ?? prev.seo.noIndex,
+          noFollow: product.seo?.noFollow ?? prev.seo.noFollow,
+        },
+        variants: product.variants && product.variants.length > 0
+          ? product.variants.map((variant: any) => {
+              if (variant.dimensions && variant.dimensions._id) {
+                const { _id, ...cleanDimensions } = variant.dimensions;
+                return { ...variant, dimensions: cleanDimensions };
+              }
+              return variant;
+            })
+          : prev.variants,
+        images: (product.images || []).map((img: any) => {
+          if (typeof img === 'string') {
+            if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) {
+              return img;
+            }
+            if (/^[0-9a-fA-F]{24}$/.test(img)) {
+              return null;
+            }
+            return img;
+          }
+          return img?.url || null;
+        }).filter((img: any) => img !== null && img !== undefined),
+      }));
+    }
+  }, [product]);
   
   // Modal states
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
@@ -370,9 +463,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
       careInstructions: formData.careInstructions || undefined,
       modelMeasurements: formData.modelMeasurements && formData.modelMeasurements.height ? {
         height: formData.modelMeasurements.height,
-        bust: '',
-        waist: '',
-        hips: '',
+        bust: formData.modelMeasurements.bust || '',
+        waist: formData.modelMeasurements.waist || '',
+        hips: formData.modelMeasurements.hips || '',
+        sizeWearing: formData.modelMeasurements.sizeWearing || '',
       } : undefined,
       designer: formData.designer || undefined,
       handwork: formData.handwork && formData.handwork.length > 0 ? formData.handwork : undefined,
@@ -1309,10 +1403,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     type="text"
                     value={formData.modelMeasurements?.height || ''}
                     onChange={(e) => handleChange('modelMeasurements', {
+                      ...formData.modelMeasurements,
                       height: e.target.value,
-                      bust: '',
-                      waist: '',
-                      hips: '',
                     })}
                     className="input-field"
                     placeholder="e.g., 5'6&quot;"

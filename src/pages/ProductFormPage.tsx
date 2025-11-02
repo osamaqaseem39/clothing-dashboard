@@ -155,6 +155,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
       bust: '',
       waist: '',
       hips: '',
+      sizeWearing: '',
     },
     designer: product?.designer || '',
     handwork: product?.handwork || [],
