@@ -24,7 +24,6 @@ import ProductFormBasic from '../components/products/ProductFormBasic';
 import ProductFormInventory from '../components/products/ProductFormInventory';
 import ProductFormShipping from '../components/products/ProductFormShipping';
 import ProductFormAttributes from '../components/products/ProductFormAttributes';
-import ProductFormVariations from '../components/products/ProductFormVariations';
 import ProductFormImages from '../components/products/ProductFormImages';
 import ProductFormSEO from '../components/products/ProductFormSEO';
 
@@ -194,10 +193,102 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     { id: 'inventory', name: 'Inventory', icon: '📦' },
     { id: 'shipping', name: 'Shipping', icon: '🚚' },
     { id: 'attributes', name: 'Attributes', icon: '🏷️' },
-    { id: 'variations', name: 'Variations', icon: '🔄' },
     { id: 'images', name: 'Images', icon: '🖼️' },
     { id: 'seo', name: 'SEO', icon: '🔍' },
   ];
+
+  // Helper function to extract ID from object or string
+  const extractId = (value: any): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && '_id' in value) return value._id;
+    return '';
+  };
+
+  // Helper function to extract category IDs
+  const extractCategoryIds = (categories: any): string[] => {
+    if (!categories) return [];
+    if (Array.isArray(categories)) {
+      return categories.map(cat => extractId(cat)).filter(id => id);
+    }
+    const id = extractId(categories);
+    return id ? [id] : [];
+  };
+
+  // Update formData when product changes (important for async loading)
+  useEffect(() => {
+    if (product) {
+      // Extract category ID(s) - handle both array and single value, object and string
+      const categoryIds = extractCategoryIds(product.categories);
+      
+      // Extract brand ID - handle both object and string
+      const brandId = extractId(product.brand || product.brandId);
+
+      setFormData(prev => ({
+        ...prev,
+        name: product.name || '',
+        description: product.description || '',
+        shortDescription: product.shortDescription || '',
+        sku: product.sku || '',
+        price: product.price || 0,
+        salePrice: product.salePrice || 0,
+        stockQuantity: product.stockQuantity || 0,
+        stockStatus: product.stockStatus || 'instock',
+        weight: product.weight || 0,
+        dimensions: product.dimensions || { length: 0, width: 0, height: 0 },
+        manageStock: product.manageStock ?? true,
+        allowBackorders: product.allowBackorders ?? false,
+        status: product.status || 'draft',
+        categories: categoryIds.length > 0 ? categoryIds : [],
+        tags: product.tags || [],
+        brand: brandId,
+        attributes: product.attributes || [],
+        variations: product.variations || [],
+        images: product.images || [],
+        features: product.features || [],
+        colors: product.colors || [],
+        fabric: product.fabric || '',
+        collectionName: product.collectionName || '',
+        occasion: product.occasion || '',
+        season: product.season || '',
+        careInstructions: product.careInstructions || '',
+        modelMeasurements: product.modelMeasurements || {
+          height: '',
+          bust: '',
+          waist: '',
+          hips: '',
+          sizeWearing: '',
+        },
+        designer: product.designer || '',
+        handwork: product.handwork || [],
+        colorFamily: product.colorFamily || '',
+        pattern: product.pattern || '',
+        sleeveLength: product.sleeveLength || '',
+        neckline: product.neckline || '',
+        length: product.length || '',
+        fit: product.fit || '',
+        ageGroup: product.ageGroup || '',
+        bodyType: product.bodyType || [],
+        isLimitedEdition: product.isLimitedEdition || false,
+        isCustomMade: product.isCustomMade || false,
+        customDeliveryDays: product.customDeliveryDays || 0,
+        sizeChart: product.sizeChart || '',
+        sizeChartImageUrl: product.sizeChartImageUrl || '',
+        availableSizes: product.availableSizes || [],
+        seo: product.seo || {
+          title: '',
+          description: '',
+          keywords: [],
+          slug: '',
+          canonicalUrl: '',
+          ogImage: '',
+          noIndex: false,
+          noFollow: false,
+        },
+        isActive: product.isActive ?? true,
+      }));
+    }
+  }, [product]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -459,14 +550,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
 
                 {activeTab === 'attributes' && (
                   <ProductFormAttributes
-                    formData={formData}
-                    errors={errors}
-                    onFieldChange={handleFieldChange}
-                  />
-                )}
-
-                {activeTab === 'variations' && (
-                  <ProductFormVariations
                     formData={formData}
                     errors={errors}
                     onFieldChange={handleFieldChange}

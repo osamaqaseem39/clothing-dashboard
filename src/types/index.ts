@@ -363,6 +363,7 @@ export interface Inventory {
   _id: string;
   productId: string;
   variantId?: string;
+  size?: string;
   productName?: string;
   sku?: string;
   productImage?: string;

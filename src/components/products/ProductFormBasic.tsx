@@ -68,6 +68,27 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
   const [isHandworkModalOpen, setIsHandworkModalOpen] = useState(false);
   const [isBodyTypeModalOpen, setIsBodyTypeModalOpen] = useState(false);
 
+  // Helper function to extract ID from value (handles both objects and strings)
+  const extractId = (value: any): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && '_id' in value) return value._id;
+    return '';
+  };
+
+  // Get category ID for select value
+  const getCategoryValue = (): string => {
+    if (Array.isArray(formData.categories)) {
+      return formData.categories.length > 0 ? extractId(formData.categories[0]) : '';
+    }
+    return extractId(formData.categories);
+  };
+
+  // Get brand ID for select value
+  const getBrandValue = (): string => {
+    return extractId(formData.brand);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -154,7 +175,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               Category
             </label>
             <select
-              value={Array.isArray(formData.categories) ? formData.categories[0] || '' : formData.categories || ''}
+              value={getCategoryValue()}
               onChange={(e) => onFieldChange('categories', e.target.value ? [e.target.value] : [])}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -179,7 +200,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
               Brand
             </label>
             <select
-              value={formData.brand || ''}
+              value={getBrandValue()}
               onChange={(e) => onFieldChange('brand', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
