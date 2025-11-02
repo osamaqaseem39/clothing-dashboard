@@ -4,6 +4,7 @@ import { Product, Attribute, Color } from '../../types';
 import FeaturesModal from './modals/FeaturesModal';
 import ColorsModal from './modals/ColorsModal';
 import AttributesModal from './modals/AttributesModal';
+import SizesModal from './modals/SizesModal';
 import { attributeService, colorService } from '../../services/masterDataService';
 
 interface ProductFormAttributesProps {
@@ -20,6 +21,7 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
   const [isColorsModalOpen, setIsColorsModalOpen] = useState(false);
   const [isAttributesModalOpen, setIsAttributesModalOpen] = useState(false);
+  const [isSizesModalOpen, setIsSizesModalOpen] = useState(false);
   const [attributeMap, setAttributeMap] = useState<Record<string, Attribute>>({});
   const [colorMap, setColorMap] = useState<Record<string, Color>>({});
 
@@ -133,6 +135,42 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
           </div>
         </div>
 
+        {/* Available Sizes */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Available Sizes
+              </label>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Add sizes to enable size-wise inventory management
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsSizesModalOpen(true)}
+              className="flex items-center px-3 py-1 text-sm text-amber-600 hover:text-amber-700 border border-amber-300 rounded-md hover:bg-amber-50 transition-colors"
+            >
+              <PlusIcon className="h-4 w-4 mr-1" />
+              Manage Sizes
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2 min-h-[2rem] p-3 border border-gray-200 rounded-md bg-gradient-to-br from-amber-50/50 to-orange-50/50">
+            {formData.availableSizes && formData.availableSizes.length > 0 ? (
+              formData.availableSizes.map((size, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm"
+                >
+                  {size}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-500 text-sm">No sizes added</span>
+            )}
+          </div>
+        </div>
+
         {/* Attributes */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
@@ -215,6 +253,13 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
         onClose={() => setIsAttributesModalOpen(false)}
         attributes={formData.attributes || []}
         onAttributesChange={(attributes) => onFieldChange('attributes', attributes)}
+      />
+      
+      <SizesModal
+        isOpen={isSizesModalOpen}
+        onClose={() => setIsSizesModalOpen(false)}
+        sizes={formData.availableSizes || []}
+        onSizesChange={(sizes) => onFieldChange('availableSizes', sizes)}
       />
     </div>
   );
