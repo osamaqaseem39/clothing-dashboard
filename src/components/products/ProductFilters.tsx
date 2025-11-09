@@ -52,12 +52,6 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
     colorFamilies: ['Pastels', 'Brights', 'Neutrals', 'Dark', 'Earthy', 'Jewel Tones'],
     patterns: ['Solid', 'Floral', 'Geometric', 'Abstract', 'Striped', 'Polka Dot', 'Embroidered'],
     sleeveLengths: ['Sleeveless', 'Short', '3/4', 'Long', 'Full'],
-    necklines: ['Round', 'V-neck', 'Boat', 'High', 'Off-shoulder', 'Halter', 'Sweetheart'],
-    lengths: ['Short', 'Medium', 'Long', 'Floor Length', 'Ankle Length'],
-    fits: ['Loose', 'Fitted', 'Semi-fitted', 'Oversized', 'A-line', 'Straight'],
-    ageGroups: ['Young Adult', 'Adult', 'Mature'],
-    bodyTypes: ['Apple', 'Pear', 'Hourglass', 'Rectangle', 'Inverted Triangle', 'Diamond'],
-    handwork: ['Embroidery', 'Zari', 'Sequins', 'Beadwork', 'Applique', 'Cutwork', 'Mirror Work'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '6', '8', '10', '12', '14', '16', '18', '20'],
   };
 
@@ -183,114 +177,6 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                     <span className="ml-2 text-sm text-gray-700">{length}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Neckline */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Neckline</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {filterOptions.necklines.map((neckline) => (
-                  <label key={neckline} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={((localFilters as any).necklines || []).includes(neckline)}
-                      onChange={(e) => handleArrayFilterChange('necklines', neckline, e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{neckline}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Length */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Garment Length</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {filterOptions.lengths.map((length) => (
-                  <label key={length} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={((localFilters as any).lengths || []).includes(length)}
-                      onChange={(e) => handleArrayFilterChange('lengths', length, e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{length}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Fit */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Fit</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {filterOptions.fits.map((fit) => (
-                  <label key={fit} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={((localFilters as any).fits || []).includes(fit)}
-                      onChange={(e) => handleArrayFilterChange('fits', fit, e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{fit}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Age Group */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Age Group</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {filterOptions.ageGroups.map((age) => (
-                  <label key={age} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={((localFilters as any).ageGroups || []).includes(age)}
-                      onChange={(e) => handleArrayFilterChange('ageGroups', age, e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{age}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Body Type */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Body Type</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {filterOptions.bodyTypes.map((bodyType) => (
-                  <label key={bodyType} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={((localFilters as any).bodyTypes || []).includes(bodyType)}
-                      onChange={(e) => handleArrayFilterChange('bodyTypes', bodyType, e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{bodyType}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Handwork */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Handwork</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {filterOptions.handwork.map((work) => (
-                  <label key={work} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={((localFilters as any).handwork || []).includes(work)}
-                      onChange={(e) => handleArrayFilterChange('handwork', work, e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{work}</span>
                   </label>
                 ))}
               </div>

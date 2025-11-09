@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import React from 'react';
 import { Product, Category, Brand } from '../../types';
-import HandworkModal from './modals/HandworkModal';
-import BodyTypeModal from './modals/BodyTypeModal';
 
 interface ProductFormBasicProps {
   formData: Partial<Product>;
@@ -46,10 +43,6 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
   colorFamilies = [],
   patterns = [],
   sleeveLengths = [],
-  necklines = [],
-  lengths = [],
-  fits = [],
-  ageGroups = [],
   onFieldChange,
   onNestedFieldChange,
   onAddCategory,
@@ -60,14 +53,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
   onAddColorFamily,
   onAddPattern,
   onAddSleeveLength,
-  onAddNeckline,
-  onAddLength,
-  onAddFit,
-  onAddAgeGroup,
 }) => {
-  const [isHandworkModalOpen, setIsHandworkModalOpen] = useState(false);
-  const [isBodyTypeModalOpen, setIsBodyTypeModalOpen] = useState(false);
-
   // Helper function to extract ID from value (handles both objects and strings)
   const extractId = (value: any): string => {
     if (!value) return '';
@@ -397,175 +383,7 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Row 3: Neckline, Length, Fit, Age Group */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Neckline
-            </label>
-            <select
-              value={formData.neckline || ''}
-              onChange={(e) => onFieldChange('neckline', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Neckline</option>
-              {necklines.map(n => (
-                <option key={n._id} value={n.name}>{n.name}</option>
-              ))}
-            </select>
-            <button type="button" onClick={onAddNeckline} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
-              + Add new neckline
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Length
-            </label>
-            <select
-              value={formData.length || ''}
-              onChange={(e) => onFieldChange('length', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Length</option>
-              {lengths.map(l => (
-                <option key={l._id} value={l.name}>{l.name}</option>
-              ))}
-            </select>
-            <button type="button" onClick={onAddLength} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
-              + Add new length
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fit
-            </label>
-            <select
-              value={formData.fit || ''}
-              onChange={(e) => onFieldChange('fit', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Fit</option>
-              {fits.map(f => (
-                <option key={f._id} value={f.name}>{f.name}</option>
-              ))}
-            </select>
-            <button type="button" onClick={onAddFit} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
-              + Add new fit
-            </button>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Age Group
-            </label>
-            <select
-              value={formData.ageGroup || ''}
-              onChange={(e) => onFieldChange('ageGroup', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Age Group</option>
-              {ageGroups.map(a => (
-                <option key={a._id} value={a.name}>{a.name}</option>
-              ))}
-            </select>
-            <button type="button" onClick={onAddAgeGroup} className="mt-2 text-sm text-blue-600 hover:text-blue-700">
-              + Add new age group
-            </button>
-          </div>
-        </div>
-
-        {/* Care Instructions */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Care Instructions
-          </label>
-          <textarea
-            value={formData.careInstructions || ''}
-            onChange={(e) => onFieldChange('careInstructions', e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="e.g., Dry clean only, Hand wash in cold water"
-          />
-        </div>
-
-        {/* Handwork Details */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Handwork Details
-            </label>
-            <button
-              type="button"
-              onClick={() => setIsHandworkModalOpen(true)}
-              className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50"
-            >
-              <PlusIcon className="h-4 w-4 mr-1" />
-              Manage Handwork
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2 min-h-[2rem] p-3 border border-gray-200 rounded-md">
-            {formData.handwork?.map((handwork, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
-              >
-                {handwork}
-              </span>
-            ))}
-            {(!formData.handwork || formData.handwork.length === 0) && (
-              <span className="text-gray-500 text-sm">No handwork details added</span>
-            )}
-          </div>
-        </div>
-
-        {/* Body Type Suitability */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Body Type Suitability
-            </label>
-            <button
-              type="button"
-              onClick={() => setIsBodyTypeModalOpen(true)}
-              className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50"
-            >
-              <PlusIcon className="h-4 w-4 mr-1" />
-              Manage Body Types
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2 min-h-[2rem] p-3 border border-gray-200 rounded-md">
-            {formData.bodyType?.map((bodyType, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-              >
-                {bodyType}
-              </span>
-            ))}
-            {(!formData.bodyType || formData.bodyType.length === 0) && (
-              <span className="text-gray-500 text-sm">No body types added</span>
-            )}
-          </div>
-        </div>
       </div>
-
-      {/* Modals */}
-      <HandworkModal
-        isOpen={isHandworkModalOpen}
-        onClose={() => setIsHandworkModalOpen(false)}
-        handwork={formData.handwork || []}
-        onHandworkChange={(handwork) => onFieldChange('handwork', handwork)}
-      />
-      
-      <BodyTypeModal
-        isOpen={isBodyTypeModalOpen}
-        onClose={() => setIsBodyTypeModalOpen(false)}
-        bodyTypes={formData.bodyType || []}
-        onBodyTypesChange={(bodyTypes) => onFieldChange('bodyType', bodyTypes)}
-      />
     </div>
   );
 };

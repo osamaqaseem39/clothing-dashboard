@@ -11,10 +11,6 @@ import {
   colorFamilyService,
   patternService,
   sleeveLengthService,
-  necklineService,
-  lengthService,
-  fitService,
-  ageGroupService,
 } from '../services/masterDataService';
 import CreateItemModal from '../components/products/modals/CreateItemModal';
 import CategoryForm from '../components/products/CategoryForm';
@@ -37,10 +33,6 @@ interface ProductFormPageProps {
   colorFamilies?: any[];
   patterns?: any[];
   sleeveLengths?: any[];
-  necklines?: any[];
-  lengths?: any[];
-  fits?: any[];
-  ageGroups?: any[];
   onSubmit: (productData: Partial<Product>) => Promise<void>;
   onDelete?: (productId: string) => Promise<void>;
   isLoading?: boolean;
@@ -56,10 +48,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   colorFamilies = [],
   patterns = [],
   sleeveLengths = [],
-  necklines = [],
-  lengths = [],
-  fits = [],
-  ageGroups = [],
   onSubmit,
   onDelete,
   isLoading = false,
@@ -77,10 +65,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   const [colorFamiliesState, setColorFamiliesState] = useState<any[]>(colorFamilies);
   const [patternsState, setPatternsState] = useState<any[]>(patterns);
   const [sleeveLengthsState, setSleeveLengthsState] = useState<any[]>(sleeveLengths);
-  const [necklinesState, setNecklinesState] = useState<any[]>(necklines);
-  const [lengthsState, setLengthsState] = useState<any[]>(lengths);
-  const [fitsState, setFitsState] = useState<any[]>(fits);
-  const [ageGroupsState, setAgeGroupsState] = useState<any[]>(ageGroups);
 
   useEffect(() => {
     setCategoriesState(categories);
@@ -105,10 +89,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   useEffect(() => { setColorFamiliesState(colorFamilies); }, [colorFamilies]);
   useEffect(() => { setPatternsState(patterns); }, [patterns]);
   useEffect(() => { setSleeveLengthsState(sleeveLengths); }, [sleeveLengths]);
-  useEffect(() => { setNecklinesState(necklines); }, [necklines]);
-  useEffect(() => { setLengthsState(lengths); }, [lengths]);
-  useEffect(() => { setFitsState(fits); }, [fits]);
-  useEffect(() => { setAgeGroupsState(ageGroups); }, [ageGroups]);
 
   const [showCreateCategory, setShowCreateCategory] = useState(false);
   const [showCreateBrand, setShowCreateBrand] = useState(false);
@@ -118,10 +98,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   const [showCreateColorFamily, setShowCreateColorFamily] = useState(false);
   const [showCreatePattern, setShowCreatePattern] = useState(false);
   const [showCreateSleeveLength, setShowCreateSleeveLength] = useState(false);
-  const [showCreateNeckline, setShowCreateNeckline] = useState(false);
-  const [showCreateLength, setShowCreateLength] = useState(false);
-  const [showCreateFit, setShowCreateFit] = useState(false);
-  const [showCreateAgeGroup, setShowCreateAgeGroup] = useState(false);
   const [formData, setFormData] = useState<Partial<Product>>({
     name: product?.name || '',
     description: product?.description || '',
@@ -511,10 +487,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                     colorFamilies={colorFamiliesState}
                     patterns={patternsState}
                     sleeveLengths={sleeveLengthsState}
-                    necklines={necklinesState}
-                    lengths={lengthsState}
-                    fits={fitsState}
-                    ageGroups={ageGroupsState}
                     onAddCategory={() => setShowCreateCategory(true)}
                     onAddBrand={() => setShowCreateBrand(true)}
                     onAddMaterial={() => setShowCreateMaterial(true)}
@@ -523,10 +495,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                     onAddColorFamily={() => setShowCreateColorFamily(true)}
                     onAddPattern={() => setShowCreatePattern(true)}
                     onAddSleeveLength={() => setShowCreateSleeveLength(true)}
-                    onAddNeckline={() => setShowCreateNeckline(true)}
-                    onAddLength={() => setShowCreateLength(true)}
-                    onAddFit={() => setShowCreateFit(true)}
-                    onAddAgeGroup={() => setShowCreateAgeGroup(true)}
                     onFieldChange={handleFieldChange}
                     onNestedFieldChange={handleNestedFieldChange}
                   />
@@ -752,78 +720,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             setShowCreateSleeveLength(false);
           } else {
             throw new Error(res.message || 'Failed to create sleeve length');
-          }
-        }}
-      />
-
-      {/* Create Neckline */}
-      <CreateItemModal
-        isOpen={showCreateNeckline}
-        title="Add New Neckline"
-        onClose={() => setShowCreateNeckline(false)}
-        onSubmit={async (values) => {
-          const res = await necklineService.create({ name: values.name, description: values.description });
-          if (res.success && res.data) {
-            const item = res.data;
-            setNecklinesState(prev => [item, ...prev]);
-            handleFieldChange('neckline', item.name);
-            setShowCreateNeckline(false);
-          } else {
-            throw new Error(res.message || 'Failed to create neckline');
-          }
-        }}
-      />
-
-      {/* Create Length */}
-      <CreateItemModal
-        isOpen={showCreateLength}
-        title="Add New Length"
-        onClose={() => setShowCreateLength(false)}
-        onSubmit={async (values) => {
-          const res = await lengthService.create({ name: values.name, description: values.description });
-          if (res.success && res.data) {
-            const item = res.data;
-            setLengthsState(prev => [item, ...prev]);
-            handleFieldChange('length', item.name);
-            setShowCreateLength(false);
-          } else {
-            throw new Error(res.message || 'Failed to create length');
-          }
-        }}
-      />
-
-      {/* Create Fit */}
-      <CreateItemModal
-        isOpen={showCreateFit}
-        title="Add New Fit"
-        onClose={() => setShowCreateFit(false)}
-        onSubmit={async (values) => {
-          const res = await fitService.create({ name: values.name, description: values.description });
-          if (res.success && res.data) {
-            const item = res.data;
-            setFitsState(prev => [item, ...prev]);
-            handleFieldChange('fit', item.name);
-            setShowCreateFit(false);
-          } else {
-            throw new Error(res.message || 'Failed to create fit');
-          }
-        }}
-      />
-
-      {/* Create Age Group */}
-      <CreateItemModal
-        isOpen={showCreateAgeGroup}
-        title="Add New Age Group"
-        onClose={() => setShowCreateAgeGroup(false)}
-        onSubmit={async (values) => {
-          const res = await ageGroupService.create({ name: values.name, description: values.description });
-          if (res.success && res.data) {
-            const item = res.data;
-            setAgeGroupsState(prev => [item, ...prev]);
-            handleFieldChange('ageGroup', item.name);
-            setShowCreateAgeGroup(false);
-          } else {
-            throw new Error(res.message || 'Failed to create age group');
           }
         }}
       />

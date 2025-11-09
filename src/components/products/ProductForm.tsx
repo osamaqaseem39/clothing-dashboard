@@ -3,8 +3,6 @@ import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Product, Category, Brand, ProductVariant } from '../../types';
 import TagsModal from './modals/TagsModal';
 import KeywordsModal from './modals/KeywordsModal';
-import HandworkModal from './modals/HandworkModal';
-import BodyTypeModal from './modals/BodyTypeModal';
 import SizesModal from './modals/SizesModal';
 import FeaturesModal from './modals/FeaturesModal';
 import ColorsModal from './modals/ColorsModal';
@@ -15,10 +13,6 @@ import {
   colorFamilyService,
   patternService,
   sleeveLengthService,
-  necklineService,
-  lengthService,
-  fitService,
-  ageGroupService,
   materialService,
   occasionService,
   seasonService,
@@ -302,15 +296,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
   // Modal states
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
   const [isKeywordsModalOpen, setIsKeywordsModalOpen] = useState(false);
-  const [isHandworkModalOpen, setIsHandworkModalOpen] = useState(false);
-  const [isBodyTypeModalOpen, setIsBodyTypeModalOpen] = useState(false);
   const [isSizesModalOpen, setIsSizesModalOpen] = useState(false);
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
   const [isColorsModalOpen, setIsColorsModalOpen] = useState(false);
   const [isAttributesModalOpen, setIsAttributesModalOpen] = useState(false);
   // Quick add modal states
   const [quickAdd, setQuickAdd] = useState<{
-    type: null | 'Color Family' | 'Pattern' | 'Sleeve Length' | 'Neckline' | 'Length' | 'Fit' | 'Age Group' | 'Fabric' | 'Occasion' | 'Season';
+    type: null | 'Color Family' | 'Pattern' | 'Sleeve Length' | 'Fabric' | 'Occasion' | 'Season';
   }>({ type: null });
 
   // Local option lists to allow appending newly created values
@@ -320,10 +312,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [colorFamilyOptions, setColorFamilyOptions] = useState<string[]>([]);
   const [patternOptions, setPatternOptions] = useState<string[]>([]);
   const [sleeveLengthOptions, setSleeveLengthOptions] = useState<string[]>([]);
-  const [necklineOptions, setNecklineOptions] = useState<string[]>([]);
-  const [lengthOptions, setLengthOptions] = useState<string[]>([]);
-  const [fitOptions, setFitOptions] = useState<string[]>([]);
-  const [ageGroupOptions, setAgeGroupOptions] = useState<string[]>([]);
   const [isOptionsLoading, setIsOptionsLoading] = useState<boolean>(false);
 
   // Load master data options
@@ -336,10 +324,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           colorFamiliesRes,
           patternsRes,
           sleeveLengthsRes,
-          necklinesRes,
-          lengthsRes,
-          fitsRes,
-          ageGroupsRes,
           fabricsRes,
           occasionsRes,
           seasonsRes,
@@ -347,10 +331,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           colorFamilyService.getAll(),
           patternService.getAll(),
           sleeveLengthService.getAll(),
-          necklineService.getAll(),
-          lengthService.getAll(),
-          fitService.getAll(),
-          ageGroupService.getAll(),
           materialService.getAll(),
           occasionService.getAll(),
           seasonService.getAll(),
@@ -362,10 +342,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
         if (colorFamiliesRes.success && colorFamiliesRes.data) setColorFamilyOptions(sortByName(colorFamiliesRes.data));
         if (patternsRes.success && patternsRes.data) setPatternOptions(sortByName(patternsRes.data));
         if (sleeveLengthsRes.success && sleeveLengthsRes.data) setSleeveLengthOptions(sortByName(sleeveLengthsRes.data));
-        if (necklinesRes.success && necklinesRes.data) setNecklineOptions(sortByName(necklinesRes.data));
-        if (lengthsRes.success && lengthsRes.data) setLengthOptions(sortByName(lengthsRes.data));
-        if (fitsRes.success && fitsRes.data) setFitOptions(sortByName(fitsRes.data));
-        if (ageGroupsRes.success && ageGroupsRes.data) setAgeGroupOptions(sortByName(ageGroupsRes.data));
         if (fabricsRes.success && fabricsRes.data) setFabricOptions(sortByName(fabricsRes.data));
         if (occasionsRes.success && occasionsRes.data) setOccasionOptions(sortByName(occasionsRes.data));
         if (seasonsRes.success && seasonsRes.data) setSeasonOptions(sortByName(seasonsRes.data));
@@ -1251,140 +1227,52 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </div>
             </div>
 
-            {/* Row 3: Neckline, Length, Fit, Age Group */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Neckline</label>
-                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Neckline' })}>+ Add new neckline</button>
-                </div>
-                <select
-                  value={formData.neckline}
-                  onChange={(e) => handleChange('neckline', e.target.value)}
-                  className="input-field"
-                >
-                  <option value="">Select Neckline</option>
-                  {necklineOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Length</label>
-                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Length' })}>+ Add new length</button>
-                </div>
-                <select
-                  value={formData.length}
-                  onChange={(e) => handleChange('length', e.target.value)}
-                  className="input-field"
-                >
-                  <option value="">Select Length</option>
-                  {lengthOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Fit</label>
-                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Fit' })}>+ Add new fit</button>
-                </div>
-                <select
-                  value={formData.fit}
-                  onChange={(e) => handleChange('fit', e.target.value)}
-                  className="input-field"
-                >
-                  <option value="">Select Fit</option>
-                  {fitOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Age Group</label>
-                  <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Age Group' })}>+ Add new age group</button>
-                </div>
-                <select
-                  value={formData.ageGroup}
-                  onChange={(e) => handleChange('ageGroup', e.target.value)}
-                  className="input-field"
-                >
-                  <option value="">Select Age Group</option>
-                  {ageGroupOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-          {/* Quick Add Modal Dispatcher */}
-          {quickAdd.type && (
-            <QuickAddMasterDataModal
-              isOpen={true}
-              onClose={() => setQuickAdd({ type: null })}
-              title={quickAdd.type}
-              service={
-                quickAdd.type === 'Color Family' ? (colorFamilyService as any) :
-                quickAdd.type === 'Pattern' ? (patternService as any) :
-                quickAdd.type === 'Sleeve Length' ? (sleeveLengthService as any) :
-                quickAdd.type === 'Neckline' ? (necklineService as any) :
-                quickAdd.type === 'Length' ? (lengthService as any) :
-                quickAdd.type === 'Fit' ? (fitService as any) :
-                quickAdd.type === 'Age Group' ? (ageGroupService as any) :
-                quickAdd.type === 'Fabric' ? (materialService as any) :
-                quickAdd.type === 'Occasion' ? (occasionService as any) :
-                (seasonService as any)
-              }
-              onCreated={(created: any) => {
-                const name = created.name;
-                switch (quickAdd.type) {
-                  case 'Color Family':
-                    setColorFamilyOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('colorFamily', name);
-                    break;
-                  case 'Pattern':
-                    setPatternOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('pattern', name);
-                    break;
-                  case 'Sleeve Length':
-                    setSleeveLengthOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('sleeveLength', name);
-                    break;
-                  case 'Neckline':
-                    setNecklineOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('neckline', name);
-                    break;
-                  case 'Length':
-                    setLengthOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('length', name);
-                    break;
-                  case 'Fit':
-                    setFitOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('fit', name);
-                    break;
-                  case 'Age Group':
-                    setAgeGroupOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('ageGroup', name);
-                    break;
-                  case 'Fabric':
-                    setFabricOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('fabric', name);
-                    break;
-                  case 'Occasion':
-                    setOccasionOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('occasion', name);
-                    break;
-                  case 'Season':
-                    setSeasonOptions(prev => prev.includes(name) ? prev : [...prev, name]);
-                    handleChange('season', name);
-                    break;
+            {/* Quick Add Modal Dispatcher */}
+            {quickAdd.type && (
+              <QuickAddMasterDataModal
+                isOpen={true}
+                onClose={() => setQuickAdd({ type: null })}
+                title={quickAdd.type}
+                service={
+                  quickAdd.type === 'Color Family' ? (colorFamilyService as any) :
+                  quickAdd.type === 'Pattern' ? (patternService as any) :
+                  quickAdd.type === 'Sleeve Length' ? (sleeveLengthService as any) :
+                  quickAdd.type === 'Fabric' ? (materialService as any) :
+                  quickAdd.type === 'Occasion' ? (occasionService as any) :
+                  (seasonService as any)
                 }
-                setQuickAdd({ type: null });
-              }}
-            />
-          )}
+                onCreated={(created: any) => {
+                  const name = created.name;
+                  switch (quickAdd.type) {
+                    case 'Color Family':
+                      setColorFamilyOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                      handleChange('colorFamily', name);
+                      break;
+                    case 'Pattern':
+                      setPatternOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                      handleChange('pattern', name);
+                      break;
+                    case 'Sleeve Length':
+                      setSleeveLengthOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                      handleChange('sleeveLength', name);
+                      break;
+                    case 'Fabric':
+                      setFabricOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                      handleChange('fabric', name);
+                      break;
+                    case 'Occasion':
+                      setOccasionOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                      handleChange('occasion', name);
+                      break;
+                    case 'Season':
+                      setSeasonOptions(prev => prev.includes(name) ? prev : [...prev, name]);
+                      handleChange('season', name);
+                      break;
+                  }
+                  setQuickAdd({ type: null });
+                }}
+              />
+            )}
               </div>
             </div>
             </div>
@@ -1564,66 +1452,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </div>
               </div>
 
-              {/* Handwork Details */}
-              <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Handwork Details
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setIsHandworkModalOpen(true)}
-                  className="btn btn-secondary text-sm"
-                >
-                  <PlusIcon className="h-4 w-4 mr-1" />
-                  Manage Handwork
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {formData.handwork?.map((handwork, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
-                  >
-                    {handwork}
-                  </span>
-                ))}
-                {(!formData.handwork || formData.handwork.length === 0) && (
-                  <span className="text-gray-500 text-sm">No handwork details added</span>
-                )}
-              </div>
-            </div>
-
-            {/* Body Type Suitability */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Body Type Suitability
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setIsBodyTypeModalOpen(true)}
-                  className="btn btn-secondary text-sm"
-                >
-                  <PlusIcon className="h-4 w-4 mr-1" />
-                  Manage Body Types
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                {formData.bodyType?.map((bodyType, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                  >
-                    {bodyType}
-                  </span>
-                ))}
-                {(!formData.bodyType || formData.bodyType.length === 0) && (
-                  <span className="text-gray-500 text-sm">No body types added</span>
-                )}
-              </div>
-            </div>
-
               {/* Special Features */}
               <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-4">
@@ -1667,19 +1495,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               )}
             </div>
 
-              {/* Care Instructions */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Care Instructions
-                </label>
-                <textarea
-                  value={formData.careInstructions}
-                  onChange={(e) => handleChange('careInstructions', e.target.value)}
-                  rows={3}
-                  className="input-field"
-                  placeholder="e.g., Dry clean only, Hand wash in cold water, Do not bleach"
-                />
-              </div>
             </div>
           )}
 
@@ -1770,20 +1585,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           onClose={() => setIsAttributesModalOpen(false)}
           attributes={formData.attributes || []}
           onAttributesChange={(attributes) => handleChange('attributes', attributes)}
-        />
-
-        <HandworkModal
-          isOpen={isHandworkModalOpen}
-          onClose={() => setIsHandworkModalOpen(false)}
-          handwork={formData.handwork || []}
-          onHandworkChange={(handwork) => handleChange('handwork', handwork)}
-        />
-
-        <BodyTypeModal
-          isOpen={isBodyTypeModalOpen}
-          onClose={() => setIsBodyTypeModalOpen(false)}
-          bodyTypes={formData.bodyType || []}
-          onBodyTypesChange={(bodyTypes) => handleChange('bodyType', bodyTypes)}
         />
 
         <SizesModal

@@ -31,14 +31,6 @@ import PatternsPage from './pages/PatternsPage';
 import PatternFormPage from './pages/PatternFormPage';
 import SleeveLengthsPage from './pages/SleeveLengthsPage';
 import SleeveLengthFormPage from './pages/SleeveLengthFormPage';
-import NecklinesPage from './pages/NecklinesPage';
-import NecklineFormPage from './pages/NecklineFormPage';
-import LengthsPage from './pages/LengthsPage';
-import LengthFormPage from './pages/LengthFormPage';
-import FitsPage from './pages/FitsPage';
-import FitFormPage from './pages/FitFormPage';
-import AgeGroupsPage from './pages/AgeGroupsPage';
-import AgeGroupFormPage from './pages/AgeGroupFormPage';
 import ColorFamiliesPage from './pages/ColorFamiliesPage';
 import ColorFamilyFormPage from './pages/ColorFamilyFormPage';
 import MasterDataPage from './pages/MasterDataPage';
@@ -133,18 +125,6 @@ const AppContent: React.FC = () => {
           <Route path="sleeve-lengths" element={<SleeveLengthsPage />} />
           <Route path="sleeve-lengths/new" element={<SleeveLengthFormPage />} />
           <Route path="sleeve-lengths/:id/edit" element={<SleeveLengthFormPage />} />
-          <Route path="necklines" element={<NecklinesPage />} />
-          <Route path="necklines/new" element={<NecklineFormPage />} />
-          <Route path="necklines/:id/edit" element={<NecklineFormPage />} />
-          <Route path="lengths" element={<LengthsPage />} />
-          <Route path="lengths/new" element={<LengthFormPage />} />
-          <Route path="lengths/:id/edit" element={<LengthFormPage />} />
-          <Route path="fits" element={<FitsPage />} />
-          <Route path="fits/new" element={<FitFormPage />} />
-          <Route path="fits/:id/edit" element={<FitFormPage />} />
-          <Route path="age-groups" element={<AgeGroupsPage />} />
-          <Route path="age-groups/new" element={<AgeGroupFormPage />} />
-          <Route path="age-groups/:id/edit" element={<AgeGroupFormPage />} />
           <Route path="color-families" element={<ColorFamiliesPage />} />
           <Route path="color-families/new" element={<ColorFamilyFormPage />} />
           <Route path="color-families/:id/edit" element={<ColorFamilyFormPage />} />
