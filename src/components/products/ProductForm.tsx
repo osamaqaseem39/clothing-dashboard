@@ -1273,10 +1273,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 }}
               />
             )}
-              </div>
-            </div>
-            </div>
-          )}
+          </div>
+        )}
 
           {/* Measurements Tab */}
           {activeTab === 'measurements' && (
