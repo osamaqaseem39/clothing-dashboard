@@ -11,8 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
-import { brandService } from '../services/brandService';
-import type { Product, Category, Brand, ProductFilters as ProductFiltersType } from '../types';
+import type { Product, Category, ProductFilters as ProductFiltersType } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import ProductFilters from '../components/products/ProductFilters';
@@ -29,7 +28,6 @@ const Products: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<ProductFiltersType>({
     search: '',
@@ -71,14 +69,9 @@ const Products: React.FC = () => {
   const fetchSetupData = async () => {
     try {
       const categoriesResponse = await categoryService.getCategories();
-      const brandsResponse = await brandService.getBrands();
       
       if (categoriesResponse.success && categoriesResponse.data) {
         setCategories(categoriesResponse.data);
-      }
-      
-      if (brandsResponse.success && brandsResponse.data) {
-        setBrands(brandsResponse.data);
       }
     } catch (error) {
       console.error('Error fetching setup data:', error);
