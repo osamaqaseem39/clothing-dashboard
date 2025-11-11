@@ -11,7 +11,6 @@ import {
   SunIcon,
   TagIcon,
   LinkIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import type { Category, Brand } from '../types';
 import { useNavigate } from 'react-router-dom';

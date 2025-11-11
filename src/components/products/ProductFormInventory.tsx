@@ -48,7 +48,8 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
     } else {
       setSizeInventory([]);
     }
-  }, [formData.availableSizes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.availableSizes, hasSizes, sizeInventory]);
 
   // Calculate total stock from size-wise inventory
   useEffect(() => {
@@ -58,7 +59,8 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
         onFieldChange('stockQuantity', total);
       }
     }
-  }, [sizeInventory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sizeInventory, hasSizes, formData.stockQuantity, onFieldChange]);
 
   const handleSizeQuantityChange = (size: string, quantity: number) => {
     const updated = sizeInventory.map(si => 

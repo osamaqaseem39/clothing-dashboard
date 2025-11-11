@@ -36,10 +36,12 @@ const MasterDataListPage: React.FC<MasterDataListPageProps> = ({
 
   useEffect(() => {
     loadItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     filterItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, searchQuery]);
 
   const loadItems = async () => {

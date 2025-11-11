@@ -42,6 +42,7 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCollapsed]);
 
   return (

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { materialService, MasterDataItem } from '../services/masterDataService';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import ErrorMessage from '../components/ui/ErrorMessage';
 
 const MaterialsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +20,7 @@ const MaterialsPage: React.FC = () => {
 
   useEffect(() => {
     filterMaterials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [materials, searchQuery]);
 
   const loadMaterials = async () => {

@@ -20,6 +20,7 @@ const SeasonsPage: React.FC = () => {
 
   useEffect(() => {
     filterSeasons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasons, searchQuery]);
 
   const loadSeasons = async () => {

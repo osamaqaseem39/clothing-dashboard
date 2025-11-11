@@ -26,7 +26,6 @@ import {
 } from 'recharts';
 import { dashboardService } from '../services/dashboardService';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import ErrorMessage from '../components/ui/ErrorMessage';
 
 const Analytics: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +40,7 @@ const Analytics: React.FC = () => {
 
   useEffect(() => {
     fetchAnalyticsData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange]);
 
   const fetchAnalyticsData = async () => {
@@ -76,8 +76,8 @@ const Analytics: React.FC = () => {
       setConversionData(conversionResponse.success && conversionResponse.data ? conversionResponse.data.conversions || [] : []);
 
       // Check if any data was loaded successfully
-      const hasData = [revenueResponse, ordersResponse, customerResponse, productResponse, categoryResponse, conversionResponse]
-        .some(response => response.success && response.data);
+      // const hasData = [revenueResponse, ordersResponse, customerResponse, productResponse, categoryResponse, conversionResponse]
+      //   .some(response => response.success && response.data);
 
       // Don't set error if no data - just show empty state
       // The warning message below will handle this case

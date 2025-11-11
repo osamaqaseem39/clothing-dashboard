@@ -264,6 +264,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         isActive: product.isActive ?? true,
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
   useEffect(() => {

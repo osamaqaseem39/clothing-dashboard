@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { XMarkIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ProductFilters as ProductFiltersType } from '../../types';
 
 interface ProductFiltersProps {

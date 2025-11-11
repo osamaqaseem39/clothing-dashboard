@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { XMarkIcon, CheckIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { Attribute } from '../../../types';
 import { attributeService, sizeService, Size } from '../../../services/masterDataService';
 import QuickAddMasterDataModal from '../../master-data/QuickAddMasterDataModal';

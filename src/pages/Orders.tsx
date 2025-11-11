@@ -25,6 +25,7 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, selectedStatus]);
 
   const fetchOrders = async () => {

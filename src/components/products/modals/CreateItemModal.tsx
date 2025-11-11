@@ -41,6 +41,7 @@ const CreateItemModal: React.FC<CreateItemModalProps> = ({
       setIsSaving(false);
     }
     // Intentionally exclude initialValues to avoid reset on identity changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   if (!isOpen) return null;

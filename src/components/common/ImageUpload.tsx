@@ -185,7 +185,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200">
                 <img
                   src={image}
-                  alt={`Uploaded image ${index + 1}`}
+                  alt={`Upload ${index + 1}`}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';

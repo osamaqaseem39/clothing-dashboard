@@ -20,6 +20,7 @@ const OccasionsPage: React.FC = () => {
 
   useEffect(() => {
     filterOccasions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [occasions, searchQuery]);
 
   const loadOccasions = async () => {

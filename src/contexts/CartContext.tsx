@@ -122,6 +122,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({
   // Initialize cart on mount
   useEffect(() => {
     initializeCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId, sessionId]);
 
   const initializeCart = async () => {

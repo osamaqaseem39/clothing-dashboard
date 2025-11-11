@@ -31,6 +31,7 @@ const Categories: React.FC = () => {
 
   useEffect(() => {
     filterCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, searchQuery]);
 
   const loadCategories = async () => {

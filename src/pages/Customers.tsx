@@ -27,6 +27,7 @@ const Customers: React.FC = () => {
 
   useEffect(() => {
     fetchCustomers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, selectedStatus]);
 
   const fetchCustomers = async () => {
@@ -73,18 +74,18 @@ const Customers: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-red-100 text-red-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status.toLowerCase()) {
+  //     case 'active':
+  //       return 'bg-green-100 text-green-800';
+  //     case 'inactive':
+  //       return 'bg-red-100 text-red-800';
+  //     case 'pending':
+  //       return 'bg-yellow-100 text-yellow-800';
+  //     default:
+  //       return 'bg-gray-100 text-gray-800';
+  //   }
+  // };
 
   const getCustomerValue = (customer: Customer) => {
     if (!customer.orders || customer.orders.length === 0) return 'New Customer';

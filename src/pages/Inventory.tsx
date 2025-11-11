@@ -49,6 +49,7 @@ const Inventory: React.FC = () => {
 
   useEffect(() => {
     filterInventory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventory, searchQuery, statusFilter]);
 
   const loadInventory = async () => {
