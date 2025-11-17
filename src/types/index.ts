@@ -120,6 +120,10 @@ export interface Product {
   sizeChart: string;
   sizeChartImageUrl?: string;
   availableSizes: string[];
+  sizeInventory?: Array<{
+    size: string;
+    quantity: number;
+  }>;
   createdAt: string;
   updatedAt: string;
   

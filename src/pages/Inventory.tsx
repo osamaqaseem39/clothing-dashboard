@@ -395,6 +395,7 @@ const Inventory: React.FC = () => {
 
   const updateSizeStock = (index: number, field: string, value: number) => {
     const updated = [...sizeWiseStock];
+
     if (index >= updated.length) {
       // Add new entry if index is out of bounds
       const size = selectedProduct?.availableSizes?.[index] || '';
