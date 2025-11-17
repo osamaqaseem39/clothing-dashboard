@@ -88,7 +88,8 @@ export const categoryService = {
 
   // Update category
   async updateCategory(id: string, categoryData: Partial<Category>): Promise<ApiResponse<Category>> {
-    const response = await api.put(`/categories/${id}`, categoryData);
+    // Use PATCH instead of PUT for better compatibility
+    const response = await api.patch(`/categories/${id}`, categoryData);
     const payload = response.data;
     
     // Normalize response: backend may return the item directly or wrapped in { success, data }
