@@ -174,7 +174,7 @@ const ShopPage: React.FC = () => {
           {products.map((product) => (
             <div key={product._id} className="bg-white shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow">
               {/* Product Image */}
-              <div className="aspect-w-1 aspect-h-1">
+              <div className="relative aspect-[3/4] overflow-hidden">
                 <Link to={`/products/${product.slug}`}>
                   <img
                     src={
@@ -183,7 +183,7 @@ const ShopPage: React.FC = () => {
                         : product.images?.[0]?.url || '/placeholder-product.png'
                     }
                     alt={product.name}
-                    className="w-full h-64 object-cover hover:scale-105 transition-transform duration-200"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                   />
                 </Link>
               </div>
