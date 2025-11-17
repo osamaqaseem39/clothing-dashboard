@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon, ExclamationTriangleIcon, XCircleIcon, CheckCircleIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, MinusIcon, ExclamationTriangleIcon, XCircleIcon, CheckCircleIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { inventoryService } from '../services/inventoryService';
 import type { Inventory as InventoryType } from '../types';
 import Button from '../components/ui/Button';
@@ -26,6 +26,7 @@ const Inventory: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [adjustingStock, setAdjustingStock] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -158,6 +159,37 @@ const Inventory: React.FC = () => {
     setShowDetails(true);
   };
 
+  const handleAdjustStock = async (item: InventoryType, adjustment: number) => {
+    if (adjustingStock === item._id) return; // Prevent multiple simultaneous adjustments
+    
+    try {
+      setAdjustingStock(item._id);
+      setError(null);
+      
+      const response = await inventoryService.adjustStock(item._id, {
+        quantity: adjustment,
+        type: 'adjustment',
+        notes: `Manual adjustment: ${adjustment > 0 ? '+' : ''}${adjustment}`,
+      });
+
+      if (response.success && response.data) {
+        // Update the inventory item in the list
+        setInventory(inventory.map(inv => 
+          inv._id === item._id ? response.data! : inv
+        ));
+        setSuccessMessage(`Stock ${adjustment > 0 ? 'increased' : 'decreased'} by ${Math.abs(adjustment)}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        setError(response.message || 'Failed to adjust stock');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to adjust stock');
+      console.error('Error adjusting stock:', err);
+    } finally {
+      setAdjustingStock(null);
+    }
+  };
+
   const handleAddItem = () => {
     setEditingItem(null);
     resetForm();
@@ -256,8 +288,33 @@ const Inventory: React.FC = () => {
       header: 'Stock',
       render: (item: InventoryType) => (
         <div className="text-center">
-          <div className="font-medium text-gray-900">{item.currentStock}</div>
-          <div className="text-sm text-gray-500">Available: {item.availableStock}</div>
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <button
+              onClick={() => handleAdjustStock(item, -1)}
+              disabled={adjustingStock === item._id || item.currentStock <= 0}
+              className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Decrease by 1"
+            >
+              <MinusIcon className="h-4 w-4" />
+            </button>
+            <div className="min-w-[60px]">
+              <div className="font-medium text-gray-900">{item.currentStock}</div>
+              <div className="text-xs text-gray-500">Avail: {item.availableStock}</div>
+            </div>
+            <button
+              onClick={() => handleAdjustStock(item, 1)}
+              disabled={adjustingStock === item._id}
+              className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Increase by 1"
+            >
+              <PlusIcon className="h-4 w-4" />
+            </button>
+          </div>
+          {adjustingStock === item._id && (
+            <div className="flex justify-center mt-1">
+              <LoadingSpinner size="sm" />
+            </div>
+          )}
         </div>
       ),
     },

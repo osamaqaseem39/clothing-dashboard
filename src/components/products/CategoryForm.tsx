@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Category } from '../../types';
 import ImageUpload from '../common/ImageUpload';
@@ -28,6 +28,38 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Update form data when category prop changes (e.g., after async load)
+  useEffect(() => {
+    if (category) {
+      // Handle parentId - it might be a string or an object with _id
+      let parentId = '';
+      if (category.parentId) {
+        parentId = typeof category.parentId === 'string' 
+          ? category.parentId 
+          : (category.parentId as any)?._id || '';
+      }
+      
+      setFormData({
+        name: category.name || '',
+        slug: category.slug || '',
+        description: category.description || '',
+        parentId: parentId,
+        isActive: category.isActive ?? true,
+        image: category.image || '',
+      });
+    } else {
+      // Reset form for new category
+      setFormData({
+        name: '',
+        slug: '',
+        description: '',
+        parentId: '',
+        isActive: true,
+        image: '',
+      });
+    }
+  }, [category]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -100,19 +132,19 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {category ? 'Edit Category' : 'Add New Category'}
-          </h2>
-          <button
-            onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XMarkIcon className="h-6 w-6" />
-          </button>
-        </div>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {category ? 'Edit Category' : 'Add New Category'}
+        </h2>
+        <button
+          onClick={onCancel}
+          className="text-gray-400 hover:text-gray-600"
+          type="button"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+      </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}

@@ -305,7 +305,26 @@ const Products: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {product.category?.name || 'Uncategorized'}
+                      {(() => {
+                        // Handle categories array (populated from backend)
+                        if (product.categories && Array.isArray(product.categories) && product.categories.length > 0) {
+                          const firstCategory = product.categories[0] as string | { name: string; _id?: string };
+                          // Category can be an object with name or just a string ID
+                          if (typeof firstCategory === 'object' && firstCategory !== null && 'name' in firstCategory) {
+                            return firstCategory.name;
+                          }
+                          // If it's a string ID, try to find it in the categories list
+                          if (typeof firstCategory === 'string') {
+                            const foundCategory = categories.find(cat => cat._id === firstCategory);
+                            return foundCategory?.name || 'Uncategorized';
+                          }
+                        }
+                        // Fallback to single category object (for backward compatibility)
+                        if ((product as any).category && typeof (product as any).category === 'object' && (product as any).category.name) {
+                          return (product as any).category.name;
+                        }
+                        return 'Uncategorized';
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {product.fabric || '-'}
