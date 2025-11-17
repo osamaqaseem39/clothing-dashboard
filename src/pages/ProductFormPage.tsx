@@ -98,6 +98,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   const [showCreateColorFamily, setShowCreateColorFamily] = useState(false);
   const [showCreatePattern, setShowCreatePattern] = useState(false);
   const [showCreateSleeveLength, setShowCreateSleeveLength] = useState(false);
+  const [sizeInventory, setSizeInventory] = useState<Array<{ size: string; quantity: number }>>([]);
   const [formData, setFormData] = useState<Partial<Product>>({
     name: product?.name || '',
     description: product?.description || '',
@@ -367,6 +368,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
       await onSubmit({
         ...formData,
         status,
+        sizeInventory: sizeInventory.length > 0 ? sizeInventory : undefined,
       });
       setHasUnsavedChanges(false);
     } catch (error) {
@@ -506,6 +508,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                     formData={formData}
                     errors={errors}
                     onFieldChange={handleFieldChange}
+                    onSizeInventoryChange={setSizeInventory}
                   />
                 )}
 

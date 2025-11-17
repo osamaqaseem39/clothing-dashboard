@@ -15,6 +15,7 @@ interface ProductFormInventoryProps {
   formData: Partial<Product>;
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
+  onSizeInventoryChange?: (sizeInventory: SizeInventory[]) => void;
 }
 
 interface SizeInventory {
@@ -26,6 +27,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
   formData,
   errors,
   onFieldChange,
+  onSizeInventoryChange,
 }) => {
   const hasSizes = formData.availableSizes && formData.availableSizes.length > 0;
   
@@ -44,12 +46,20 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
       // Remove sizes that are no longer in availableSizes
       const filtered = existing.filter(si => currentSizes.includes(si.size));
       
-      setSizeInventory([...filtered, ...newSizes]);
+      const updated = [...filtered, ...newSizes];
+      setSizeInventory(updated);
+      // Notify parent of size inventory changes
+      if (onSizeInventoryChange) {
+        onSizeInventoryChange(updated);
+      }
     } else {
       setSizeInventory([]);
+      if (onSizeInventoryChange) {
+        onSizeInventoryChange([]);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.availableSizes, hasSizes, sizeInventory]);
+  }, [formData.availableSizes, hasSizes]);
 
   // Calculate total stock from size-wise inventory
   useEffect(() => {
@@ -67,7 +77,22 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
       si.size === size ? { ...si, quantity: Math.max(0, quantity) } : si
     );
     setSizeInventory(updated);
+    // Notify parent of size inventory changes
+    if (onSizeInventoryChange) {
+      onSizeInventoryChange(updated);
+    }
   };
+
+  // Load existing size inventory from formData if available (for editing)
+  useEffect(() => {
+    if (formData.sizeInventory && Array.isArray(formData.sizeInventory) && formData.sizeInventory.length > 0) {
+      setSizeInventory(formData.sizeInventory as SizeInventory[]);
+      if (onSizeInventoryChange) {
+        onSizeInventoryChange(formData.sizeInventory as SizeInventory[]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-6">

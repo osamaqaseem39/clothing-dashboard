@@ -32,7 +32,33 @@ export const categoryService = {
   // Get category by ID
   async getCategory(id: string): Promise<ApiResponse<Category>> {
     const response = await api.get(`/categories/${id}`);
-    return response.data;
+    const payload = response.data;
+    
+    // Normalize response: backend may return the item directly or wrapped in { success, data }
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload &&
+      typeof payload.success === 'boolean'
+    ) {
+      // Already in ApiResponse format
+      return payload as ApiResponse<Category>;
+    } else if (payload && typeof payload === 'object' && payload._id) {
+      // Backend returned the category directly, wrap it
+      return {
+        success: true,
+        data: payload as Category,
+      };
+    } else {
+      // Invalid response
+      return {
+        success: false,
+        data: {} as Category,
+        message: 'Invalid category response',
+      };
+    }
   },
 
   // Create new category

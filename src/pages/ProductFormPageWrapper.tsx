@@ -8,6 +8,7 @@ import {
   colorFamilyService, patternService, sleeveLengthService
 } from '../services/masterDataService';
 import { Product, Category, Brand } from '../types';
+import { inventoryService } from '../services/inventoryService';
 import ProductFormPage from './ProductFormPage';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
@@ -70,7 +71,30 @@ const ProductFormPageWrapper: React.FC = () => {
       if (isEditing && id) {
         const productResponse = await productService.getProduct(id);
         if (productResponse.success && productResponse.data?.product) {
-          setProduct(productResponse.data.product);
+          const productData = productResponse.data.product;
+          
+          // Load inventory data if product has sizes
+          if (productData.availableSizes && productData.availableSizes.length > 0) {
+            try {
+              const inventoryResponse = await inventoryService.getInventoryByProduct(id);
+              if (inventoryResponse.success && inventoryResponse.data) {
+                // Add size inventory data to product
+                const sizeInventory = productData.availableSizes.map((size: string) => {
+                  const invItem = inventoryResponse.data.find((inv: any) => inv.size === size);
+                  return {
+                    size,
+                    quantity: invItem?.currentStock || 0,
+                  };
+                });
+                (productData as any).sizeInventory = sizeInventory;
+              }
+            } catch (err) {
+              console.error('Error loading inventory data:', err);
+              // Don't fail if inventory loading fails
+            }
+          }
+          
+          setProduct(productData);
         } else {
           setError(productResponse.message || 'Product not found');
         }

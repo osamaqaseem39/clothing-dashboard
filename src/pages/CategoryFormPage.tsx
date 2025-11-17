@@ -25,9 +25,12 @@ const CategoryFormPage: React.FC = () => {
           id ? categoryService.getCategory(id) : Promise.resolve({ success: true, data: null }),
         ]);
         if (catsRes.success && catsRes.data) setParentCategories(catsRes.data);
-        if (id && catRes.success && catRes.data) setCategory(catRes.data);
-        else if (id && !catRes.success) {
-          setError('Failed to load category. It may not exist.');
+        if (id && catRes.success && catRes.data) {
+          console.log('Loaded category:', catRes.data);
+          setCategory(catRes.data);
+        } else if (id && !catRes.success) {
+          console.error('Failed to load category:', catRes);
+          setError((catRes as any).message || 'Failed to load category. It may not exist.');
         }
       } catch (err) {
         setError('Failed to load category data');

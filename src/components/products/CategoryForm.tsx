@@ -31,7 +31,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
   // Update form data when category prop changes (e.g., after async load)
   useEffect(() => {
-    if (category) {
+    if (category && category._id) {
+      console.log('CategoryForm: Updating form with category:', category);
       // Handle parentId - it might be a string or an object with _id
       let parentId = '';
       if (category.parentId) {
@@ -45,10 +46,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         slug: category.slug || '',
         description: category.description || '',
         parentId: parentId,
-        isActive: category.isActive ?? true,
+        isActive: (category as any).isActive !== undefined ? (category as any).isActive : true,
         image: category.image || '',
       });
-    } else {
+    } else if (!category) {
       // Reset form for new category
       setFormData({
         name: '',

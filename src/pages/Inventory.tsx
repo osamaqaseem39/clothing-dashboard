@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, MinusIcon, ExclamationTriangleIcon, XCircleIcon, CheckCircleIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { inventoryService } from '../services/inventoryService';
-import type { Inventory as InventoryType } from '../types';
+import { productService } from '../services/productService';
+import type { Inventory as InventoryType, Product } from '../types';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -27,6 +28,17 @@ const Inventory: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [adjustingStock, setAdjustingStock] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [loadingProduct, setLoadingProduct] = useState(false);
+  const [sizeWiseStock, setSizeWiseStock] = useState<Array<{
+    size: string;
+    currentStock: number;
+    availableStock: number;
+    reorderPoint: number;
+    reorderQuantity: number;
+    costPrice: number;
+    sellingPrice: number;
+  }>>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -71,11 +83,37 @@ const Inventory: React.FC = () => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      const response = await inventoryService.createInventory(formData);
-      if (response.success && response.data) {
-        setInventory([response.data, ...inventory]);
-        setShowForm(false);
-        resetForm();
+      
+      // If size-wise stock is configured, create inventory for each size
+      if (sizeWiseStock.length > 0) {
+        const promises = sizeWiseStock.map(sizeStock => 
+          inventoryService.createInventory({
+            ...formData,
+            size: sizeStock.size,
+            currentStock: sizeStock.currentStock,
+            availableStock: sizeStock.availableStock,
+            reorderPoint: sizeStock.reorderPoint,
+            reorderQuantity: sizeStock.reorderQuantity,
+            costPrice: sizeStock.costPrice,
+            sellingPrice: sizeStock.sellingPrice,
+          })
+        );
+        const results = await Promise.all(promises);
+        const successful = results.filter(r => r.success && r.data);
+        if (successful.length > 0) {
+          setInventory([...successful.map(r => r.data!), ...inventory]);
+          setShowForm(false);
+          resetForm();
+          setSuccessMessage(`Created inventory for ${successful.length} size(s)`);
+        }
+      } else {
+        // Single inventory item (no sizes or single size)
+        const response = await inventoryService.createInventory(formData);
+        if (response.success && response.data) {
+          setInventory([response.data, ...inventory]);
+          setShowForm(false);
+          resetForm();
+        }
       }
     } catch (err) {
       setError('Failed to create inventory item');
@@ -91,14 +129,66 @@ const Inventory: React.FC = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await inventoryService.updateInventory(editingItem._id, formData);
-      if (response.success && response.data) {
-        setInventory(inventory.map(item => 
-          item._id === editingItem._id ? response.data! : item
-        ));
-        setShowForm(false);
-        setEditingItem(null);
-        resetForm();
+      
+      // If size-wise stock is configured, update/create inventory for each size
+      if (sizeWiseStock.length > 0) {
+        // Get existing inventory items for this product
+        const existingInventory = await inventoryService.getInventoryByProduct(editingItem.productId);
+        const existingItems = existingInventory.success && existingInventory.data ? existingInventory.data : [];
+        
+        // Update or create inventory for each size
+        const promises = sizeWiseStock.map(async (sizeStock) => {
+          const existingItem = existingItems.find((item: InventoryType) => item.size === sizeStock.size);
+          
+          if (existingItem) {
+            // Update existing inventory item
+            return inventoryService.updateInventory(existingItem._id, {
+              ...formData,
+              size: sizeStock.size,
+              currentStock: sizeStock.currentStock,
+              availableStock: sizeStock.availableStock,
+              reorderPoint: sizeStock.reorderPoint,
+              reorderQuantity: sizeStock.reorderQuantity,
+              costPrice: sizeStock.costPrice,
+              sellingPrice: sizeStock.sellingPrice,
+            });
+          } else {
+            // Create new inventory item for this size
+            return inventoryService.createInventory({
+              ...formData,
+              size: sizeStock.size,
+              currentStock: sizeStock.currentStock,
+              availableStock: sizeStock.availableStock,
+              reorderPoint: sizeStock.reorderPoint,
+              reorderQuantity: sizeStock.reorderQuantity,
+              costPrice: sizeStock.costPrice,
+              sellingPrice: sizeStock.sellingPrice,
+            });
+          }
+        });
+        
+        const results = await Promise.all(promises);
+        const successful = results.filter(r => r.success && r.data);
+        
+        if (successful.length > 0) {
+          // Reload inventory to get updated data
+          await loadInventory();
+          setShowForm(false);
+          setEditingItem(null);
+          resetForm();
+          setSuccessMessage(`Updated inventory for ${successful.length} size(s)`);
+        }
+      } else {
+        // Single inventory item update
+        const response = await inventoryService.updateInventory(editingItem._id, formData);
+        if (response.success && response.data) {
+          setInventory(inventory.map(item => 
+            item._id === editingItem._id ? response.data! : item
+          ));
+          setShowForm(false);
+          setEditingItem(null);
+          resetForm();
+        }
       }
     } catch (err) {
       setError('Failed to update inventory item');
@@ -135,7 +225,7 @@ const Inventory: React.FC = () => {
     }
   };
 
-  const handleEditItem = (item: InventoryType) => {
+  const handleEditItem = async (item: InventoryType) => {
     setEditingItem(item);
     setFormData({
       productName: item.productName || '',
@@ -151,7 +241,85 @@ const Inventory: React.FC = () => {
       warehouse: item.warehouse || 'main',
       status: item.status || 'in_stock',
     });
+    
+    // Load product to get available sizes
+    if (item.productId) {
+      await loadProductForSizes(item.productId);
+      
+      // Load existing inventory for all sizes of this product
+      try {
+        const existingInventory = await inventoryService.getInventoryByProduct(item.productId);
+        const existingItems = existingInventory.success && existingInventory.data ? existingInventory.data : [];
+        
+        // If product has sizes, initialize size-wise stock for all sizes
+        if (selectedProduct && selectedProduct.availableSizes && selectedProduct.availableSizes.length > 0) {
+          const sizeStockData = selectedProduct.availableSizes.map((size: string) => {
+            // Find existing inventory for this size
+            const existingInv = existingItems.find((inv: InventoryType) => inv.size === size);
+            return {
+              size: size,
+              currentStock: existingInv?.currentStock || 0,
+              availableStock: existingInv?.availableStock || 0,
+              reorderPoint: existingInv?.reorderPoint || 0,
+              reorderQuantity: existingInv?.reorderQuantity || 0,
+              costPrice: existingInv?.costPrice || formData.costPrice || 0,
+              sellingPrice: existingInv?.sellingPrice || formData.sellingPrice || 0,
+            };
+          });
+          setSizeWiseStock(sizeStockData);
+        } else if (existingItems.length > 0) {
+          // Product doesn't have sizes, but has existing inventory
+          const sizeStockData = existingItems.map(inv => ({
+            size: inv.size || '',
+            currentStock: inv.currentStock || 0,
+            availableStock: inv.availableStock || 0,
+            reorderPoint: inv.reorderPoint || 0,
+            reorderQuantity: inv.reorderQuantity || 0,
+            costPrice: inv.costPrice || 0,
+            sellingPrice: inv.sellingPrice || 0,
+          }));
+          setSizeWiseStock(sizeStockData);
+        }
+      } catch (err) {
+        console.error('Error loading existing inventory:', err);
+      }
+    }
+    
     setShowForm(true);
+  };
+
+  const loadProductForSizes = async (productId: string) => {
+    if (!productId) return;
+    
+    try {
+      setLoadingProduct(true);
+      const response = await productService.getProduct(productId);
+      if (response.success && response.data?.product) {
+        const product = response.data.product;
+        setSelectedProduct(product);
+        
+        // Initialize size-wise stock if product has sizes (only if not editing)
+        if (product.availableSizes && product.availableSizes.length > 0 && !editingItem) {
+          const existingSizes = sizeWiseStock.map(s => s.size);
+          const newSizes = product.availableSizes
+            .filter((size: string) => !existingSizes.includes(size))
+            .map((size: string) => ({
+              size,
+              currentStock: 0,
+              availableStock: 0,
+              reorderPoint: 0,
+              reorderQuantity: 0,
+              costPrice: formData.costPrice || 0,
+              sellingPrice: formData.sellingPrice || 0,
+            }));
+          setSizeWiseStock([...sizeWiseStock, ...newSizes]);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading product:', err);
+    } finally {
+      setLoadingProduct(false);
+    }
   };
 
   const handleViewItem = (item: InventoryType) => {
@@ -211,6 +379,55 @@ const Inventory: React.FC = () => {
       warehouse: 'main',
       status: 'in_stock' as 'in_stock' | 'low_stock' | 'out_of_stock' | 'discontinued',
     });
+    setSelectedProduct(null);
+    setSizeWiseStock([]);
+  };
+
+  const handleProductIdChange = async (productId: string) => {
+    setFormData({...formData, productId});
+    if (productId) {
+      await loadProductForSizes(productId);
+    } else {
+      setSelectedProduct(null);
+      setSizeWiseStock([]);
+    }
+  };
+
+  const updateSizeStock = (index: number, field: string, value: number) => {
+    const updated = [...sizeWiseStock];
+    if (index >= updated.length) {
+      // Add new entry if index is out of bounds
+      const size = selectedProduct?.availableSizes?.[index] || '';
+      updated.push({
+        size,
+        currentStock: 0,
+        availableStock: 0,
+        reorderPoint: 0,
+        reorderQuantity: 0,
+        costPrice: formData.costPrice || 0,
+        sellingPrice: formData.sellingPrice || 0,
+      });
+    }
+    if (updated[index]) {
+      updated[index] = { ...updated[index], [field]: value };
+      setSizeWiseStock(updated);
+    }
+  };
+
+  const addSizeStock = () => {
+    setSizeWiseStock([...sizeWiseStock, {
+      size: '',
+      currentStock: 0,
+      availableStock: 0,
+      reorderPoint: 0,
+      reorderQuantity: 0,
+      costPrice: formData.costPrice || 0,
+      sellingPrice: formData.sellingPrice || 0,
+    }]);
+  };
+
+  const removeSizeStock = (index: number) => {
+    setSizeWiseStock(sizeWiseStock.filter((_, i) => i !== index));
   };
 
   const filterInventory = () => {
@@ -582,19 +799,34 @@ const Inventory: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700">
                     Product ID *
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.productId}
-                    onChange={(e) => setFormData({...formData, productId: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="Product MongoDB ID"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={formData.productId}
+                      onChange={(e) => handleProductIdChange(e.target.value)}
+                      className="mt-1 block flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="Product MongoDB ID"
+                    />
+                    {loadingProduct && (
+                      <div className="mt-1 flex items-center">
+                        <LoadingSpinner size="sm" />
+                      </div>
+                    )}
+                  </div>
+                  {selectedProduct && (
+                    <p className="mt-1 text-xs text-green-600">
+                      Product: {selectedProduct.name}
+                      {selectedProduct.availableSizes && selectedProduct.availableSizes.length > 0 && 
+                        ` (${selectedProduct.availableSizes.length} sizes available)`
+                      }
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Size
+                    Size (for single size products)
                   </label>
                   <input
                     type="text"
@@ -602,74 +834,226 @@ const Inventory: React.FC = () => {
                     onChange={(e) => setFormData({...formData, size: e.target.value})}
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="e.g., S, M, L, XL (optional)"
+                    disabled={sizeWiseStock.length > 0}
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Leave empty if product has no size variations
+                    {sizeWiseStock.length > 0 
+                      ? 'Use size-wise stock section below for products with multiple sizes'
+                      : 'Leave empty if product has no size variations'
+                    }
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Current Stock *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    value={formData.currentStock}
-                    onChange={(e) => setFormData({...formData, currentStock: Number(e.target.value)})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
+              {/* Size-wise Stock Management */}
+              {selectedProduct && selectedProduct.availableSizes && selectedProduct.availableSizes.length > 0 && (
+                <div className="border-t pt-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">Size-wise Stock Management</h3>
+                    <button
+                      type="button"
+                      onClick={addSizeStock}
+                      className="btn btn-secondary text-sm"
+                    >
+                      <PlusIcon className="h-4 w-4 mr-1" />
+                      Add Size
+                    </button>
+                  </div>
+                  
+                  {sizeWiseStock.length === 0 && (
+                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                      <p className="text-sm text-blue-800">
+                        This product has {selectedProduct.availableSizes.length} available size(s). 
+                        Click "Add Size" to start managing stock for each size.
+                      </p>
+                    </div>
+                  )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Available Stock *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    value={formData.availableStock}
-                    onChange={(e) => setFormData({...formData, availableStock: Number(e.target.value)})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
+                  {sizeWiseStock.length > 0 && (
+                    <div className="space-y-4">
+                      {sizeWiseStock.map((sizeStock, index) => (
+                        <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                          <div className="flex justify-between items-center mb-3">
+                            <div className="flex-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Size *
+                              </label>
+                              <select
+                                value={sizeStock.size}
+                                onChange={(e) => {
+                                  const updated = [...sizeWiseStock];
+                                  updated[index] = { ...updated[index], size: e.target.value };
+                                  setSizeWiseStock(updated);
+                                }}
+                                className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                required
+                              >
+                                <option value="">Select Size</option>
+                                {selectedProduct.availableSizes?.map((size: string) => (
+                                  <option key={size} value={size}>{size}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeSizeStock(index)}
+                              className="ml-3 text-red-600 hover:text-red-800"
+                              title="Remove this size"
+                            >
+                              <TrashIcon className="h-5 w-5" />
+                            </button>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Current Stock
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={sizeStock.currentStock}
+                                onChange={(e) => updateSizeStock(index, 'currentStock', Number(e.target.value))}
+                                className="block w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Available Stock
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={sizeStock.availableStock}
+                                onChange={(e) => updateSizeStock(index, 'availableStock', Number(e.target.value))}
+                                className="block w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Reorder Point
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={sizeStock.reorderPoint}
+                                onChange={(e) => updateSizeStock(index, 'reorderPoint', Number(e.target.value))}
+                                className="block w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Reorder Qty
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                value={sizeStock.reorderQuantity}
+                                onChange={(e) => updateSizeStock(index, 'reorderQuantity', Number(e.target.value))}
+                                className="block w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Cost Price
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={sizeStock.costPrice}
+                                onChange={(e) => updateSizeStock(index, 'costPrice', Number(e.target.value))}
+                                className="block w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Selling Price
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={sizeStock.sellingPrice}
+                                onChange={(e) => updateSizeStock(index, 'sellingPrice', Number(e.target.value))}
+                                className="block w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Cost Price *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={formData.costPrice}
-                    onChange={(e) => setFormData({...formData, costPrice: Number(e.target.value)})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
+              {/* Regular Stock Fields (only show if not using size-wise stock) */}
+              {sizeWiseStock.length === 0 && (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Current Stock *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={formData.currentStock}
+                      onChange={(e) => setFormData({...formData, currentStock: Number(e.target.value)})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Selling Price *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={formData.sellingPrice}
-                    onChange={(e) => setFormData({...formData, sellingPrice: Number(e.target.value)})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Available Stock *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={formData.availableStock}
+                      onChange={(e) => setFormData({...formData, availableStock: Number(e.target.value)})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Pricing Fields (only show if not using size-wise stock) */}
+              {sizeWiseStock.length === 0 && (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Cost Price *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="0.01"
+                      value={formData.costPrice}
+                      onChange={(e) => setFormData({...formData, costPrice: Number(e.target.value)})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Selling Price *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="0.01"
+                      value={formData.sellingPrice}
+                      onChange={(e) => setFormData({...formData, sellingPrice: Number(e.target.value)})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
