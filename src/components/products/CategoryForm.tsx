@@ -277,7 +277,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             </button>
           </div>
         </form>
-      </div>
     </div>
   );
 };
