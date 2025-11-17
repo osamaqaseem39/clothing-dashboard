@@ -77,10 +77,10 @@ const ProductFormPageWrapper: React.FC = () => {
           if (productData.availableSizes && productData.availableSizes.length > 0) {
             try {
               const inventoryResponse = await inventoryService.getInventoryByProduct(id);
-              if (inventoryResponse.success && inventoryResponse.data) {
+              if (inventoryResponse.success && inventoryResponse.data && Array.isArray(inventoryResponse.data)) {
                 // Add size inventory data to product
                 const sizeInventory = productData.availableSizes.map((size: string) => {
-                  const invItem = inventoryResponse.data.find((inv: any) => inv.size === size);
+                  const invItem = inventoryResponse.data!.find((inv: any) => inv.size === size);
                   return {
                     size,
                     quantity: invItem?.currentStock || 0,
