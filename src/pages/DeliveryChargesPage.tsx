@@ -155,6 +155,69 @@ const DeliveryChargesPage: React.FC = () => {
     }
   };
 
+  const handleQuickSetup = async () => {
+    if (!window.confirm('This will create 3 delivery charges:\n1. Lahore: 150 PKR\n2. Punjab (other cities): 250 PKR\n3. Outside Punjab: 350 PKR\n\nExisting charges will not be deleted. Continue?')) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const charges = [
+        {
+          locationName: 'Lahore',
+          locationType: 'city' as const,
+          country: 'PK',
+          state: 'Punjab',
+          city: 'Lahore',
+          baseCharge: 150,
+          enabled: true,
+          priority: 100, // Highest priority for city-specific charge
+          estimatedDeliveryDays: 2,
+        },
+        {
+          locationName: 'Punjab (Other Cities)',
+          locationType: 'state' as const,
+          country: 'PK',
+          state: 'Punjab',
+          baseCharge: 250,
+          enabled: true,
+          priority: 50, // Medium priority for state-level charge
+          estimatedDeliveryDays: 3,
+        },
+        {
+          locationName: 'Outside Punjab',
+          locationType: 'country' as const,
+          country: 'PK',
+          baseCharge: 350,
+          enabled: true,
+          priority: 0, // Lowest priority for country-level charge
+          estimatedDeliveryDays: 5,
+        },
+      ];
+
+      // Create all charges
+      for (const charge of charges) {
+        try {
+          await deliveryChargeService.create(charge);
+        } catch (err: any) {
+          // If charge already exists, skip it
+          if (err.response?.status !== 409) {
+            console.error('Error creating charge:', charge.locationName, err);
+          }
+        }
+      }
+
+      await loadDeliveryCharges();
+      alert('Quick setup completed! Three delivery charges have been created.');
+    } catch (err: any) {
+      console.error('Error in quick setup:', err);
+      setError(err.response?.data?.message || 'Failed to complete quick setup');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       locationName: '',
@@ -208,17 +271,27 @@ const DeliveryChargesPage: React.FC = () => {
           <div className="h-6 w-px bg-gray-300" />
           <h1 className="text-2xl font-bold text-gray-900">Delivery Charges</h1>
         </div>
-        <button
-          onClick={() => {
-            setEditingCharge(null);
-            resetForm();
-            setShowForm(true);
-          }}
-          className="btn btn-primary"
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Add Delivery Charge
-        </button>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={handleQuickSetup}
+            disabled={isLoading}
+            className="btn btn-secondary"
+            title="Quick Setup: Creates Lahore (150), Punjab (250), Outside Punjab (350)"
+          >
+            Quick Setup
+          </button>
+          <button
+            onClick={() => {
+              setEditingCharge(null);
+              resetForm();
+              setShowForm(true);
+            }}
+            className="btn btn-primary"
+          >
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Add Delivery Charge
+          </button>
+        </div>
       </div>
 
       {error && (

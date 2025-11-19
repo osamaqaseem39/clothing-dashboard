@@ -19,6 +19,7 @@ const Categories: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [deleteConfirm, setDeleteConfirm] = useState<Category | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'tree'>('table');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -32,7 +33,7 @@ const Categories: React.FC = () => {
   useEffect(() => {
     filterCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categories, searchQuery]);
+  }, [categories, searchQuery, statusFilter]);
 
   const loadCategories = async () => {
     try {
@@ -49,16 +50,24 @@ const Categories: React.FC = () => {
   };
 
   const filterCategories = () => {
-    if (!searchQuery.trim()) {
-      setFilteredCategories(categories);
-      return;
+    let filtered = categories;
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(category => 
+        statusFilter === 'active' ? category.isActive === true : category.isActive === false
+      );
     }
 
-    const filtered = categories.filter(category =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (category.description && category.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(category =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (category.description && category.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+
     setFilteredCategories(filtered);
   };
 
@@ -236,6 +245,21 @@ const Categories: React.FC = () => {
                   placeholder="Search categories..."
                 />
               </div>
+              
+              {/* Status Filter */}
+              <div className="flex items-center space-x-2">
+                <label className="text-sm font-medium text-gray-700">Status:</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                  className="block rounded-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 sm:text-sm"
+                >
+                  <option value="all">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              
               <div className="text-sm text-gray-500">
                 {filteredCategories.length} of {categories.length} categories
               </div>
