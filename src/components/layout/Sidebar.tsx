@@ -14,6 +14,7 @@ import {
   PresentationChartLineIcon,
   WrenchScrewdriverIcon,
   BuildingOfficeIcon,
+  MapPinIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
@@ -41,6 +42,7 @@ const Sidebar: React.FC = () => {
     { name: 'Orders', href: '/dashboard/orders', icon: TruckIcon },
     { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
     { name: 'Brands', href: '/dashboard/brands', icon: BuildingOfficeIcon },
+    { name: 'Delivery Charges', href: '/dashboard/delivery-charges', icon: MapPinIcon },
     { name: 'Analytics', href: '/dashboard/analytics', icon: PresentationChartLineIcon },
     { name: 'Settings', href: '/dashboard/settings', icon: WrenchScrewdriverIcon },
   ];
