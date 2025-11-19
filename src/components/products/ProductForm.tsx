@@ -16,6 +16,8 @@ import {
   materialService,
   occasionService,
   seasonService,
+  sizeService,
+  Size,
 } from '../../services/masterDataService';
 
 interface ProductFormProps {
@@ -313,6 +315,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [patternOptions, setPatternOptions] = useState<string[]>([]);
   const [sleeveLengthOptions, setSleeveLengthOptions] = useState<string[]>([]);
   const [isOptionsLoading, setIsOptionsLoading] = useState<boolean>(false);
+  const [sizeNamesMap, setSizeNamesMap] = useState<Record<string, string>>({});
 
   // Load master data options
   useEffect(() => {
@@ -355,6 +358,33 @@ const ProductForm: React.FC<ProductFormProps> = ({
     loadOptions();
     return () => { isMounted = false; };
   }, []);
+
+  // Fetch size names when availableSizes change
+  useEffect(() => {
+    const fetchSizeNames = async () => {
+      if (!formData.availableSizes || formData.availableSizes.length === 0) {
+        setSizeNamesMap({});
+        return;
+      }
+
+      try {
+        const response = await sizeService.getAll();
+        if (response.success && response.data) {
+          const namesMap: Record<string, string> = {};
+          response.data.forEach((size: Size) => {
+            if (formData.availableSizes?.includes(size._id)) {
+              namesMap[size._id] = size.name;
+            }
+          });
+          setSizeNamesMap(namesMap);
+        }
+      } catch (error) {
+        console.error('Error fetching size names:', error);
+      }
+    };
+
+    fetchSizeNames();
+  }, [formData.availableSizes]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -1314,12 +1344,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                  {formData.availableSizes?.map((size, index) => (
+                  {formData.availableSizes?.map((sizeId, index) => (
                     <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                      key={sizeId || index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                     >
-                      {size}
+                      {sizeNamesMap[sizeId] || sizeId}
                     </span>
                   ))}
                   {(!formData.availableSizes || formData.availableSizes.length === 0) && (

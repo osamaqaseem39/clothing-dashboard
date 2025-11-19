@@ -1,10 +1,12 @@
-import React from 'react';
-import ArrayFieldModal from './ArrayFieldModal';
+import React, { useState, useEffect } from 'react';
+import { XMarkIcon, CheckIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { sizeService, Size } from '../../../services/masterDataService';
+import QuickAddMasterDataModal from '../../master-data/QuickAddMasterDataModal';
 
 interface SizesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  sizes: string[];
+  sizes: string[]; // Array of size IDs
   onSizesChange: (sizes: string[]) => void;
 }
 
@@ -14,17 +16,160 @@ const SizesModal: React.FC<SizesModalProps> = ({
   sizes,
   onSizesChange,
 }) => {
+  const [availableSizes, setAvailableSizes] = useState<Size[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSizes();
+    }
+  }, [isOpen]);
+
+  const fetchSizes = async () => {
+    try {
+      setIsLoading(true);
+      const response = await sizeService.getAll();
+      
+      if (response.success && response.data) {
+        setAvailableSizes(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching sizes:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleSize = (sizeId: string) => {
+    if (sizes.includes(sizeId)) {
+      onSizesChange(sizes.filter(id => id !== sizeId));
+    } else {
+      onSizesChange([...sizes, sizeId]);
+    }
+  };
+
+  const filteredSizes = availableSizes.filter(size =>
+    size.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (!isOpen) return null;
+
   return (
-    <ArrayFieldModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Available Sizes"
-      items={sizes}
-      onItemsChange={onSizesChange}
-      placeholder="Add size (e.g., S, M, L, XL, 6, 8, 10)"
-      description="Add all available sizes for this product."
-      color="yellow"
-    />
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">Select Available Sizes</h3>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsQuickAddOpen(true)}
+              className="text-sm px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-1"
+            >
+              <PlusIcon className="h-4 w-4" />
+              Add New Size
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-600 mb-4">
+          Select sizes from the database to avoid duplication. Sizes are stored in the database and can be reused across products.
+        </p>
+
+        {/* Search */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Search sizes..."
+          />
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Loading sizes...</p>
+          </div>
+        ) : (
+          <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-md p-4">
+            {filteredSizes.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">
+                {searchTerm ? 'No sizes found matching your search' : 'No sizes available'}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {filteredSizes.map((size) => {
+                  const isSelected = sizes.includes(size._id);
+                  return (
+                    <button
+                      key={size._id}
+                      type="button"
+                      onClick={() => toggleSize(size._id)}
+                      className={`w-full text-left px-4 py-3 rounded-md border-2 transition-colors ${
+                        isSelected
+                          ? 'border-yellow-500 bg-yellow-50'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-gray-900">{size.name}</span>
+                        {isSelected && (
+                          <CheckIcon className="h-5 w-5 text-yellow-600" />
+                        )}
+                      </div>
+                      {size.description && (
+                        <p className="text-sm text-gray-500 mt-1">{size.description}</p>
+                      )}
+                      {size.sizeType && (
+                        <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+                          {size.sizeType}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Selected Count */}
+        {sizes.length > 0 && (
+          <div className="mt-4 p-3 bg-yellow-50 rounded-md">
+            <p className="text-sm text-yellow-800">
+              <strong>{sizes.length}</strong> size{sizes.length !== 1 ? 's' : ''} selected
+            </p>
+          </div>
+        )}
+
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            onClick={onClose}
+            className="btn btn-secondary"
+          >
+            Done
+          </button>
+        </div>
+        <QuickAddMasterDataModal
+          isOpen={isQuickAddOpen}
+          onClose={() => setIsQuickAddOpen(false)}
+          title="Size"
+          service={sizeService as any}
+          onCreated={(created: Size) => {
+            setAvailableSizes(prev => [...prev, created]);
+            onSizesChange([...sizes, created._id]);
+          }}
+        />
+      </div>
+    </div>
   );
 };
 

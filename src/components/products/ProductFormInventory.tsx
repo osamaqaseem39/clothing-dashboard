@@ -10,6 +10,7 @@ import {
   MinusIcon
 } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
+import { sizeService, Size } from '../../services/masterDataService';
 
 interface ProductFormInventoryProps {
   formData: Partial<Product>;
@@ -33,6 +34,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
   
   // Initialize size-wise inventory state
   const [sizeInventory, setSizeInventory] = useState<SizeInventory[]>([]);
+  const [sizeNamesMap, setSizeNamesMap] = useState<Record<string, string>>({});
 
   // Initialize or update size inventory when availableSizes change
   useEffect(() => {
@@ -94,6 +96,33 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fetch size names when availableSizes change
+  useEffect(() => {
+    const fetchSizeNames = async () => {
+      if (!formData.availableSizes || formData.availableSizes.length === 0) {
+        setSizeNamesMap({});
+        return;
+      }
+
+      try {
+        const response = await sizeService.getAll();
+        if (response.success && response.data) {
+          const namesMap: Record<string, string> = {};
+          response.data.forEach((size: Size) => {
+            if (formData.availableSizes?.includes(size._id)) {
+              namesMap[size._id] = size.name;
+            }
+          });
+          setSizeNamesMap(namesMap);
+        }
+      } catch (error) {
+        console.error('Error fetching size names:', error);
+      }
+    };
+
+    fetchSizeNames();
+  }, [formData.availableSizes]);
+
   return (
     <div className="space-y-6">
       {/* Info Banner */}
@@ -107,7 +136,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               </p>
               <p className="mt-1 text-sm text-blue-700">
                 This product has {formData.availableSizes?.length} size(s) configured. 
-                Inventory will be managed separately for each size: {formData.availableSizes?.join(', ')}
+                Inventory will be managed separately for each size: {formData.availableSizes?.map(id => sizeNamesMap[id] || id).join(', ')}
               </p>
             </div>
           </div>
@@ -177,7 +206,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
                     <div key={size} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
                       <div className="w-20 flex-shrink-0">
                         <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200">
-                          {size}
+                          {sizeNamesMap[size] || size}
                         </span>
                       </div>
                       <div className="flex-1">

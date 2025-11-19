@@ -42,32 +42,167 @@ export interface CreateDeliveryChargeDto {
 
 export const deliveryChargeService = {
   async getAll(): Promise<ApiResponse<DeliveryCharge[]>> {
-    const response = await api.get<ApiResponse<DeliveryCharge[]>>('/shipping/delivery-charges');
-    return response.data;
+    try {
+      const response = await api.get('/shipping/delivery-charges');
+      const payload = response.data;
+
+      // Normalize response: backend may return array directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<DeliveryCharge[]>;
+      }
+
+      // Backend returned array directly, wrap it
+      return {
+        success: true,
+        data: (Array.isArray(payload) ? payload : []) as DeliveryCharge[],
+      };
+    } catch (error: any) {
+      console.error('Error loading delivery charges:', error);
+      return {
+        success: false,
+        data: [],
+        message: error.response?.data?.message || error.message || 'Failed to load delivery charges',
+      };
+    }
   },
 
   async getById(id: string): Promise<ApiResponse<DeliveryCharge>> {
-    const response = await api.get<ApiResponse<DeliveryCharge>>(`/shipping/delivery-charges/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/shipping/delivery-charges/${id}`);
+      const payload = response.data;
+
+      // Normalize response: backend may return object directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<DeliveryCharge>;
+      }
+
+      // Backend returned object directly, wrap it
+      return {
+        success: true,
+        data: payload as DeliveryCharge,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: {} as DeliveryCharge,
+        message: error.response?.data?.message || error.message || 'Failed to load delivery charge',
+      };
+    }
   },
 
   async create(data: CreateDeliveryChargeDto): Promise<ApiResponse<DeliveryCharge>> {
-    const response = await api.post<ApiResponse<DeliveryCharge>>('/shipping/delivery-charges', data);
-    return response.data;
+    try {
+      const response = await api.post('/shipping/delivery-charges', data);
+      const payload = response.data;
+
+      // Normalize response: backend may return object directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<DeliveryCharge>;
+      }
+
+      // Backend returned object directly, wrap it
+      return {
+        success: true,
+        data: payload as DeliveryCharge,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: {} as DeliveryCharge,
+        message: error.response?.data?.message || error.message || 'Failed to create delivery charge',
+      };
+    }
   },
 
   async update(id: string, data: Partial<CreateDeliveryChargeDto>): Promise<ApiResponse<DeliveryCharge>> {
-    const response = await api.patch<ApiResponse<DeliveryCharge>>(`/shipping/delivery-charges/${id}`, data);
-    return response.data;
+    try {
+      const response = await api.patch(`/shipping/delivery-charges/${id}`, data);
+      const payload = response.data;
+
+      // Normalize response: backend may return object directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<DeliveryCharge>;
+      }
+
+      // Backend returned object directly, wrap it
+      return {
+        success: true,
+        data: payload as DeliveryCharge,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: {} as DeliveryCharge,
+        message: error.response?.data?.message || error.message || 'Failed to update delivery charge',
+      };
+    }
   },
 
   async toggleStatus(id: string, enabled: boolean): Promise<ApiResponse<DeliveryCharge>> {
-    const response = await api.patch<ApiResponse<DeliveryCharge>>(`/shipping/delivery-charges/${id}/status`, { enabled });
-    return response.data;
+    try {
+      const response = await api.patch(`/shipping/delivery-charges/${id}/status`, { enabled });
+      const payload = response.data;
+
+      // Normalize response: backend may return object directly or wrapped in { success, data }
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        !Array.isArray(payload) &&
+        'success' in payload &&
+        'data' in payload &&
+        typeof (payload as any).success === 'boolean'
+      ) {
+        return payload as ApiResponse<DeliveryCharge>;
+      }
+
+      // Backend returned object directly, wrap it
+      return {
+        success: true,
+        data: payload as DeliveryCharge,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: {} as DeliveryCharge,
+        message: error.response?.data?.message || error.message || 'Failed to toggle delivery charge status',
+      };
+    }
   },
 
   async delete(id: string): Promise<void> {
-    await api.delete(`/shipping/delivery-charges/${id}`);
+    try {
+      await api.delete(`/shipping/delivery-charges/${id}`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || error.message || 'Failed to delete delivery charge');
+    }
   },
 };
 
