@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Product, Attribute, Color } from '../../types';
 import FeaturesModal from './modals/FeaturesModal';
 import ColorsModal from './modals/ColorsModal';
 import AttributesModal from './modals/AttributesModal';
 import SizesModal from './modals/SizesModal';
-import { attributeService, colorService } from '../../services/masterDataService';
+import { attributeService, colorService, sizeService, Size } from '../../services/masterDataService';
 
 interface ProductFormAttributesProps {
   formData: Partial<Product>;
@@ -24,6 +24,7 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
   const [isSizesModalOpen, setIsSizesModalOpen] = useState(false);
   const [attributeMap, setAttributeMap] = useState<Record<string, Attribute>>({});
   const [colorMap, setColorMap] = useState<Record<string, Color>>({});
+  const [sizeMap, setSizeMap] = useState<Record<string, Size>>({});
 
   // Load attribute and color data for display
   useEffect(() => {
@@ -54,6 +55,20 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
         }
       } catch (error) {
         console.error('Error loading colors:', error);
+      }
+
+      // Load sizes
+      try {
+        const sizeResponse = await sizeService.getAll();
+        if (sizeResponse.success && sizeResponse.data) {
+          const map: Record<string, Size> = {};
+          sizeResponse.data.forEach((size: Size) => {
+            map[size._id] = size;
+          });
+          setSizeMap(map);
+        }
+      } catch (error) {
+        console.error('Error loading sizes:', error);
       }
     };
 
@@ -157,14 +172,33 @@ const ProductFormAttributes: React.FC<ProductFormAttributesProps> = ({
           </div>
           <div className="flex flex-wrap gap-2 min-h-[2rem] p-3 border border-gray-200 rounded-md bg-gradient-to-br from-amber-50/50 to-orange-50/50">
             {formData.availableSizes && formData.availableSizes.length > 0 ? (
-              formData.availableSizes.map((size, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm"
-                >
-                  {size}
-                </span>
-              ))
+              formData.availableSizes.map((sizeId, index) => {
+                const size = sizeMap[sizeId];
+                return (
+                  <span
+                    key={index}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200 shadow-sm"
+                  >
+                    <span>
+                      {size?.name || sizeId}
+                      {size?.unit && size.unit !== 'none' && (
+                        <span className="text-xs text-amber-600 ml-1">({size.unit})</span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updatedSizes = (formData.availableSizes || []).filter(id => id !== sizeId);
+                        onFieldChange('availableSizes', updatedSizes);
+                      }}
+                      className="ml-1 text-amber-600 hover:text-amber-800 transition-colors"
+                      title="Remove size"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  </span>
+                );
+              })
             ) : (
               <span className="text-gray-500 text-sm">No sizes added</span>
             )}

@@ -18,6 +18,7 @@ export interface Color extends MasterDataItem {
 
 export interface Size extends MasterDataItem {
   sizeType?: 'numeric' | 'alphabetic' | 'custom';
+  unit?: 'cm' | 'inch' | 'US' | 'UK' | 'EU' | 'none';
 }
 
 export interface ApiResponse<T> {
