@@ -247,15 +247,22 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           </div>
 
           {/* Status */}
-          <div>
-            <label className="flex items-center">
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.isActive}
                 onChange={(e) => handleChange('isActive', e.target.checked)}
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
-              <span className="ml-2 text-sm text-gray-700">Active</span>
+              <div className="ml-3">
+                <span className="text-sm font-medium text-gray-700">Active Status</span>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.isActive 
+                    ? 'This category will be visible to customers' 
+                    : 'This category will be hidden from customers'}
+                </p>
+              </div>
             </label>
           </div>
 

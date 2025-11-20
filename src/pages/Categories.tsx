@@ -137,7 +137,7 @@ const Categories: React.FC = () => {
     },
     {
       key: 'status',
-      header: 'Status',
+      header: 'Active Status',
       render: (category: Category) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
           category.isActive 
@@ -339,7 +339,7 @@ const Categories: React.FC = () => {
                     </div>
                   )}
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Status</label>
+                    <label className="text-sm font-medium text-gray-500">Active Status</label>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       selectedCategory.isActive 
                         ? 'bg-green-100 text-green-800' 
