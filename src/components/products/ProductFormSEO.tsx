@@ -5,7 +5,7 @@ import ImageUpload from '../common/ImageUpload';
 import KeywordsModal from './modals/KeywordsModal';
 
 interface ProductFormSEOProps {
-  formData: Partial<Product>;
+  formData: Partial<Product> | any; // Allow flexible form data type
   errors: Record<string, string>;
   onFieldChange: (field: string, value: any) => void;
   onNestedFieldChange: (parentField: string, field: string, value: any) => void;
