@@ -274,8 +274,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
           slug: product.seo?.slug || product.slug || prev.seo.slug,
           canonicalUrl: product.seo?.canonicalUrl || prev.seo.canonicalUrl,
           ogImage: product.seo?.ogImage || prev.seo.ogImage,
-          noIndex: product.seo?.noIndex ?? prev.seo.noIndex,
-          noFollow: product.seo?.noFollow ?? prev.seo.noFollow,
+          noIndex: product.seo?.noIndex ?? prev.seo.noIndex ?? false,
+          noFollow: product.seo?.noFollow ?? prev.seo.noFollow ?? false,
         },
         variants: product.variants && product.variants.length > 0
           ? product.variants.map((variant: any) => {
@@ -462,6 +462,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
         title: formData.seo.title || formData.name,
         // Auto-populate SEO description from shortDescription if empty
         description: formData.seo.description || formData.shortDescription || formData.description.substring(0, 160),
+        // Ensure noIndex and noFollow have default values
+        noIndex: formData.seo.noIndex ?? false,
+        noFollow: formData.seo.noFollow ?? false,
       },
       variants: formData.variants.map(variant => {
         // Clean dimensions to remove _id if present

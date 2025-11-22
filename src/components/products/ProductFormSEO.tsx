@@ -151,7 +151,7 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
             </button>
           </div>
           <div className="flex flex-wrap gap-2 min-h-[2rem] p-3 border border-gray-200 rounded-md">
-            {formData.seo?.keywords?.map((keyword, index) => (
+            {formData.seo?.keywords?.map((keyword: string, index: number) => (
               <span
                 key={index}
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
