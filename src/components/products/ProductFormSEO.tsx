@@ -29,16 +29,31 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             SEO Title
           </label>
-          <input
-            type="text"
-            value={formData.seo?.title || ''}
-            onChange={(e) => onNestedFieldChange('seo', 'title', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="SEO optimized title"
-            maxLength={60}
-          />
-          <p className="mt-1 text-sm text-gray-500">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={formData.seo?.title || ''}
+              onChange={(e) => onNestedFieldChange('seo', 'title', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="SEO optimized title (defaults to product name)"
+              maxLength={60}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (formData.name) {
+                  onNestedFieldChange('seo', 'title', formData.name);
+                }
+              }}
+              className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50 whitespace-nowrap"
+              disabled={!formData.name}
+            >
+              Use Name
+            </button>
+          </div>
+          <p className={`mt-1 text-sm ${(formData.seo?.title?.length || 0) > 60 ? 'text-red-500' : 'text-gray-500'}`}>
             {formData.seo?.title?.length || 0}/60 characters
+            {(formData.seo?.title?.length || 0) > 60 && ' (too long)'}
           </p>
         </div>
 
@@ -47,15 +62,41 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             SEO Slug
           </label>
-          <input
-            type="text"
-            value={formData.seo?.slug || ''}
-            onChange={(e) => onNestedFieldChange('seo', 'slug', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="seo-friendly-url"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={formData.seo?.slug || ''}
+              onChange={(e) => {
+                const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+                onNestedFieldChange('seo', 'slug', slug);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="seo-friendly-url"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (formData.name) {
+                  const generatedSlug = formData.name
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/[\s_-]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                  onNestedFieldChange('seo', 'slug', generatedSlug);
+                }
+              }}
+              className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50 whitespace-nowrap"
+              disabled={!formData.name}
+            >
+              Generate
+            </button>
+          </div>
           <p className="mt-1 text-sm text-gray-500">
             URL: /products/{formData.seo?.slug || 'your-slug'}
+          </p>
+          <p className="mt-1 text-xs text-gray-400">
+            Leave empty to use the main product slug
           </p>
         </div>
 
@@ -64,16 +105,33 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Meta Description
           </label>
-          <textarea
-            value={formData.seo?.description || ''}
-            onChange={(e) => onNestedFieldChange('seo', 'description', e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Meta description for search engines"
-            maxLength={160}
-          />
-          <p className="mt-1 text-sm text-gray-500">
+          <div className="flex gap-2">
+            <textarea
+              value={formData.seo?.description || ''}
+              onChange={(e) => onNestedFieldChange('seo', 'description', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Meta description for search engines (defaults to short description)"
+              maxLength={160}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if ((formData as any).shortDescription) {
+                  onNestedFieldChange('seo', 'description', (formData as any).shortDescription.substring(0, 160));
+                } else if (formData.description) {
+                  onNestedFieldChange('seo', 'description', formData.description.substring(0, 160));
+                }
+              }}
+              className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50 whitespace-nowrap self-start"
+              disabled={!(formData as any).shortDescription && !formData.description}
+            >
+              Use Short Desc
+            </button>
+          </div>
+          <p className={`mt-1 text-sm ${(formData.seo?.description?.length || 0) > 160 ? 'text-red-500' : 'text-gray-500'}`}>
             {formData.seo?.description?.length || 0}/160 characters
+            {(formData.seo?.description?.length || 0) > 160 && ' (too long)'}
           </p>
         </div>
 
@@ -181,7 +239,7 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
             {formData.seo?.title || formData.name || 'Product Title'}
           </div>
           <div className="text-green-600 text-sm mt-1">
-            https://yoursite.com/products/{formData.seo?.slug || 'product-slug'}
+            https://yoursite.com/products/{formData.seo?.slug || (formData as any).slug || 'product-slug'}
           </div>
           <div className="text-gray-600 text-sm mt-2">
             {formData.seo?.description || formData.description || 'Product description will appear here...'}

@@ -9,6 +9,7 @@ import ColorsModal from './modals/ColorsModal';
 import AttributesModal from './modals/AttributesModal';
 import ImageUpload from '../common/ImageUpload';
 import QuickAddMasterDataModal from '../master-data/QuickAddMasterDataModal';
+import ProductFormSEO from './ProductFormSEO';
 import { 
   colorFamilyService,
   patternService,
@@ -31,7 +32,9 @@ interface ProductFormProps {
 
 interface ProductFormData {
   name: string;
+  slug: string;
   description: string;
+  shortDescription: string;
   type: string;
   categoryId: string;
   brandId: string;
@@ -98,7 +101,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || '',
+    slug: product?.slug || '',
     description: product?.description || '',
+    shortDescription: product?.shortDescription || '',
     type: product?.type || 'simple',
     categoryId: product?.categoryId
       ? (typeof product.categoryId === 'object' && '_id' in product.categoryId
@@ -125,12 +130,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
     tags: product?.tags || [],
     isActive: product?.isActive ?? true,
     status: product?.status || 'draft',
-    // SEO
+    // SEO - auto-populate from product data if not set
     seo: {
-      title: product?.seo?.title || '',
-      description: product?.seo?.description || '',
+      title: product?.seo?.title || product?.name || '',
+      description: product?.seo?.description || product?.shortDescription || '',
       keywords: product?.seo?.keywords || [],
-      slug: product?.seo?.slug || '',
+      slug: product?.seo?.slug || product?.slug || '',
       canonicalUrl: product?.seo?.canonicalUrl || '',
       ogImage: product?.seo?.ogImage || '',
       noIndex: product?.seo?.noIndex ?? false,
@@ -253,7 +258,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setFormData(prev => ({
         ...prev,
         name: product.name || prev.name,
+        slug: product.slug || prev.slug,
         description: product.description || prev.description,
+        shortDescription: product.shortDescription || prev.shortDescription,
         type: product.type || prev.type,
         categoryId: categoryId || prev.categoryId,
         brandId: brandId || prev.brandId,
@@ -261,10 +268,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
         isActive: product.isActive ?? prev.isActive,
         status: product.status || prev.status,
         seo: {
-          title: product.seo?.title || prev.seo.title,
-          description: product.seo?.description || prev.seo.description,
+          title: product.seo?.title || product.name || prev.seo.title,
+          description: product.seo?.description || product.shortDescription || prev.seo.description,
           keywords: product.seo?.keywords || prev.seo.keywords,
-          slug: product.seo?.slug || prev.seo.slug,
+          slug: product.seo?.slug || product.slug || prev.seo.slug,
           canonicalUrl: product.seo?.canonicalUrl || prev.seo.canonicalUrl,
           ogImage: product.seo?.ogImage || prev.seo.ogImage,
           noIndex: product.seo?.noIndex ?? prev.seo.noIndex,
@@ -440,12 +447,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
     // Note: We cast images as any[] to satisfy the union type
     const productData: Partial<Product> = {
       name: formData.name,
+      slug: formData.slug || formData.seo.slug || generateSlug(formData.name), // Use SEO slug or generate from name
       description: formData.description,
+      shortDescription: formData.shortDescription || formData.description.substring(0, 200),
       type: formData.type as any,
       tags: formData.tags,
       isActive: formData.isActive,
       status: formData.status as any,
-      seo: formData.seo,
+      seo: {
+        ...formData.seo,
+        // Ensure SEO slug matches main slug if not explicitly set
+        slug: formData.seo.slug || formData.slug || generateSlug(formData.name),
+        // Auto-populate SEO title from name if empty
+        title: formData.seo.title || formData.name,
+        // Auto-populate SEO description from shortDescription if empty
+        description: formData.seo.description || formData.shortDescription || formData.description.substring(0, 160),
+      },
       variants: formData.variants.map(variant => {
         // Clean dimensions to remove _id if present
         const dimensions = variant.dimensions || { length: 0, width: 0, height: 0 };
@@ -510,11 +527,66 @@ const ProductForm: React.FC<ProductFormProps> = ({
     await onSubmit(productData);
   };
 
+  // Helper function to generate slug from text
+  const generateSlug = (text: string): string => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+  };
+
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [field]: value,
+      };
+      
+      // Auto-sync SEO fields when name or slug changes
+      if (field === 'name' && value) {
+        // Auto-generate slug from name if slug is empty
+        if (!prev.slug) {
+          updated.slug = generateSlug(value);
+        }
+        // Auto-generate SEO slug from name if SEO slug is empty
+        if (!prev.seo.slug) {
+          updated.seo = {
+            ...prev.seo,
+            slug: generateSlug(value),
+          };
+        }
+        // Auto-generate SEO title from name if SEO title is empty
+        if (!prev.seo.title) {
+          updated.seo = {
+            ...updated.seo,
+            title: value,
+          };
+        }
+      }
+      
+      // Auto-sync main slug with SEO slug if main slug is empty
+      if (field === 'slug' && value && !prev.slug) {
+        // Main slug is being set, ensure SEO slug matches if empty
+        if (!prev.seo.slug) {
+          updated.seo = {
+            ...prev.seo,
+            slug: value,
+          };
+        }
+      }
+      
+      // Auto-sync shortDescription to SEO description if SEO description is empty
+      if (field === 'shortDescription' && value && !prev.seo.description) {
+        updated.seo = {
+          ...prev.seo,
+          description: value.substring(0, 160), // Limit to 160 chars
+        };
+      }
+      
+      return updated;
+    });
     
     // Clear field-specific error
     if (errors[field]) {
@@ -686,6 +758,55 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Slug *
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => {
+                    handleChange('slug', e.target.value);
+                    // Sync SEO slug with main slug
+                    setFormData(prev => ({
+                      ...prev,
+                      seo: {
+                        ...prev.seo,
+                        slug: e.target.value,
+                      },
+                    }));
+                  }}
+                  className={`input-field flex-1 ${errors.slug ? 'border-red-300' : ''}`}
+                  placeholder="product-slug"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const generatedSlug = generateSlug(formData.name);
+                    handleChange('slug', generatedSlug);
+                    setFormData(prev => ({
+                      ...prev,
+                      seo: {
+                        ...prev.seo,
+                        slug: generatedSlug,
+                      },
+                    }));
+                  }}
+                  className="btn btn-secondary whitespace-nowrap"
+                  disabled={!formData.name}
+                >
+                  Generate
+                </button>
+              </div>
+              <p className="mt-1 text-sm text-gray-500">
+                URL: /products/{formData.slug || 'product-slug'}
+              </p>
+              {errors.slug && (
+                <p className="mt-1 text-sm text-red-600">{errors.slug}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Product Type *
               </label>
               <select
@@ -771,6 +892,35 @@ const ProductForm: React.FC<ProductFormProps> = ({
               {errors.description && (
                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
               )}
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Short Description
+              </label>
+              <textarea
+                value={formData.shortDescription}
+                onChange={(e) => {
+                  handleChange('shortDescription', e.target.value);
+                  // Auto-sync to SEO description if empty
+                  if (!formData.seo.description) {
+                    setFormData(prev => ({
+                      ...prev,
+                      seo: {
+                        ...prev.seo,
+                        description: e.target.value.substring(0, 160),
+                      },
+                    }));
+                  }
+                }}
+                className="input-field"
+                rows={2}
+                placeholder="Brief product description (used for meta description and product cards)"
+                maxLength={200}
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                {formData.shortDescription?.length || 0}/200 characters
+              </p>
             </div>
           </div>
 
@@ -1024,100 +1174,29 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
           {/* SEO Tab */}
           {activeTab === 'seo' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    SEO Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.seo.title}
-                    onChange={(e) => handleChange('seo', { ...formData.seo, title: e.target.value })}
-                    className="input-field"
-                    placeholder="SEO title"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    SEO Slug
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.seo.slug}
-                    onChange={(e) => handleChange('seo', { ...formData.seo, slug: e.target.value })}
-                    className="input-field"
-                    placeholder="seo-friendly-url"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Meta Description
-                  </label>
-                  <textarea
-                    value={formData.seo.description}
-                    onChange={(e) => handleChange('seo', { ...formData.seo, description: e.target.value })}
-                    rows={3}
-                    className="input-field"
-                    placeholder="Meta description for search engines"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Keywords
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setIsKeywordsModalOpen(true)}
-                      className="btn btn-secondary text-sm"
-                    >
-                      <PlusIcon className="h-4 w-4 mr-1" />
-                      Manage Keywords
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2 min-h-[2rem]">
-                    {formData.seo.keywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                    {formData.seo.keywords.length === 0 && (
-                      <span className="text-gray-500 text-sm">No keywords added</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <div className="flex gap-6">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.seo.noIndex}
-                        onChange={(e) => handleChange('seo', { ...formData.seo, noIndex: e.target.checked })}
-                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">No Index</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.seo.noFollow}
-                        onChange={(e) => handleChange('seo', { ...formData.seo, noFollow: e.target.checked })}
-                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">No Follow</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ProductFormSEO
+              formData={formData}
+              errors={errors}
+              onFieldChange={handleChange}
+              onNestedFieldChange={(parentField, field, value) => {
+                if (parentField === 'seo') {
+                  setFormData(prev => ({
+                    ...prev,
+                    seo: {
+                      ...prev.seo,
+                      [field]: value,
+                    },
+                  }));
+                  // Auto-sync main slug with SEO slug when SEO slug changes
+                  if (field === 'slug' && value) {
+                    setFormData(prev => ({
+                      ...prev,
+                      slug: value, // Sync main slug with SEO slug
+                    }));
+                  }
+                }
+              }}
+            />
           )}
 
           {/* Clothing Properties Tab */}
