@@ -32,7 +32,7 @@ export const productService = {
 
     // Strip fields rejected by backend
     const {
-      seo, // nested SEO object not supported by backend
+      seo, // Extract SEO to handle separately
       isActive,
       features,
       colors,
@@ -272,6 +272,37 @@ export const productService = {
     copyIfDefined('customDeliveryDays');
     copyIfDefined('sizeChart');
     copyIfDefined('availableSizes');
+
+    // SEO - include if provided, ensure required fields have defaults
+    if (seo && typeof seo === 'object') {
+      const seoData: any = {};
+      if (seo.title !== undefined && seo.title !== null && seo.title !== '') {
+        seoData.title = String(seo.title).trim();
+      }
+      if (seo.description !== undefined && seo.description !== null && seo.description !== '') {
+        seoData.description = String(seo.description).trim();
+      }
+      if (seo.keywords && Array.isArray(seo.keywords) && seo.keywords.length > 0) {
+        seoData.keywords = seo.keywords.filter((k: any) => k && String(k).trim() !== '').map((k: any) => String(k).trim());
+      }
+      if (seo.slug !== undefined && seo.slug !== null && seo.slug !== '') {
+        seoData.slug = String(seo.slug).trim();
+      }
+      if (seo.canonicalUrl !== undefined && seo.canonicalUrl !== null && seo.canonicalUrl !== '') {
+        seoData.canonicalUrl = String(seo.canonicalUrl).trim();
+      }
+      if (seo.ogImage !== undefined && seo.ogImage !== null && seo.ogImage !== '') {
+        seoData.ogImage = String(seo.ogImage).trim();
+      }
+      // Ensure noIndex and noFollow are boolean with defaults
+      seoData.noIndex = seo.noIndex ?? false;
+      seoData.noFollow = seo.noFollow ?? false;
+      
+      // Only include SEO if it has at least one field
+      if (Object.keys(seoData).length > 0) {
+        whitelisted.seo = seoData;
+      }
+    }
 
     return whitelisted;
   },
