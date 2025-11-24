@@ -55,7 +55,7 @@ const Orders: React.FC = () => {
       } else if (response.data && Array.isArray(response.data)) {
         // Handle case where response.data is directly the array
         setOrders(response.data);
-        setTotalPages(response.totalPages || 1);
+        setTotalPages(response.pagination?.totalPages || 1);
       }
     } catch (err: any) {
       console.error('Error fetching orders:', err);

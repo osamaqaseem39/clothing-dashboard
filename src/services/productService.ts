@@ -289,10 +289,24 @@ export const productService = {
         seoData.slug = String(seo.slug).trim();
       }
       if (seo.canonicalUrl !== undefined && seo.canonicalUrl !== null && seo.canonicalUrl !== '') {
-        seoData.canonicalUrl = String(seo.canonicalUrl).trim();
+        const trimmedUrl = String(seo.canonicalUrl).trim();
+        // Only include if it's a valid URL (backend requires @IsUrl() validation)
+        try {
+          new URL(trimmedUrl);
+          seoData.canonicalUrl = trimmedUrl;
+        } catch {
+          // Invalid URL, skip it (field is optional)
+        }
       }
       if (seo.ogImage !== undefined && seo.ogImage !== null && seo.ogImage !== '') {
-        seoData.ogImage = String(seo.ogImage).trim();
+        const trimmedImage = String(seo.ogImage).trim();
+        // Only include if it's a valid URL (backend requires @IsUrl() validation)
+        try {
+          new URL(trimmedImage);
+          seoData.ogImage = trimmedImage;
+        } catch {
+          // Invalid URL, skip it (field is optional)
+        }
       }
       // Ensure noIndex and noFollow are boolean with defaults
       seoData.noIndex = seo.noIndex ?? false;
