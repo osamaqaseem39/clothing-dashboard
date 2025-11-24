@@ -42,8 +42,20 @@ const Orders: React.FC = () => {
       );
 
       if (response.success && response.data) {
-        setOrders(response.data.orders || []);
-        setTotalPages(response.data.totalPages || 1);
+        // Backend returns PaginatedResult: { data: Order[], total, page, limit, totalPages }
+        // ApiResponse wraps it: { success: true, data: PaginatedResult }
+        const paginatedData = response.data;
+        const ordersData = Array.isArray(paginatedData) 
+          ? paginatedData 
+          : (paginatedData.orders || paginatedData.data || []);
+        const totalPages = paginatedData.totalPages || 1;
+        
+        setOrders(ordersData);
+        setTotalPages(totalPages);
+      } else if (response.data && Array.isArray(response.data)) {
+        // Handle case where response.data is directly the array
+        setOrders(response.data);
+        setTotalPages(response.totalPages || 1);
       }
     } catch (err: any) {
       console.error('Error fetching orders:', err);
