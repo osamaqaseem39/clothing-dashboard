@@ -50,11 +50,14 @@ const Orders: React.FC = () => {
           : (paginatedData.orders || paginatedData.data || []);
         const totalPages = paginatedData.totalPages || 1;
         
-        setOrders(ordersData);
+        // Normalize orders to match frontend format
+        const normalizedOrders = ordersData.map(normalizeOrder);
+        setOrders(normalizedOrders);
         setTotalPages(totalPages);
       } else if (response.data && Array.isArray(response.data)) {
         // Handle case where response.data is directly the array
-        setOrders(response.data);
+        const normalizedOrders = response.data.map(normalizeOrder);
+        setOrders(normalizedOrders);
         setTotalPages(response.pagination?.totalPages || 1);
       }
     } catch (err: any) {
@@ -102,7 +105,8 @@ const Orders: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | undefined) => {
+    if (!status) return 'bg-gray-100 text-gray-800';
     switch (status.toLowerCase()) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
@@ -111,6 +115,7 @@ const Orders: React.FC = () => {
       case 'shipped':
         return 'bg-purple-100 text-purple-800';
       case 'delivered':
+      case 'completed':
         return 'bg-green-100 text-green-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
@@ -119,17 +124,105 @@ const Orders: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string | undefined) => {
+    if (!status) return null;
     switch (status.toLowerCase()) {
       case 'shipped':
         return <TruckIcon className="h-4 w-4" />;
       case 'delivered':
+      case 'completed':
         return <CheckCircleIcon className="h-4 w-4" />;
       case 'cancelled':
         return <XCircleIcon className="h-4 w-4" />;
       default:
         return null;
     }
+  };
+
+  // Normalize order data from backend to frontend format
+  const normalizeOrder = (order: any): Order => {
+    // Handle customerId - it can be an object (populated) or string (ID)
+    const customer = typeof order.customerId === 'object' && order.customerId 
+      ? order.customerId 
+      : null;
+    
+    // Normalize shipping address
+    const shippingAddr = order.shippingAddress ? {
+      _id: order._id + '_shipping',
+      type: 'shipping' as const,
+      firstName: order.shippingAddress.firstName || '',
+      lastName: order.shippingAddress.lastName || '',
+      company: order.shippingAddress.company,
+      addressLine1: order.shippingAddress.addressLine1 || '',
+      addressLine2: order.shippingAddress.addressLine2,
+      street: order.shippingAddress.addressLine1 || '',
+      city: order.shippingAddress.city || '',
+      state: order.shippingAddress.state || '',
+      postalCode: order.shippingAddress.postalCode || '',
+      zipCode: order.shippingAddress.postalCode || '',
+      country: order.shippingAddress.country || '',
+      phone: order.shippingAddress.phone || '',
+      isDefault: false,
+    } : {
+      _id: order._id + '_shipping',
+      type: 'shipping' as const,
+      firstName: '',
+      lastName: '',
+      addressLine1: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: '',
+      phone: '',
+      isDefault: false,
+    };
+
+    // Normalize billing address
+    const billingAddr = order.billingAddress ? {
+      _id: order._id + '_billing',
+      type: 'billing' as const,
+      firstName: order.billingAddress.firstName || '',
+      lastName: order.billingAddress.lastName || '',
+      company: order.billingAddress.company,
+      addressLine1: order.billingAddress.addressLine1 || '',
+      addressLine2: order.billingAddress.addressLine2,
+      street: order.billingAddress.addressLine1 || '',
+      city: order.billingAddress.city || '',
+      state: order.billingAddress.state || '',
+      postalCode: order.billingAddress.postalCode || '',
+      zipCode: order.billingAddress.postalCode || '',
+      country: order.billingAddress.country || '',
+      phone: order.billingAddress.phone || '',
+      isDefault: false,
+    } : shippingAddr;
+    
+    return {
+      _id: order._id,
+      userId: customer || {
+        _id: order.customerId || '',
+        firstName: shippingAddr.firstName || 'Guest',
+        lastName: shippingAddr.lastName || '',
+        email: order.shippingAddress?.email || order.billingAddress?.email || '',
+        phone: shippingAddr.phone || '',
+        role: 'user' as const,
+        isActive: true,
+        addresses: [],
+        createdAt: order.createdAt || new Date().toISOString(),
+      },
+      orderNumber: order._id.substring(0, 8).toUpperCase(),
+      items: order.items || [],
+      shippingAddress: shippingAddr,
+      billingAddress: billingAddr,
+      totalAmount: order.total || 0,
+      paymentStatus: order.paymentStatus || 'pending',
+      orderStatus: order.status || order.orderStatus || 'pending',
+      shippingMethod: order.shippingMethod || 'Standard',
+      paymentMethod: order.paymentMethod || 'N/A',
+      trackingNumber: order.trackingId || order.trackingNumber,
+      placedAt: order.createdAt || new Date().toISOString(),
+      createdAt: order.createdAt || new Date().toISOString(),
+      updatedAt: order.updatedAt || new Date().toISOString(),
+    };
   };
 
   if (isLoading && orders.length === 0) {
@@ -249,7 +342,7 @@ const Orders: React.FC = () => {
                     <div className="flex items-center">
                       <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.orderStatus)}`}>
                         {getStatusIcon(order.orderStatus)}
-                        <span className="ml-1">{order.orderStatus}</span>
+                        <span className="ml-1">{order.orderStatus || 'Pending'}</span>
                       </span>
                     </div>
                   </td>
@@ -262,14 +355,13 @@ const Orders: React.FC = () => {
                         <EyeIcon className="h-4 w-4" />
                       </button>
                       <select
-                        value={order.orderStatus}
+                        value={order.orderStatus || 'pending'}
                         onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                         className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-primary-500"
                       >
                         <option value="pending">Pending</option>
                         <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
+                        <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
                     </div>
@@ -372,7 +464,7 @@ const Orders: React.FC = () => {
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Status:</span> 
                     <span className={`ml-2 inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedOrder.orderStatus)}`}>
-                      {selectedOrder.orderStatus}
+                      {selectedOrder.orderStatus || 'Pending'}
                     </span>
                   </p>
                   <p className="text-sm text-gray-600">

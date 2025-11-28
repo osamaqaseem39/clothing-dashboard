@@ -31,8 +31,8 @@ const ShopPage: React.FC = () => {
     try {
       const response = await categoryService.getCategories();
       if (response.success && response.data) {
-        // Filter only active categories
-        setCategories(response.data.filter((cat: Category) => cat.isActive !== false));
+        // Fetch all categories
+        setCategories(response.data);
       }
     } catch (err) {
       console.error('Error fetching categories:', err);
