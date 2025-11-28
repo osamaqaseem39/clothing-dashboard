@@ -170,16 +170,57 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Canonical URL
           </label>
-          <input
-            type="url"
-            value={formData.seo?.canonicalUrl || ''}
-            onChange={(e) => onNestedFieldChange('seo', 'canonicalUrl', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="https://example.com/canonical-url"
-          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={formData.seo?.canonicalUrl || ''}
+              onChange={(e) => {
+                const url = e.target.value.trim();
+                onNestedFieldChange('seo', 'canonicalUrl', url);
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="https://yoursite.com/products/product-slug"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                // Auto-generate canonical URL from product slug
+                const baseUrl = window.location.origin || 'https://yoursite.com';
+                const productSlug = formData.seo?.slug || (formData as any).slug || '';
+                if (productSlug) {
+                  const canonicalUrl = `${baseUrl}/products/${productSlug}`;
+                  onNestedFieldChange('seo', 'canonicalUrl', canonicalUrl);
+                } else {
+                  // If no slug, use product ID
+                  const productId = (formData as any)._id || '';
+                  if (productId) {
+                    const canonicalUrl = `${baseUrl}/products/${productId}`;
+                    onNestedFieldChange('seo', 'canonicalUrl', canonicalUrl);
+                  }
+                }
+              }}
+              className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-md hover:bg-blue-50 whitespace-nowrap"
+              disabled={!formData.seo?.slug && !(formData as any).slug && !(formData as any)._id}
+            >
+              Auto Generate
+            </button>
+          </div>
           <p className="mt-1 text-sm text-gray-500">
-            Leave empty to use the default product URL
+            {formData.seo?.canonicalUrl ? (
+              <>
+                Canonical URL: <span className="font-mono text-xs">{formData.seo.canonicalUrl}</span>
+              </>
+            ) : (
+              <>
+                Leave empty to use the default product URL: <span className="font-mono text-xs">/products/{formData.seo?.slug || (formData as any).slug || 'product-slug'}</span>
+              </>
+            )}
           </p>
+          {formData.seo?.canonicalUrl && !formData.seo.canonicalUrl.match(/^https?:\/\//) && (
+            <p className="mt-1 text-sm text-red-500">
+              Canonical URL must start with http:// or https://
+            </p>
+          )}
         </div>
 
         {/* Open Graph Image */}
