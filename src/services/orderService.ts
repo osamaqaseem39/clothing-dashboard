@@ -97,7 +97,7 @@ export const orderService = {
 
   // Update order status
   async updateOrderStatus(id: string, status: string): Promise<ApiResponse<{ order: Order }>> {
-    const response = await api.put(`/orders/${id}/status`, { status });
+    const response = await api.patch(`/orders/${id}/status`, { status });
     return response.data;
   },
 

@@ -76,12 +76,18 @@ const Orders: React.FC = () => {
   const updateOrderStatus = async (orderId: string, status: string) => {
     try {
       const response = await orderService.updateOrderStatus(orderId, status);
-      if (response.success) {
+      // Backend returns OrderDocument directly or wrapped in ApiResponse
+      const updatedOrder = response.success ? (response.data?.order || response.data) : response;
+      
+      if (updatedOrder) {
+        // Normalize the updated order
+        const normalizedOrder = normalizeOrder(updatedOrder);
+        
         setOrders(orders.map(order => 
-          order._id === orderId ? { ...order, orderStatus: status as any } : order
+          order._id === orderId ? normalizedOrder : order
         ));
         if (selectedOrder?._id === orderId) {
-          setSelectedOrder({ ...selectedOrder, orderStatus: status as any });
+          setSelectedOrder(normalizedOrder);
         }
       }
     } catch (err: any) {
