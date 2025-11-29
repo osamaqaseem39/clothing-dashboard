@@ -288,24 +288,32 @@ export const productService = {
       if (seo.slug !== undefined && seo.slug !== null && seo.slug !== '') {
         seoData.slug = String(seo.slug).trim();
       }
+      // Canonical URL - only include if it's a valid, non-empty URL
       if (seo.canonicalUrl !== undefined && seo.canonicalUrl !== null && seo.canonicalUrl !== '') {
         const trimmedUrl = String(seo.canonicalUrl).trim();
         // Only include if it's a valid URL (backend requires @IsUrl() validation)
-        try {
-          new URL(trimmedUrl);
-          seoData.canonicalUrl = trimmedUrl;
-        } catch {
-          // Invalid URL, skip it (field is optional)
+        if (trimmedUrl) {
+          try {
+            new URL(trimmedUrl);
+            seoData.canonicalUrl = trimmedUrl;
+          } catch (error) {
+            // Invalid URL, skip it (field is optional)
+            console.warn('Invalid canonical URL format, skipping:', trimmedUrl);
+          }
         }
       }
+      // OG Image - only include if it's a valid, non-empty URL
       if (seo.ogImage !== undefined && seo.ogImage !== null && seo.ogImage !== '') {
         const trimmedImage = String(seo.ogImage).trim();
         // Only include if it's a valid URL (backend requires @IsUrl() validation)
-        try {
-          new URL(trimmedImage);
-          seoData.ogImage = trimmedImage;
-        } catch {
-          // Invalid URL, skip it (field is optional)
+        if (trimmedImage) {
+          try {
+            new URL(trimmedImage);
+            seoData.ogImage = trimmedImage;
+          } catch (error) {
+            // Invalid URL, skip it (field is optional)
+            console.warn('Invalid OG image URL format, skipping:', trimmedImage);
+          }
         }
       }
       // Ensure noIndex and noFollow are boolean with defaults
