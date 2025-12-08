@@ -127,36 +127,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          dispatch({ type: 'AUTH_START' });
-          const response = await authService.getCurrentUser();
-          if (response.success && response.data?.user) {
-            dispatch({
-              type: 'AUTH_SUCCESS',
-              payload: { user: response.data.user, token },
-            });
-          } else {
-            // Invalid token - clear it and logout
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            dispatch({ type: 'AUTH_LOGOUT' });
-          }
-        } catch (error) {
-          // Authentication failed - clear tokens and logout
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          dispatch({ type: 'AUTH_LOGOUT' });
-        }
-      } else {
-        // No token - ensure we're logged out
+    // Restore token and user from localStorage on mount
+    // Do NOT refresh the token or validate it - just restore what's stored
+    // Token validation will happen naturally when API calls are made
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    if (token && storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { user, token },
+        });
+      } catch (error) {
+        // Invalid stored data - clear it
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         dispatch({ type: 'AUTH_LOGOUT' });
       }
-    };
-
-    initializeAuth();
+    } else {
+      // No token - ensure we're logged out
+      dispatch({ type: 'AUTH_LOGOUT' });
+    }
   }, []);
 
   const login = async (email: string, password: string) => {
