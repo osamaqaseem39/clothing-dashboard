@@ -120,7 +120,7 @@ const Dashboard: React.FC = () => {
   const statsCards = [
     {
       name: 'Total Revenue',
-      value: stats ? formatCurrency(stats.totalRevenue) : '$0.00',
+      value: stats ? formatCurrency(stats.totalRevenue) : '₨0.00',
       change: '+20.1%',
       changeType: 'positive' as const,
       icon: CurrencyDollarIcon,

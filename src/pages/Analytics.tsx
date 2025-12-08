@@ -216,7 +216,7 @@ const Analytics: React.FC = () => {
                   <div className="text-2xl font-semibold text-gray-900">
                     {revenueData.length > 0 
                       ? formatCurrency(revenueData.reduce((sum, item) => sum + (item.revenue || 0), 0))
-                      : '$0.00'
+                      : formatCurrency(0)
                     }
                   </div>
                                       <div className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
@@ -509,10 +509,10 @@ const Analytics: React.FC = () => {
                         revenueData.reduce((sum, item) => sum + (item.revenue || 0), 0) /
                         ordersData.reduce((sum, item) => sum + (item.orders || 0), 0)
                       )
-                    : '$0.00'
+                    : formatCurrency(0)
                   }
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$45.20</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(45.20)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">+12.5%</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <ArrowTrendingUpIcon className="h-5 w-5 text-green-500" />

@@ -151,7 +151,7 @@ const CheckoutPage: React.FC = () => {
         discountTotal: 0,
         shippingTotal: 0, // Calculate based on shipping method
         taxTotal: 0, // Calculate based on location
-        currency: 'USD',
+        currency: 'PKR',
         billingAddress: formData.billingAddress,
         shippingAddress: formData.sameAsBilling 
           ? formData.billingAddress 
@@ -613,11 +613,11 @@ const CheckoutPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">$0.00</span>
+                  <span className="font-medium">{formatCurrency(0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">$0.00</span>
+                  <span className="font-medium">{formatCurrency(0)}</span>
                 </div>
                 <div className="border-t border-gray-200 pt-2">
                   <div className="flex justify-between text-lg font-semibold">

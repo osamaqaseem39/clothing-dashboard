@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { BellIcon, MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
@@ -8,6 +9,24 @@ const Header: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { user, logout } = useAuth();
   const { toggleSidebar } = useSidebar();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserMenuOpen]);
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -87,7 +106,7 @@ const Header: React.FC = () => {
           </div>
 
           {/* User menu */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
               type="button"
               className="flex items-center space-x-3 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -95,33 +114,67 @@ const Header: React.FC = () => {
             >
               <div className="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center">
                 <span className="text-primary-600 font-semibold text-sm">
-                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                  {user?.firstName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                  {user?.lastName?.charAt(0)?.toUpperCase() || ''}
                 </span>
               </div>
               <span className="hidden md:block text-sm font-medium text-gray-700">
-                {user?.firstName} {user?.lastName}
+                {user?.firstName && user?.lastName 
+                  ? `${user.firstName} ${user.lastName}`
+                  : user?.email || 'User'}
               </span>
             </button>
 
             {/* User dropdown */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                 <div className="py-1">
-                  <a
-                    href="/profile"
+                  {/* User info section */}
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary-600 font-semibold text-sm">
+                          {user?.firstName?.charAt(0)?.toUpperCase() || ''}{user?.lastName?.charAt(0)?.toUpperCase() || ''}
+                        </span>
+                      </div>
+                      <div className="ml-3 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {user?.firstName && user?.lastName 
+                            ? `${user.firstName} ${user.lastName}`
+                            : user?.email || 'User'}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user?.email || ''}
+                        </p>
+                        {user?.role && (
+                          <p className="text-xs text-gray-500 capitalize mt-0.5">
+                            {user.role}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Link
+                    to="/dashboard/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsUserMenuOpen(false)}
                   >
                     Your Profile
-                  </a>
-                  <a
-                    href="/settings"
+                  </Link>
+                  <Link
+                    to="/dashboard/settings"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsUserMenuOpen(false)}
                   >
                     Settings
-                  </a>
+                  </Link>
                   <div className="border-t border-gray-100" />
                   <button
-                    onClick={logout}
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      logout();
+                    }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Sign out

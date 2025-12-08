@@ -18,7 +18,6 @@ import {
   MapPinIcon,
   QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
-import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import Tooltip from '../ui/Tooltip';
 
@@ -32,7 +31,6 @@ interface SidebarItem {
 const Sidebar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
   const { isCollapsed, toggleSidebar } = useSidebar();
 
   const navigation: SidebarItem[] = [
@@ -137,25 +135,6 @@ const Sidebar: React.FC = () => {
             )}
           </button>
         </div>
-        
-        {/* User info */}
-        {!isCollapsed && (
-          <div className="mt-5 px-4">
-            <div className="flex items-center">
-              <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 font-semibold text-sm">
-                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                </span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">
-                  {user?.firstName} {user?.lastName}
-                </p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Navigation */}
         <nav className={`mt-8 flex-1 space-y-1 px-2 ${isCollapsed ? 'px-1' : ''}`}>

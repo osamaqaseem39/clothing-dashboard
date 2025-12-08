@@ -5,7 +5,6 @@ import {
   ClockIcon,
   BanknotesIcon,
   CubeIcon,
-  CurrencyDollarIcon,
   PlusIcon,
   MinusIcon
 } from '@heroicons/react/24/outline';
@@ -331,7 +330,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               Regular Price *
             </label>
             <div className="relative">
-              <CurrencyDollarIcon className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 pointer-events-none" />
+              <span className="absolute left-3 top-3.5 text-gray-400 pointer-events-none font-medium">₨</span>
               <input
                 type="number"
                 step="0.01"
@@ -356,7 +355,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               Sale Price
             </label>
             <div className="relative">
-              <CurrencyDollarIcon className="absolute left-3 top-3.5 h-5 w-5 text-orange-400 pointer-events-none" />
+              <span className="absolute left-3 top-3.5 text-orange-400 pointer-events-none font-medium">₨</span>
               <input
                 type="number"
                 step="0.01"
@@ -383,7 +382,7 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
               Cost Price
             </label>
             <div className="relative">
-              <CurrencyDollarIcon className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 pointer-events-none" />
+              <span className="absolute left-3 top-3.5 text-gray-400 pointer-events-none font-medium">₨</span>
               <input
                 type="number"
                 step="0.01"
