@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PlusIcon,
@@ -15,6 +15,7 @@ import type { Product, Category, ProductFilters as ProductFiltersType } from '..
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import ProductFilters from '../components/products/ProductFilters';
+import { useDebounce } from '../hooks/useDebounce';
 
 const Products: React.FC = () => {
   const navigate = useNavigate();
@@ -37,19 +38,18 @@ const Products: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProducts();
-    fetchSetupData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, filters]);
+  // Debounce search term to reduce API calls
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const fetchProducts = async () => {
+  // Memoize fetchProducts to prevent unnecessary re-creations
+  const fetchProducts = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       
       const response = await productService.getProducts({
         ...filters,
+        search: debouncedSearchTerm, // Use debounced search term
         page: currentPage,
         limit: 10,
       });
@@ -64,9 +64,9 @@ const Products: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, filters, debouncedSearchTerm]);
 
-  const fetchSetupData = async () => {
+  const fetchSetupData = useCallback(async () => {
     try {
       const categoriesResponse = await categoryService.getCategories();
       
@@ -76,7 +76,12 @@ const Products: React.FC = () => {
     } catch (error) {
       console.error('Error fetching setup data:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchSetupData();
+  }, [fetchProducts, fetchSetupData]);
 
   const handleDeleteProduct = async (product: Product) => {
     setProductToDelete(product);
@@ -113,10 +118,10 @@ const Products: React.FC = () => {
     navigate('/dashboard/products/new');
   };
 
-  const handleSearchChange = (value: string) => {
+  const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-    setFilters(prev => ({ ...prev, search: value }));
-  };
+    // Don't update filters immediately - let debounce handle it
+  }, []);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);

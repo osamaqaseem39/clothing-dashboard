@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   CheckCircleIcon, 
   XCircleIcon, 
@@ -29,7 +29,11 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
   onFieldChange,
   onSizeInventoryChange,
 }) => {
-  const hasSizes = formData.availableSizes && formData.availableSizes.length > 0;
+  // Memoize hasSizes to prevent unnecessary recalculations
+  const hasSizes = useMemo(() => 
+    formData.availableSizes && formData.availableSizes.length > 0,
+    [formData.availableSizes]
+  );
   
   // Initialize size-wise inventory state
   const [sizeInventory, setSizeInventory] = useState<SizeInventory[]>([]);
@@ -73,16 +77,19 @@ const ProductFormInventory: React.FC<ProductFormInventoryProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sizeInventory, hasSizes, formData.stockQuantity, onFieldChange]);
 
-  const handleSizeQuantityChange = (size: string, quantity: number) => {
-    const updated = sizeInventory.map(si => 
-      si.size === size ? { ...si, quantity: Math.max(0, quantity) } : si
-    );
-    setSizeInventory(updated);
-    // Notify parent of size inventory changes
-    if (onSizeInventoryChange) {
-      onSizeInventoryChange(updated);
-    }
-  };
+  // Memoize handleSizeQuantityChange to prevent unnecessary re-renders
+  const handleSizeQuantityChange = useCallback((size: string, quantity: number) => {
+    setSizeInventory(prev => {
+      const updated = prev.map(si => 
+        si.size === size ? { ...si, quantity: Math.max(0, quantity) } : si
+      );
+      // Notify parent of size inventory changes
+      if (onSizeInventoryChange) {
+        onSizeInventoryChange(updated);
+      }
+      return updated;
+    });
+  }, [onSizeInventoryChange]);
 
   // Load existing size inventory from formData if available (for editing)
   useEffect(() => {
