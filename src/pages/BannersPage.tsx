@@ -73,8 +73,14 @@ const BannersPage: React.FC = () => {
     setError(null);
 
     try {
+      // Clean requiredSize to remove _id if it exists
+      const cleanRequiredSize = formData.requiredSize
+        ? { width: formData.requiredSize.width, height: formData.requiredSize.height }
+        : { width: 1920, height: 800 };
+
       const submitData: CreateBannerDto = {
         ...formData,
+        requiredSize: cleanRequiredSize,
         startDate: formData.startDate || undefined,
         endDate: formData.endDate || undefined,
       };
@@ -109,6 +115,11 @@ const BannersPage: React.FC = () => {
 
   const handleEdit = (banner: Banner) => {
     setEditingBanner(banner);
+    // Clean requiredSize to remove _id if it exists
+    const cleanRequiredSize = banner.requiredSize 
+      ? { width: banner.requiredSize.width, height: banner.requiredSize.height }
+      : { width: 1920, height: 800 };
+    
     setFormData({
       title: banner.title,
       subtitle: banner.subtitle || '',
@@ -122,7 +133,7 @@ const BannersPage: React.FC = () => {
       position: banner.position,
       startDate: banner.startDate ? new Date(banner.startDate).toISOString().split('T')[0] : '',
       endDate: banner.endDate ? new Date(banner.endDate).toISOString().split('T')[0] : '',
-      requiredSize: banner.requiredSize || { width: 1920, height: 800 },
+      requiredSize: cleanRequiredSize,
     });
     setShowForm(true);
   };
