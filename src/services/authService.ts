@@ -53,10 +53,24 @@ export const authService = {
     return response.data;
   },
 
-  // Logout (client-side)
-  logout(): void {
+  // Logout (client-side and optionally server-side)
+  async logout(): Promise<void> {
+    try {
+      // Optionally call backend logout endpoint (don't wait for it)
+      // This is fire-and-forget - we clear client-side regardless
+      api.post('/auth/logout').catch(() => {
+        // Ignore errors - we're logging out anyway
+      });
+    } catch (error) {
+      // Ignore errors - proceed with client-side logout
+    }
+    
+    // Clear all storage immediately
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.clear();
+    
+    // Redirect to login
     window.location.href = '/login';
   },
 }; 

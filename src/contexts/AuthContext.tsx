@@ -18,23 +18,38 @@ type AuthAction =
   | { type: 'CLEAR_ERROR' }
   | { type: 'UPDATE_USER'; payload: User };
 
-const initialState: AuthState = {
-  user: {
-    _id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com',
-    role: 'admin',
-    isActive: true,
-    addresses: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  token: 'mock-token',
-  isAuthenticated: true,
-  isLoading: false,
-  error: null,
+// Initialize state from localStorage if available
+const getInitialState = (): AuthState => {
+  const token = localStorage.getItem('token');
+  const userStr = localStorage.getItem('user');
+  
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      return {
+        user,
+        token,
+        isAuthenticated: true,
+        isLoading: true, // Will be set to false after verification
+        error: null,
+      };
+    } catch (error) {
+      // Invalid user data, clear it
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }
+  
+  return {
+    user: null,
+    token: null,
+    isAuthenticated: false,
+    isLoading: false,
+    error: null,
+  };
 };
+
+const initialState: AuthState = getInitialState();
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
   switch (action.type) {
@@ -124,12 +139,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               payload: { user: response.data.user, token },
             });
           } else {
-            dispatch({ type: 'AUTH_FAILURE', payload: 'Invalid token' });
+            // Invalid token - clear it and logout
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            dispatch({ type: 'AUTH_LOGOUT' });
           }
         } catch (error) {
-          dispatch({ type: 'AUTH_FAILURE', payload: 'Authentication failed' });
+          // Authentication failed - clear tokens and logout
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          dispatch({ type: 'AUTH_LOGOUT' });
         }
       } else {
+        // No token - ensure we're logged out
         dispatch({ type: 'AUTH_LOGOUT' });
       }
     };
@@ -180,9 +202,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    // Dispatch logout action first to update state immediately
     dispatch({ type: 'AUTH_LOGOUT' });
+    
+    // Clear all auth-related data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Clear any other potential storage items
+    sessionStorage.clear();
+    
+    // Call authService logout (which handles backend call and redirect)
+    await authService.logout();
   };
 
   const clearError = () => {
