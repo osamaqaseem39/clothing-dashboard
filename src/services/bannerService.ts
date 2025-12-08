@@ -57,13 +57,31 @@ export const bannerService = {
       const response = await api.get(`/banners?${params.toString()}`);
       const payload = response.data;
 
-      if (payload && payload.data) {
-        return payload as ApiResponse<Banner[]>;
+      // Handle paginated response structure: { data: [], total: 0, page: 1, limit: 100, totalPages: 0 }
+      if (payload && typeof payload === 'object') {
+        // Check if it's a paginated response with 'data' property
+        if ('data' in payload && Array.isArray(payload.data)) {
+          return {
+            success: true,
+            data: payload.data as Banner[],
+            message: 'Banners loaded successfully',
+          };
+        }
+        // Check if payload itself is an array (direct array response)
+        if (Array.isArray(payload)) {
+          return {
+            success: true,
+            data: payload as Banner[],
+            message: 'Banners loaded successfully',
+          };
+        }
       }
 
+      // Fallback - return empty array if structure is unexpected
+      console.warn('Unexpected response structure:', payload);
       return {
         success: true,
-        data: (Array.isArray(payload) ? payload : []) as Banner[],
+        data: [],
         message: 'Banners loaded successfully',
       };
     } catch (error: any) {

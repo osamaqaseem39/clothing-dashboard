@@ -48,14 +48,20 @@ const BannersPage: React.FC = () => {
     setError(null);
     try {
       const response = await bannerService.getAll(1, 100);
-      if (response.success && response.data) {
-        setBanners(response.data);
+      console.log('Banner service response:', response); // Debug log
+      if (response.success) {
+        if (Array.isArray(response.data)) {
+          setBanners(response.data);
+        } else {
+          console.warn('Response data is not an array:', response.data);
+          setBanners([]);
+        }
       } else {
         setError(response.message || 'Failed to load banners');
       }
     } catch (err: any) {
       console.error('Error loading banners:', err);
-      setError(err.response?.data?.message || 'Failed to load banners');
+      setError(err.response?.data?.message || err.message || 'Failed to load banners');
     } finally {
       setIsLoading(false);
     }
