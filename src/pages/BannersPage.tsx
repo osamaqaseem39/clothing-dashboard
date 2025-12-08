@@ -351,9 +351,10 @@ const BannersPage: React.FC = () => {
                     Image URL *
                   </label>
                   <ImageUpload
-                    value={formData.imageUrl}
-                    onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-                    folder="banners"
+                    existingImages={formData.imageUrl ? [formData.imageUrl] : []}
+                    onImageUpload={(url) => setFormData({ ...formData, imageUrl: url })}
+                    onImageRemove={() => setFormData({ ...formData, imageUrl: '' })}
+                    maxImages={1}
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Recommended size: {formData.requiredSize.width} x {formData.requiredSize.height}px
