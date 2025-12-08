@@ -1,5 +1,6 @@
 import React from 'react';
 import { Product, Category, Brand } from '../../types';
+import InfoIcon from '../ui/InfoIcon';
 
 interface ProductFormBasicProps {
   formData: Partial<Product>;
@@ -82,8 +83,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
         
         {/* Product Name */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             Product Name *
+            <InfoIcon content="Enter a clear, descriptive product name. This will be displayed to customers and used for SEO. Minimum 3 characters required." />
           </label>
           <input
             type="text"
@@ -102,8 +104,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
 
         {/* SKU */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             SKU *
+            <InfoIcon content="Stock Keeping Unit - unique identifier for inventory tracking. Use letters, numbers, dashes, underscores, and dots only." />
           </label>
           <input
             type="text"
@@ -122,8 +125,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
 
         {/* Description */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             Description *
+            <InfoIcon content="Detailed product description. Include key features, materials, care instructions, and any important details customers should know. Minimum 20 characters required." />
           </label>
           <textarea
             value={formData.description || ''}
@@ -142,8 +146,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
 
         {/* Short Description */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             Short Description
+            <InfoIcon content="Brief summary used in product cards, search results, and meta descriptions. Should be concise and compelling." />
           </label>
           <textarea
             value={formData.shortDescription || ''}
@@ -157,8 +162,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
         {/* Category and Brand */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
               Category
+              <InfoIcon content="Select the main category for this product. Categories help organize products and improve navigation. Products can appear in category listings and search results." />
             </label>
             <select
               value={getCategoryValue()}
@@ -182,8 +188,9 @@ const ProductFormBasic: React.FC<ProductFormBasicProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
               Brand
+              <InfoIcon content="Optional: Select the brand or manufacturer. Brands help customers filter and find products. Useful for brand-aware shoppers." />
             </label>
             <select
               value={getBrandValue()}

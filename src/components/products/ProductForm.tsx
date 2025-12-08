@@ -10,6 +10,7 @@ import AttributesModal from './modals/AttributesModal';
 import ImageUpload from '../common/ImageUpload';
 import QuickAddMasterDataModal from '../master-data/QuickAddMasterDataModal';
 import ProductFormSEO from './ProductFormSEO';
+import InfoIcon from '../ui/InfoIcon';
 import { 
   colorFamilyService,
   patternService,
@@ -744,8 +745,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Product Name *
+                <InfoIcon content="Enter a clear, descriptive product name. This will be displayed to customers and used for SEO. Minimum 3 characters required." />
               </label>
               <input
                 type="text"
@@ -760,8 +762,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Slug *
+                <InfoIcon content="URL-friendly version of the product name. Used in the product URL (e.g., /products/product-slug). Auto-generated from product name if left empty. Use lowercase letters, numbers, and hyphens only." />
               </label>
               <div className="flex gap-2">
                 <input
@@ -809,8 +812,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Product Type *
+                <InfoIcon content="Simple: Standard product with fixed price. Variable: Product with multiple variants (sizes, colors). Grouped: Collection of related products. External: Product sold on another website." />
               </label>
               <select
                 value={formData.type}
@@ -828,8 +832,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Category *
+                <InfoIcon content="Select the main category for this product. Categories help organize products and improve navigation. Products can appear in category listings and search results." />
               </label>
               <select
                 value={formData.categoryId}
@@ -849,8 +854,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Brand
+                <InfoIcon content="Optional: Select the brand or manufacturer. Brands help customers filter and find products. Useful for brand-aware shoppers." />
               </label>
               <select
                 value={formData.brandId}
@@ -867,8 +873,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Status
+                <InfoIcon content="Draft: Product is saved but not visible to customers. Published: Product is live and visible. Archived: Product is hidden but kept for records." />
               </label>
               <select
                 value={formData.status}
@@ -882,8 +889,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Description *
+                <InfoIcon content="Detailed product description. Include key features, materials, care instructions, and any important details customers should know. Minimum 20 characters required." />
               </label>
               <textarea
                 value={formData.description}
@@ -898,8 +906,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                 Short Description
+                <InfoIcon content="Brief summary (max 200 characters) used in product cards, search results, and meta descriptions. Should be concise and compelling." />
               </label>
               <textarea
                 value={formData.shortDescription}
@@ -995,8 +1004,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         SKU *
+                        <InfoIcon content="Stock Keeping Unit - unique identifier for inventory tracking. Use letters, numbers, dashes, underscores, and dots only." />
                       </label>
                       <input
                         type="text"
@@ -1027,8 +1037,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         Price *
+                        <InfoIcon content="Selling price for this variant. Must be greater than 0. This is the price customers will pay." />
                       </label>
                       <input
                         type="number"
@@ -1044,8 +1055,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         Compare Price
+                        <InfoIcon content="Original or MSRP price. If set, will be shown crossed out next to the selling price to show savings. Used for displaying discounts." />
                       </label>
                       <input
                         type="number"
@@ -1058,8 +1070,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         Cost Price
+                        <InfoIcon content="Internal cost price for profit margin calculations. Not visible to customers. Used for inventory and financial reporting." />
                       </label>
                       <input
                         type="number"
@@ -1209,7 +1222,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Fabric Type</label>
+                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    Fabric Type
+                    <InfoIcon content="Select the primary fabric or material used in this clothing item (e.g., Cotton, Silk, Linen). Helps customers understand product quality and care requirements." />
+                  </label>
                   <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Fabric' })}>+ Add new fabric type</button>
                 </div>
                 <select
@@ -1225,8 +1241,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   Collection
+                  <InfoIcon content="Optional collection name (e.g., 'Summer 2024', 'Eid Collection'). Used to group related products for marketing and display purposes." />
                 </label>
                 <input
                   type="text"
@@ -1239,7 +1256,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Occasion</label>
+                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    Occasion
+                    <InfoIcon content="Select the occasion this clothing is suitable for (e.g., Casual, Formal, Wedding, Party). Helps customers find appropriate clothing for their needs." />
+                  </label>
                   <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Occasion' })}>+ Add new occasion</button>
                 </div>
                 <select
@@ -1256,7 +1276,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Season</label>
+                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    Season
+                    <InfoIcon content="Select the season this clothing is designed for (e.g., Spring, Summer, Fall, Winter). Helps with seasonal collections and recommendations." />
+                  </label>
                   <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setQuickAdd({ type: 'Season' })}>+ Add new season</button>
                 </div>
                 <select

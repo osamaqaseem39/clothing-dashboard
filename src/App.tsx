@@ -37,6 +37,8 @@ import MasterDataPage from './pages/MasterDataPage';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import DeliveryChargesPage from './pages/DeliveryChargesPage';
+import BannersPage from './pages/BannersPage';
+import Help from './pages/Help';
 // Removed Cart, Checkout, Shop from dashboard
 
 // Protected Route Component
@@ -133,6 +135,8 @@ const AppContent: React.FC = () => {
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
           <Route path="delivery-charges" element={<DeliveryChargesPage />} />
+          <Route path="banners" element={<BannersPage />} />
+          <Route path="help" element={<Help />} />
         </Route>
 
         {/* Removed Shop, Cart, Checkout, and Order Confirmation routes */}

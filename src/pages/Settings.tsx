@@ -8,6 +8,7 @@ import {
   GlobeAltIcon,
   CheckCircleIcon,
   XCircleIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
@@ -61,6 +62,38 @@ const Settings: React.FC = () => {
     defaultCurrency: 'PKR',
     taxRate: 8.5,
     shippingCost: 5.99,
+  });
+
+  const [seoSettings, setSeoSettings] = useState({
+    // Google Metadata
+    metaTitle: '',
+    metaDescription: '',
+    metaKeywords: '',
+    // Open Graph
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    ogUrl: '',
+    ogType: 'website',
+    ogSiteName: '',
+    // Twitter Cards
+    twitterCard: 'summary_large_image',
+    twitterTitle: '',
+    twitterDescription: '',
+    twitterImage: '',
+    twitterSite: '',
+    twitterCreator: '',
+    // Analytics & Tracking
+    googleAnalyticsId: '',
+    googleTagManagerId: '',
+    googleSearchConsoleVerification: '',
+    facebookPixelId: '',
+    // Additional SEO
+    canonicalUrl: '',
+    robotsMeta: 'index, follow',
+    faviconUrl: '',
+    siteLogoUrl: '',
+    structuredData: '',
   });
 
   const handleStoreSettingsSave = async () => {
@@ -119,8 +152,23 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleSeoSettingsSave = async () => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccessMessage('SEO & Metadata settings updated successfully!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError('Failed to update SEO settings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const tabs = [
     { id: 'general', name: 'General', icon: BuildingStorefrontIcon },
+    { id: 'seo', name: 'SEO & Metadata', icon: MagnifyingGlassIcon },
     { id: 'user', name: 'User Profile', icon: UserIcon },
     { id: 'security', name: 'Security', icon: ShieldCheckIcon },
     { id: 'payment', name: 'Payment', icon: CreditCardIcon },
@@ -555,6 +603,399 @@ const Settings: React.FC = () => {
                   />
                 </button>
               </div>
+            </div>
+          </div>
+        );
+
+      case 'seo':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">SEO & Metadata Settings</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Configure SEO metadata, Open Graph tags, and analytics for your website
+              </p>
+            </div>
+
+            {/* Google Metadata */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Google Metadata</h4>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Meta Title
+                    <span className="text-xs text-gray-500 ml-2">(Recommended: 50-60 characters)</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={60}
+                    value={seoSettings.metaTitle}
+                    onChange={(e) => setSeoSettings({...seoSettings, metaTitle: e.target.value})}
+                    placeholder="Your website title"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">{seoSettings.metaTitle.length}/60 characters</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Meta Description
+                    <span className="text-xs text-gray-500 ml-2">(Recommended: 150-160 characters)</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    maxLength={160}
+                    value={seoSettings.metaDescription}
+                    onChange={(e) => setSeoSettings({...seoSettings, metaDescription: e.target.value})}
+                    placeholder="A brief description of your website"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">{seoSettings.metaDescription.length}/160 characters</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Meta Keywords
+                    <span className="text-xs text-gray-500 ml-2">(Comma-separated)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.metaKeywords}
+                    onChange={(e) => setSeoSettings({...seoSettings, metaKeywords: e.target.value})}
+                    placeholder="keyword1, keyword2, keyword3"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Open Graph */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Open Graph (Facebook, LinkedIn, etc.)</h4>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    OG Title
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.ogTitle}
+                    onChange={(e) => setSeoSettings({...seoSettings, ogTitle: e.target.value})}
+                    placeholder="Title for social media sharing"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    OG Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={seoSettings.ogDescription}
+                    onChange={(e) => setSeoSettings({...seoSettings, ogDescription: e.target.value})}
+                    placeholder="Description for social media sharing"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      OG Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={seoSettings.ogImage}
+                      onChange={(e) => setSeoSettings({...seoSettings, ogImage: e.target.value})}
+                      placeholder="https://example.com/image.jpg"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Recommended: 1200x630px</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      OG URL
+                    </label>
+                    <input
+                      type="url"
+                      value={seoSettings.ogUrl}
+                      onChange={(e) => setSeoSettings({...seoSettings, ogUrl: e.target.value})}
+                      placeholder="https://example.com"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      OG Type
+                    </label>
+                    <select
+                      value={seoSettings.ogType}
+                      onChange={(e) => setSeoSettings({...seoSettings, ogType: e.target.value})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="website">Website</option>
+                      <option value="article">Article</option>
+                      <option value="product">Product</option>
+                      <option value="business.business">Business</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      OG Site Name
+                    </label>
+                    <input
+                      type="text"
+                      value={seoSettings.ogSiteName}
+                      onChange={(e) => setSeoSettings({...seoSettings, ogSiteName: e.target.value})}
+                      placeholder="Your site name"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Twitter Cards */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Twitter Cards</h4>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Twitter Card Type
+                  </label>
+                  <select
+                    value={seoSettings.twitterCard}
+                    onChange={(e) => setSeoSettings({...seoSettings, twitterCard: e.target.value})}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  >
+                    <option value="summary">Summary</option>
+                    <option value="summary_large_image">Summary Large Image</option>
+                    <option value="app">App</option>
+                    <option value="player">Player</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Twitter Title
+                    </label>
+                    <input
+                      type="text"
+                      value={seoSettings.twitterTitle}
+                      onChange={(e) => setSeoSettings({...seoSettings, twitterTitle: e.target.value})}
+                      placeholder="Title for Twitter"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Twitter Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={seoSettings.twitterImage}
+                      onChange={(e) => setSeoSettings({...seoSettings, twitterImage: e.target.value})}
+                      placeholder="https://example.com/twitter-image.jpg"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Twitter Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={seoSettings.twitterDescription}
+                    onChange={(e) => setSeoSettings({...seoSettings, twitterDescription: e.target.value})}
+                    placeholder="Description for Twitter"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Twitter Site (@username)
+                    </label>
+                    <input
+                      type="text"
+                      value={seoSettings.twitterSite}
+                      onChange={(e) => setSeoSettings({...seoSettings, twitterSite: e.target.value})}
+                      placeholder="@yourusername"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Twitter Creator (@username)
+                    </label>
+                    <input
+                      type="text"
+                      value={seoSettings.twitterCreator}
+                      onChange={(e) => setSeoSettings({...seoSettings, twitterCreator: e.target.value})}
+                      placeholder="@creatorusername"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Analytics & Tracking */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Analytics & Tracking</h4>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Google Analytics ID
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.googleAnalyticsId}
+                    onChange={(e) => setSeoSettings({...seoSettings, googleAnalyticsId: e.target.value})}
+                    placeholder="G-XXXXXXXXXX or UA-XXXXXXXXX-X"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Google Tag Manager ID
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.googleTagManagerId}
+                    onChange={(e) => setSeoSettings({...seoSettings, googleTagManagerId: e.target.value})}
+                    placeholder="GTM-XXXXXXX"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Google Search Console Verification
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.googleSearchConsoleVerification}
+                    onChange={(e) => setSeoSettings({...seoSettings, googleSearchConsoleVerification: e.target.value})}
+                    placeholder="Verification code"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Facebook Pixel ID
+                  </label>
+                  <input
+                    type="text"
+                    value={seoSettings.facebookPixelId}
+                    onChange={(e) => setSeoSettings({...seoSettings, facebookPixelId: e.target.value})}
+                    placeholder="123456789012345"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Additional SEO */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Additional SEO Settings</h4>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Canonical URL
+                  </label>
+                  <input
+                    type="url"
+                    value={seoSettings.canonicalUrl}
+                    onChange={(e) => setSeoSettings({...seoSettings, canonicalUrl: e.target.value})}
+                    placeholder="https://example.com"
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Robots Meta Tag
+                  </label>
+                  <select
+                    value={seoSettings.robotsMeta}
+                    onChange={(e) => setSeoSettings({...seoSettings, robotsMeta: e.target.value})}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  >
+                    <option value="index, follow">Index, Follow</option>
+                    <option value="index, nofollow">Index, No Follow</option>
+                    <option value="noindex, follow">No Index, Follow</option>
+                    <option value="noindex, nofollow">No Index, No Follow</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Favicon URL
+                    </label>
+                    <input
+                      type="url"
+                      value={seoSettings.faviconUrl}
+                      onChange={(e) => setSeoSettings({...seoSettings, faviconUrl: e.target.value})}
+                      placeholder="https://example.com/favicon.ico"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Site Logo URL
+                    </label>
+                    <input
+                      type="url"
+                      value={seoSettings.siteLogoUrl}
+                      onChange={(e) => setSeoSettings({...seoSettings, siteLogoUrl: e.target.value})}
+                      placeholder="https://example.com/logo.png"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Structured Data (JSON-LD)
+                    <span className="text-xs text-gray-500 ml-2">(Optional)</span>
+                  </label>
+                  <textarea
+                    rows={6}
+                    value={seoSettings.structuredData}
+                    onChange={(e) => setSeoSettings({...seoSettings, structuredData: e.target.value})}
+                    placeholder='{"@context": "https://schema.org", "@type": "Organization", ...}'
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Enter valid JSON-LD structured data</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-gray-200">
+              <button
+                onClick={handleSeoSettingsSave}
+                disabled={isLoading}
+                className="btn btn-primary"
+              >
+                {isLoading ? <LoadingSpinner size="sm" /> : 'Save Changes'}
+              </button>
             </div>
           </div>
         );

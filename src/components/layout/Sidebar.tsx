@@ -13,8 +13,10 @@ import {
   TruckIcon,
   PresentationChartLineIcon,
   WrenchScrewdriverIcon,
+  PhotoIcon,
   BuildingOfficeIcon,
   MapPinIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
@@ -43,8 +45,10 @@ const Sidebar: React.FC = () => {
     { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
     { name: 'Brands', href: '/dashboard/brands', icon: BuildingOfficeIcon },
     { name: 'Delivery Charges', href: '/dashboard/delivery-charges', icon: MapPinIcon },
+    { name: 'Banners', href: '/dashboard/banners', icon: PhotoIcon },
     { name: 'Analytics', href: '/dashboard/analytics', icon: PresentationChartLineIcon },
     { name: 'Settings', href: '/dashboard/settings', icon: WrenchScrewdriverIcon },
+    { name: 'Help', href: '/dashboard/help', icon: QuestionMarkCircleIcon },
   ];
 
   const isActive = (href: string) => {

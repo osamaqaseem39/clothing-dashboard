@@ -6,4 +6,5 @@ export { default as ErrorMessage } from './ErrorMessage';
 export { default as Table } from './Table';
 export { default as Pagination } from './Pagination';
 export { default as SearchInput } from './SearchInput';
-export { default as StatsCard } from './StatsCard'; 
+export { default as StatsCard } from './StatsCard';
+export { default as InfoIcon } from './InfoIcon'; 

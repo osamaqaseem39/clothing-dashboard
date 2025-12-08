@@ -3,6 +3,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import { Product } from '../../types';
 import ImageUpload from '../common/ImageUpload';
 import KeywordsModal from './modals/KeywordsModal';
+import InfoIcon from '../ui/InfoIcon';
 
 interface ProductFormSEOProps {
   formData: Partial<Product> | any; // Allow flexible form data type
@@ -26,8 +27,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
         
         {/* SEO Title */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             SEO Title
+            <InfoIcon content="Title shown in search engine results. Keep it 50-60 characters for optimal display. Should include important keywords and be compelling. Defaults to product name if empty." />
           </label>
           <div className="flex gap-2">
             <input
@@ -59,8 +61,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
 
         {/* SEO Slug */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             SEO Slug
+            <InfoIcon content="URL-friendly version for SEO. Uses lowercase letters, numbers, and hyphens. If empty, uses the main product slug. Should be descriptive and keyword-rich." />
           </label>
           <div className="flex gap-2">
             <input
@@ -102,8 +105,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
 
         {/* Meta Description */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             Meta Description
+            <InfoIcon content="Description shown in search engine results (150-160 characters recommended). Should be compelling and include key product benefits. Defaults to short description if empty." />
           </label>
           <div className="flex gap-2">
             <textarea
@@ -138,8 +142,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
         {/* Keywords */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
               Keywords
+              <InfoIcon content="Relevant search keywords for this product. Used for SEO and internal search. Add keywords that customers might use to find this product." />
             </label>
             <button
               type="button"
@@ -167,8 +172,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
 
         {/* Canonical URL */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             Canonical URL
+            <InfoIcon content="Preferred URL for this product page. Used to prevent duplicate content issues. Should be a full URL starting with http:// or https://. Leave empty to use default product URL." />
           </label>
           <div className="flex gap-2">
             <input
@@ -225,8 +231,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
 
         {/* Open Graph Image */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
             Open Graph Image
+            <InfoIcon content="Image shown when this product is shared on social media (Facebook, Twitter, etc.). Recommended size: 1200x630px. If not set, uses the first product image." />
           </label>
           <ImageUpload
             onImageUpload={(url) => onNestedFieldChange('seo', 'ogImage', url)}
@@ -238,8 +245,9 @@ const ProductFormSEO: React.FC<ProductFormSEOProps> = ({
 
         {/* SEO Options */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
             SEO Options
+            <InfoIcon content="No Index: Prevents search engines from indexing this product. No Follow: Prevents search engines from following links on this page. Use these for test products or pages you don't want in search results." />
           </label>
           <div className="space-y-3">
             <label className="flex items-center">

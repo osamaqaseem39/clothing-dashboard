@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { MasterDataItem, ApiResponse } from '../../services/masterDataService';
+import InfoIcon from '../ui/InfoIcon';
 
 interface MasterDataServiceType {
   getAll: () => Promise<ApiResponse<MasterDataItem[]>>;
@@ -225,8 +226,9 @@ const MasterDataFormPage: React.FC<MasterDataFormPageProps> = ({
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   {singularTitle} Name *
+                  <InfoIcon content={`Enter a unique name for this ${singularTitle.toLowerCase()}. This will be available for selection when creating or editing products.`} />
                 </label>
                 <input
                   type="text"
@@ -244,8 +246,9 @@ const MasterDataFormPage: React.FC<MasterDataFormPageProps> = ({
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   Description
+                  <InfoIcon content={`Optional description for this ${singularTitle.toLowerCase()}. Provides additional context and can help with organization.`} />
                 </label>
                 <textarea
                   value={formData.description}
@@ -261,16 +264,17 @@ const MasterDataFormPage: React.FC<MasterDataFormPageProps> = ({
 
               {/* Active Status */}
               <div>
-                <label className="flex items-center">
+                <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => handleFieldChange('isActive', e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <span className="ml-2 text-sm text-gray-700">
+                  <span className="text-sm text-gray-700">
                     Active (this {singularTitle.toLowerCase()} will be available for selection)
                   </span>
+                  <InfoIcon content={`When active, this ${singularTitle.toLowerCase()} will appear in dropdown lists when creating or editing products. Inactive items are hidden but not deleted.`} />
                 </label>
               </div>
 
