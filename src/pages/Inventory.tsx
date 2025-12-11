@@ -16,6 +16,15 @@ const Inventory: React.FC = () => {
   const [filteredInventory, setFilteredInventory] = useState<InventoryType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to extract productId from string or populated object
+  const extractProductId = (productId: any): string => {
+    if (!productId) return '';
+    if (typeof productId === 'string') return productId;
+    if (typeof productId === 'object' && productId._id) return productId._id.toString();
+    if (typeof productId === 'object' && productId.toString) return productId.toString();
+    return String(productId);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showForm, setShowForm] = useState(false);
@@ -132,8 +141,11 @@ const Inventory: React.FC = () => {
       
       // If size-wise stock is configured, update/create inventory for each size
       if (sizeWiseStock.length > 0) {
+        // Extract productId - handle both string and populated object
+        const productId = extractProductId(formData.productId);
+        
         // Get existing inventory items for this product
-        const existingInventory = await inventoryService.getInventoryByProduct(editingItem.productId);
+        const existingInventory = await inventoryService.getInventoryByProduct(productId);
         const existingItems = existingInventory.success && existingInventory.data ? existingInventory.data : [];
         
         // Update or create inventory for each size
@@ -227,10 +239,14 @@ const Inventory: React.FC = () => {
 
   const handleEditItem = async (item: InventoryType) => {
     setEditingItem(item);
+    
+    // Extract productId - handle both string and populated object
+    const productId = extractProductId(item.productId);
+    
     setFormData({
       productName: item.productName || '',
       sku: item.sku || '',
-      productId: item.productId || '',
+      productId: productId,
       size: item.size || '',
       currentStock: item.currentStock || 0,
       availableStock: item.availableStock || 0,
@@ -243,12 +259,12 @@ const Inventory: React.FC = () => {
     });
     
     // Load product to get available sizes
-    if (item.productId) {
-      await loadProductForSizes(item.productId);
+    if (productId) {
+      await loadProductForSizes(productId);
       
       // Load existing inventory for all sizes of this product
       try {
-        const existingInventory = await inventoryService.getInventoryByProduct(item.productId);
+        const existingInventory = await inventoryService.getInventoryByProduct(productId);
         const existingItems = existingInventory.success && existingInventory.data ? existingInventory.data : [];
         
         // If product has sizes, initialize size-wise stock for all sizes

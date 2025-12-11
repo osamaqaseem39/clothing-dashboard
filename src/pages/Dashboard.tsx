@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   CurrencyDollarIcon,
   ShoppingCartIcon,
@@ -6,6 +7,17 @@ import {
   UsersIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
+  PlusIcon,
+  PencilIcon,
+  ListBulletIcon,
+  TagIcon,
+  PhotoIcon,
+  CubeIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+  InformationCircleIcon,
+  TruckIcon,
+  RectangleStackIcon,
 } from '@heroicons/react/24/outline';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { dashboardService } from '../services/dashboardService';
@@ -14,6 +26,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [revenueData, setRevenueData] = useState<any[]>([]);
   const [ordersData, setOrdersData] = useState<any[]>([]);
@@ -148,6 +161,85 @@ const Dashboard: React.FC = () => {
     },
   ];
 
+  // Quick action buttons configuration
+  const quickActions = [
+    {
+      title: 'Products',
+      description: 'Manage your product catalog',
+      icon: ShoppingBagIcon,
+      color: 'bg-blue-500 hover:bg-blue-600',
+      actions: [
+        { label: 'View All Products', path: '/dashboard/products', icon: ListBulletIcon },
+        { label: 'Add New Product', path: '/dashboard/products/new', icon: PlusIcon },
+      ],
+    },
+    {
+      title: 'Categories',
+      description: 'Organize products by categories',
+      icon: TagIcon,
+      color: 'bg-green-500 hover:bg-green-600',
+      actions: [
+        { label: 'View Categories', path: '/dashboard/categories', icon: ListBulletIcon },
+        { label: 'Add Category', path: '/dashboard/categories/new', icon: PlusIcon },
+      ],
+    },
+    {
+      title: 'Brands',
+      description: 'Manage product brands',
+      icon: CubeIcon,
+      color: 'bg-purple-500 hover:bg-purple-600',
+      actions: [
+        { label: 'View Brands', path: '/dashboard/brands', icon: ListBulletIcon },
+        { label: 'Add Brand', path: '/dashboard/brands/new', icon: PlusIcon },
+      ],
+    },
+    {
+      title: 'Inventory',
+      description: 'Track stock levels',
+      icon: RectangleStackIcon,
+      color: 'bg-orange-500 hover:bg-orange-600',
+      actions: [
+        { label: 'Manage Inventory', path: '/dashboard/inventory', icon: ListBulletIcon },
+      ],
+    },
+    {
+      title: 'Orders',
+      description: 'View and manage orders',
+      icon: ShoppingCartIcon,
+      color: 'bg-indigo-500 hover:bg-indigo-600',
+      actions: [
+        { label: 'View Orders', path: '/dashboard/orders', icon: ListBulletIcon },
+      ],
+    },
+    {
+      title: 'Banners',
+      description: 'Manage homepage banners',
+      icon: PhotoIcon,
+      color: 'bg-pink-500 hover:bg-pink-600',
+      actions: [
+        { label: 'Manage Banners', path: '/dashboard/banners', icon: ListBulletIcon },
+      ],
+    },
+    {
+      title: 'Master Data',
+      description: 'Colors, sizes, materials, etc.',
+      icon: Cog6ToothIcon,
+      color: 'bg-gray-500 hover:bg-gray-600',
+      actions: [
+        { label: 'View Master Data', path: '/dashboard/master-data', icon: ListBulletIcon },
+      ],
+    },
+    {
+      title: 'Analytics',
+      description: 'View sales and performance',
+      icon: ChartBarIcon,
+      color: 'bg-teal-500 hover:bg-teal-600',
+      actions: [
+        { label: 'View Analytics', path: '/dashboard/analytics', icon: ListBulletIcon },
+      ],
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -156,6 +248,90 @@ const Dashboard: React.FC = () => {
         <p className="mt-1 text-sm text-gray-500">
           Welcome back! Here's what's happening with your boutique today.
         </p>
+      </div>
+
+      {/* Quick Actions Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Quickly access common tasks and manage your store
+            </p>
+          </div>
+          <InformationCircleIcon className="h-5 w-5 text-gray-400" />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action) => (
+            <div
+              key={action.title}
+              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start space-x-3">
+                <div className={`${action.color} p-2 rounded-lg text-white`}>
+                  <action.icon className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">{action.title}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{action.description}</p>
+                  <div className="mt-3 space-y-1">
+                    {action.actions.map((btn) => (
+                      <button
+                        key={btn.label}
+                        onClick={() => navigate(btn.path)}
+                        className="w-full flex items-center justify-center space-x-1 text-xs px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-md transition-colors"
+                      >
+                        <btn.icon className="h-3.5 w-3.5" />
+                        <span>{btn.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Instructions Section */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Getting Started</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+            <div className="flex items-start space-x-2">
+              <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">
+                1
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Add Products</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Start by adding your products with images, prices, and descriptions
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-semibold">
+                2
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Organize Categories</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Create categories and assign products to help customers find items easily
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-semibold">
+                3
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Manage Inventory</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Track stock levels and set up alerts for low inventory items
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats cards */}

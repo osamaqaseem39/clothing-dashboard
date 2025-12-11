@@ -1,18 +1,47 @@
 import api from './api';
 import { ApiResponse, Inventory } from '../types';
 
+// Helper to extract productId from string or populated object
+function extractProductId(productId: any): string {
+  if (!productId) return '';
+  if (typeof productId === 'string') return productId;
+  if (typeof productId === 'object' && productId._id) return productId._id.toString();
+  if (typeof productId === 'object' && productId.toString) return productId.toString();
+  return String(productId);
+}
+
+// Normalize inventory item to ensure productId is always a string
+function normalizeInventoryItem(item: any): Inventory {
+  if (!item) return item;
+  return {
+    ...item,
+    productId: extractProductId(item.productId),
+  };
+}
+
 function normalizeInventoryResponse(payload: any): ApiResponse<Inventory[] | any> {
   // Already normalized shape
   if (payload && typeof payload === 'object' && 'success' in payload) {
+    // Normalize items in the response
+    if (payload.data && Array.isArray(payload.data)) {
+      payload.data = payload.data.map(normalizeInventoryItem);
+    }
     return payload;
   }
   // Array response
   if (Array.isArray(payload)) {
-    return { success: true, data: payload } as ApiResponse<Inventory[]>;
+    return { success: true, data: payload.map(normalizeInventoryItem) } as ApiResponse<Inventory[]>;
   }
   // Common paginated shape { data: [], total, page, limit, totalPages }
   if (payload && Array.isArray(payload.data)) {
-    return { success: true, data: payload.data } as ApiResponse<Inventory[]>;
+    return { 
+      success: true, 
+      data: payload.data.map(normalizeInventoryItem),
+      ...(payload.total !== undefined && { total: payload.total }),
+      ...(payload.page !== undefined && { page: payload.page }),
+      ...(payload.limit !== undefined && { limit: payload.limit }),
+      ...(payload.totalPages !== undefined && { totalPages: payload.totalPages }),
+    } as ApiResponse<Inventory[]>;
   }
   // Direct object
   return { success: true, data: [] as Inventory[] };
@@ -28,7 +57,7 @@ export const inventoryService = {
   // Get inventory by product ID
   async getInventoryByProduct(productId: string): Promise<ApiResponse<Inventory[]>> {
     const response = await api.get(`/inventory/product/${productId}`);
-    return response.data;
+    return normalizeInventoryResponse(response.data) as ApiResponse<Inventory[]>;
   },
 
   // Get low stock items
