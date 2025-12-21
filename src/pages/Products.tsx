@@ -8,6 +8,7 @@ import {
   TrashIcon,
   EyeIcon,
   ShoppingBagIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
@@ -41,15 +42,27 @@ const Products: React.FC = () => {
   // Debounce search term to reduce API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  // Reset page when search term changes
+  useEffect(() => {
+    if (debouncedSearchTerm !== filters.search) {
+      setCurrentPage(1);
+    }
+  }, [debouncedSearchTerm]);
+
   // Memoize fetchProducts to prevent unnecessary re-creations
   const fetchProducts = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       
+      // Only include search if it's at least 2 characters (backend requirement)
+      const searchFilter = debouncedSearchTerm && debouncedSearchTerm.trim().length >= 2 
+        ? debouncedSearchTerm.trim() 
+        : undefined;
+      
       const response = await productService.getProducts({
         ...filters,
-        search: debouncedSearchTerm, // Use debounced search term
+        search: searchFilter,
         page: currentPage,
         limit: 10,
       });
@@ -120,7 +133,8 @@ const Products: React.FC = () => {
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-    // Don't update filters immediately - let debounce handle it
+    // Reset to page 1 when search changes
+    setCurrentPage(1);
   }, []);
 
   const handleCategoryChange = (value: string) => {
@@ -205,12 +219,26 @@ const Products: React.FC = () => {
               <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search products by name, SKU, or description..."
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="pl-10 pr-10 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
+              {searchTerm && (
+                <button
+                  onClick={() => handleSearchChange('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  title="Clear search"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              )}
             </div>
+            {searchTerm && searchTerm.trim().length < 2 && (
+              <p className="mt-1 text-xs text-gray-500">
+                Type at least 2 characters to search
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             <select
